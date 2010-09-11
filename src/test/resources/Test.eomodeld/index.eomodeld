@@ -1,0 +1,18 @@
+{
+    EOModelVersion = "2.1"; 
+    adaptorName = JDBC; 
+    connectionDictionary = {}; 
+    entities = (
+        {
+            className = "com.wounit.model.DifferentClassNameForEntity"; 
+            name = EntityWithDifferentClassName; 
+        }, 
+        {className = "com.wounit.model.FooEntity"; name = FooEntity; }
+    ); 
+    userInfo = {
+        "_EntityModeler" = {
+            activeDatabaseConfigName = Default; 
+            databaseConfigs = {Default = {adaptorName = JDBC; prototypeEntityName = EOJDBCPrototypes; }; }; 
+        }; 
+    }; 
+}

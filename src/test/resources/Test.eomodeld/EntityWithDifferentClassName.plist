@@ -1,0 +1,9 @@
+{
+    attributes = ({allowsNull = N; name = id; prototypeName = id; }); 
+    attributesUsedForLocking = (id); 
+    className = "com.wounit.model.DifferentClassNameForEntity"; 
+    externalName = EntityWithDifferentClassName; 
+    fetchSpecificationDictionary = {}; 
+    name = EntityWithDifferentClassName; 
+    primaryKeyAttributes = (id); 
+}

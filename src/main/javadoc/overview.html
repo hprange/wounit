@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <TITLE>API Overview</TITLE>
+  </HEAD>
+  <BODY>
+    The WOBR Unit Test framework contains a set of utilities for testing WebObjects applications using JUnit 4.7 or later.
+    <P>
+    Here is a simple test case written using WOBR Unit Test capabilities.
+    <PRE>
+import static br.com.wobr.unittest.EOAssert.*;
+
+public class TestFoo {
+   &#64;Rule
+   public TemporaryEnterpriseObjectProvider provider = new TemporaryEnterpriseObjectProvider(&quot;FooModel&quot;);
+
+   &#64;Test
+   public void cantSaveWithNullProperty() {
+      Foo foo = provider.createInstance(Foo.class);
+
+      foo.setBar(null);
+
+      confirm(foo, cannotBeSavedBecause(&quot;The bar property cannot be null&quot;));
+   }
+}
+    </PRE>
+  </BODY>
+</HTML>
