@@ -22,7 +22,7 @@ import com.wounit.matchers.SaveChangesMatcher;
  * in order to write more readable code:
  * 
  * <pre>
- * import static br.com.wobr.unittest.EOAssert.*;
+ * import static com.wounit.EOAssert.*;
  * </pre>
  * 
  * The <code>EOAssert</code> class provides static methods to checks whether an
