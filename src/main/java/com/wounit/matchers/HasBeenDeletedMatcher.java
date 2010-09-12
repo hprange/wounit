@@ -19,7 +19,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * @param <T>
  *            a kind of <code>EOEnterpriseObject</code>
  */
-public class HasBeenDeletedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatcher<T> {
+class HasBeenDeletedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatcher<T> {
     private String status;
 
     public void describeTo(Description description) {

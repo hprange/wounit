@@ -1,19 +1,19 @@
-package com.wounit;
+package com.wounit.matchers;
 
-import static com.wounit.EOAssert.canBeDeleted;
-import static com.wounit.EOAssert.canBeSaved;
-import static com.wounit.EOAssert.cannotBeDeleted;
-import static com.wounit.EOAssert.cannotBeDeletedBecause;
-import static com.wounit.EOAssert.cannotBeSaved;
-import static com.wounit.EOAssert.cannotBeSavedBecause;
-import static com.wounit.EOAssert.confirm;
-import static com.wounit.EOAssert.doNotSaveChanges;
-import static com.wounit.EOAssert.doNotSaveChangesBecause;
-import static com.wounit.EOAssert.hasBeenDeleted;
-import static com.wounit.EOAssert.hasBeenSaved;
-import static com.wounit.EOAssert.hasNotBeenDeleted;
-import static com.wounit.EOAssert.hasNotBeenSaved;
-import static com.wounit.EOAssert.saveChanges;
+import static com.wounit.matchers.EOAssert.canBeDeleted;
+import static com.wounit.matchers.EOAssert.canBeSaved;
+import static com.wounit.matchers.EOAssert.cannotBeDeleted;
+import static com.wounit.matchers.EOAssert.cannotBeDeletedBecause;
+import static com.wounit.matchers.EOAssert.cannotBeSaved;
+import static com.wounit.matchers.EOAssert.cannotBeSavedBecause;
+import static com.wounit.matchers.EOAssert.confirm;
+import static com.wounit.matchers.EOAssert.doNotSaveChanges;
+import static com.wounit.matchers.EOAssert.doNotSaveChangesBecause;
+import static com.wounit.matchers.EOAssert.hasBeenDeleted;
+import static com.wounit.matchers.EOAssert.hasBeenSaved;
+import static com.wounit.matchers.EOAssert.hasNotBeenDeleted;
+import static com.wounit.matchers.EOAssert.hasNotBeenSaved;
+import static com.wounit.matchers.EOAssert.saveChanges;
 import static org.hamcrest.CoreMatchers.is;
 
 import org.junit.Before;

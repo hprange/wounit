@@ -12,7 +12,7 @@ import com.webobjects.eocontrol.EOEditingContext;
  * @param <T>
  *            a kind of <code>EOEditingContext</code>.
  */
-public class SaveChangesMatcher<T extends EOEditingContext> extends AbstractEnhancedTypeSafeMatcher<T> {
+class SaveChangesMatcher<T extends EOEditingContext> extends AbstractEnhancedTypeSafeMatcher<T> {
     public SaveChangesMatcher() {
 	super();
     }

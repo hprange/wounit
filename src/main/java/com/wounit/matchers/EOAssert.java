@@ -1,4 +1,4 @@
-package com.wounit;
+package com.wounit.matchers;
 
 import static org.hamcrest.CoreMatchers.not;
 
@@ -8,11 +8,6 @@ import org.hamcrest.StringDescription;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
-import com.wounit.matchers.CanBeDeletedMatcher;
-import com.wounit.matchers.CanBeSavedMatcher;
-import com.wounit.matchers.HasBeenDeletedMatcher;
-import com.wounit.matchers.HasBeenSavedMatcher;
-import com.wounit.matchers.SaveChangesMatcher;
 
 /**
  * This class is the entry point for writing assertions to WebObjects related

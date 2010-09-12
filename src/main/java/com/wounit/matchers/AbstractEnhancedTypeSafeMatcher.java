@@ -15,7 +15,7 @@ import org.junit.internal.matchers.TypeSafeMatcher;
  * @param T
  *            the type of the object to be matched
  */
-public abstract class AbstractEnhancedTypeSafeMatcher<T> extends TypeSafeMatcher<T> {
+abstract class AbstractEnhancedTypeSafeMatcher<T> extends TypeSafeMatcher<T> {
     protected Exception exception;
 
     protected final String message;

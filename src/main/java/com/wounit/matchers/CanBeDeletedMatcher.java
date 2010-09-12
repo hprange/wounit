@@ -12,7 +12,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * @param <T>
  *            a kind of <code>EOEnterpriseObject</code>
  */
-public class CanBeDeletedMatcher<T extends EOEnterpriseObject> extends AbstractEnhancedTypeSafeMatcher<T> {
+class CanBeDeletedMatcher<T extends EOEnterpriseObject> extends AbstractEnhancedTypeSafeMatcher<T> {
     public CanBeDeletedMatcher() {
 	super();
     }

@@ -16,7 +16,7 @@ import com.webobjects.foundation.NSDictionary;
  * @param <T>
  *            a kind of <code>EOEnterpriseObject</code>
  */
-public class HasBeenSavedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatcher<T> {
+class HasBeenSavedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatcher<T> {
     private String status;
 
     public void describeTo(Description description) {
