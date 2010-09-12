@@ -15,8 +15,7 @@ import org.junit.internal.matchers.TypeSafeMatcher;
  * @param T
  *            the type of the object to be matched
  */
-public abstract class AbstractEnhancedTypeSafeMatcher<T> extends
-	TypeSafeMatcher<T> {
+public abstract class AbstractEnhancedTypeSafeMatcher<T> extends TypeSafeMatcher<T> {
     protected Exception exception;
 
     protected final String message;
@@ -35,7 +34,7 @@ public abstract class AbstractEnhancedTypeSafeMatcher<T> extends
      * @param message
      *            the expected exception message
      */
-    public AbstractEnhancedTypeSafeMatcher(final String message) {
+    public AbstractEnhancedTypeSafeMatcher(String message) {
 	this.message = message;
     }
 
@@ -45,7 +44,7 @@ public abstract class AbstractEnhancedTypeSafeMatcher<T> extends
      * @see org.junit.internal.matchers.TypeSafeMatcher#matchesSafely(java.lang.Object)
      */
     @Override
-    public final boolean matchesSafely(final T item) {
+    public final boolean matchesSafely(T item) {
 	try {
 	    matchesWithPossibleException(item);
 	} catch (Exception exception) {
@@ -72,6 +71,5 @@ public abstract class AbstractEnhancedTypeSafeMatcher<T> extends
      *             the <code>Exception</code> produced while trying to evaluate
      *             the matching condition
      */
-    protected abstract void matchesWithPossibleException(T item)
-	    throws Exception;
+    protected abstract void matchesWithPossibleException(T item) throws Exception;
 }

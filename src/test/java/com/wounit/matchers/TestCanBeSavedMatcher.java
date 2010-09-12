@@ -28,40 +28,31 @@ public class TestCanBeSavedMatcher {
 
     @Test
     public void descriptionForCanBeSavedFailure() throws Exception {
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("valid for save enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"error\""));
+	assertThat(mockDescription.toString(), is("valid for save enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"error\""));
     }
 
     @Test
     public void descriptionForCanBeSavedSuccess() throws Exception {
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("valid for save enterprise object\n     but got: a valid one"));
+	assertThat(mockDescription.toString(), is("valid for save enterprise object\n     but got: a valid one"));
     }
 
     @Test
     public void descriptionForCanBeSavedWithMessageFailure() throws Exception {
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>("An expected error");
 
-	Mockito.doThrow(
-		new NSValidation.ValidationException("An unexpectedError"))
-		.when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("An unexpectedError")).when(mockObject).validateForSave();
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("expecting exception other than \"An expected error\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"An unexpectedError\""));
+	assertThat(mockDescription.toString(), is("expecting exception other than \"An expected error\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"An unexpectedError\""));
     }
 
     @Test
@@ -70,9 +61,7 @@ public class TestCanBeSavedMatcher {
 
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("expecting exception other than \"An expected error\"\n     but got: no validation exception"));
+	assertThat(mockDescription.toString(), is("expecting exception other than \"An expected error\"\n     but got: no validation exception"));
     }
 
     @Test
@@ -86,8 +75,7 @@ public class TestCanBeSavedMatcher {
 
     @Test
     public void matchesCannotBeSaved() throws Exception {
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -98,8 +86,7 @@ public class TestCanBeSavedMatcher {
     public void matchesCannotBeSavedWithMatchingMessage() throws Exception {
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>("error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -110,8 +97,7 @@ public class TestCanBeSavedMatcher {
     public void matchesCannotBeSavedWithNoMatchingMessage() throws Exception {
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>("another error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
 
 	boolean result = matcher.matchesSafely(mockObject);
 

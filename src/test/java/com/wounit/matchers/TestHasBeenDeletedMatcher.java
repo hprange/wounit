@@ -32,17 +32,14 @@ public class TestHasBeenDeletedMatcher {
 
     @Test
     public void descriptionForHasBeenDeleted() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
 
-	Mockito.when(mockEditingContext.deletedObjects()).thenReturn(
-		NSArray.<EOEnterpriseObject> emptyArray());
+	Mockito.when(mockEditingContext.deletedObjects()).thenReturn(NSArray.<EOEnterpriseObject> emptyArray());
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(mockDescription.toString(),
-		is("deleted object\n     but got: an active object"));
+	assertThat(mockDescription.toString(), is("deleted object\n     but got: an active object"));
     }
 
     @Test
@@ -50,20 +47,16 @@ public class TestHasBeenDeletedMatcher {
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(mockDescription.toString(),
-		is("deleted object\n     but got: a deleted object"));
+	assertThat(mockDescription.toString(), is("deleted object\n     but got: a deleted object"));
     }
 
     @Test
     public void matchesHasBeenDeleted() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
 
-	NSArray<EOEnterpriseObject> deletedObjects = new NSArray<EOEnterpriseObject>(
-		mockObject);
+	NSArray<EOEnterpriseObject> deletedObjects = new NSArray<EOEnterpriseObject>(mockObject);
 
-	Mockito.when(mockEditingContext.deletedObjects()).thenReturn(
-		deletedObjects);
+	Mockito.when(mockEditingContext.deletedObjects()).thenReturn(deletedObjects);
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -81,11 +74,9 @@ public class TestHasBeenDeletedMatcher {
 
     @Test
     public void matchesHasNotBeenDeleted() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
 
-	Mockito.when(mockEditingContext.deletedObjects()).thenReturn(
-		NSArray.<EOEnterpriseObject> emptyArray());
+	Mockito.when(mockEditingContext.deletedObjects()).thenReturn(NSArray.<EOEnterpriseObject> emptyArray());
 
 	boolean result = matcher.matchesSafely(mockObject);
 

@@ -34,8 +34,7 @@ public class TestEOAssert {
     private FooEntity foo;
 
     @Rule
-    public final TemporaryEnterpriseObjectProvider provider = new TemporaryEnterpriseObjectProvider(
-	    "Test");
+    public final TemporaryEnterpriseObjectProvider provider = new TemporaryEnterpriseObjectProvider("Test");
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -201,16 +200,14 @@ public class TestEOAssert {
 	thrown.expect(AssertionError.class);
 	thrown.expectMessage(is("\nExpected: not expecting exception other than \"This foo object can't be saved\" while saving the editing context\n     but got: no exception and the editing context was successfully saved"));
 
-	confirm(editingContext,
-		doNotSaveChangesBecause("This foo object can't be saved"));
+	confirm(editingContext, doNotSaveChangesBecause("This foo object can't be saved"));
     }
 
     @Test
     public void doNotSaveChangesWithMessageSuccess() throws Exception {
 	foo.setCanBeSaved(false);
 
-	confirm(editingContext,
-		doNotSaveChangesBecause("This foo object can't be saved"));
+	confirm(editingContext, doNotSaveChangesBecause("This foo object can't be saved"));
     }
 
     @Test

@@ -103,8 +103,7 @@ import com.wounit.matchers.SaveChangesMatcher;
  * <pre>
  * // Much safer check whether the editing context does not save changes
  * // successfully
- * confirm(editingContext,
- * 	doNotSaveChangesBecause(&quot;The bar property of Foo cannot be null&quot;));
+ * confirm(editingContext, doNotSaveChangesBecause(&quot;The bar property of Foo cannot be null&quot;));
  * </pre>
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
@@ -154,8 +153,7 @@ public class EOAssert {
      * @return a <code>Matcher</code> matching if the enterprise object can
      *         <b>NOT</b> be deleted
      */
-    public static Matcher<EOEnterpriseObject> cannotBeDeletedBecause(
-	    final String message) {
+    public static Matcher<EOEnterpriseObject> cannotBeDeletedBecause(String message) {
 	return not(new CanBeDeletedMatcher<EOEnterpriseObject>(message));
     }
 
@@ -178,8 +176,7 @@ public class EOAssert {
      * @return a <code>Matcher</code> matching if the enterprise object can
      *         <b>NOT</b> be saved
      */
-    public static Matcher<EOEnterpriseObject> cannotBeSavedBecause(
-	    final String message) {
+    public static Matcher<EOEnterpriseObject> cannotBeSavedBecause(String message) {
 	return not(new CanBeSavedMatcher<EOEnterpriseObject>(message));
     }
 
@@ -205,8 +202,7 @@ public class EOAssert {
      * @see org.hamcrest.CoreMatchers
      * @see org.junit.matchers.JUnitMatchers
      */
-    public static <T extends EOEnterpriseObject> void confirm(
-	    final T enterpriseObject, final Matcher<T> matcher) {
+    public static <T extends EOEnterpriseObject> void confirm(T enterpriseObject, Matcher<T> matcher) {
 	confirmImplementation(enterpriseObject, matcher);
     }
 
@@ -232,13 +228,11 @@ public class EOAssert {
      * @see org.hamcrest.CoreMatchers
      * @see org.junit.matchers.JUnitMatchers
      */
-    public static <T extends EOEditingContext> void confirm(
-	    final T editingContext, final Matcher<T> matcher) {
+    public static <T extends EOEditingContext> void confirm(T editingContext, Matcher<T> matcher) {
 	confirmImplementation(editingContext, matcher);
     }
 
-    private static <T> void confirmImplementation(final T actual,
-	    final Matcher<T> matcher) {
+    private static <T> void confirmImplementation(T actual, Matcher<T> matcher) {
 	if (matcher.matches(actual)) {
 	    return;
 	}
@@ -271,8 +265,7 @@ public class EOAssert {
      * @return a <code>Matcher</code> matching if the editing context can
      *         <b>NOT</b> be saved
      */
-    public static Matcher<EOEditingContext> doNotSaveChangesBecause(
-	    final String message) {
+    public static Matcher<EOEditingContext> doNotSaveChangesBecause(String message) {
 	return not(new SaveChangesMatcher<EOEditingContext>(message));
     }
 

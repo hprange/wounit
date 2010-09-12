@@ -28,53 +28,40 @@ public class TestCanBeDeletedMatcher {
 
     @Test
     public void descriptionForCanBeDeletedFailure() throws Exception {
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForDelete();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForDelete();
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("valid for delete enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"error\""));
+	assertThat(mockDescription.toString(), is("valid for delete enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"error\""));
     }
 
     @Test
     public void descriptionForCanBeDeletedSuccess() throws Exception {
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("valid for delete enterprise object\n     but got: a valid one"));
+	assertThat(mockDescription.toString(), is("valid for delete enterprise object\n     but got: a valid one"));
     }
 
     @Test
     public void descriptionForCanBeDeletedWithMessageFailure() throws Exception {
-	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>(
-		"An expected error");
+	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>("An expected error");
 
-	Mockito.doThrow(
-		new NSValidation.ValidationException("An unexpectedError"))
-		.when(mockObject).validateForDelete();
+	Mockito.doThrow(new NSValidation.ValidationException("An unexpectedError")).when(mockObject).validateForDelete();
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("expecting exception other than \"An expected error\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"An unexpectedError\""));
+	assertThat(mockDescription.toString(), is("expecting exception other than \"An expected error\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"An unexpectedError\""));
     }
 
     @Test
     public void descriptionForCanBeDeletedWithMessageSuccess() throws Exception {
-	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>(
-		"An expected error");
+	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>("An expected error");
 
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("expecting exception other than \"An expected error\"\n     but got: no validation exception"));
+	assertThat(mockDescription.toString(), is("expecting exception other than \"An expected error\"\n     but got: no validation exception"));
     }
 
     @Test
@@ -88,8 +75,7 @@ public class TestCanBeDeletedMatcher {
 
     @Test
     public void matchesCannotBeDeleted() throws Exception {
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForDelete();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForDelete();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -100,8 +86,7 @@ public class TestCanBeDeletedMatcher {
     public void matchesCannotBeDeletedWithNoMatchingMessage() throws Exception {
 	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>("another error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForDelete();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForDelete();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -112,8 +97,7 @@ public class TestCanBeDeletedMatcher {
     public void matchesCannotBeSavedWithMatchingMessage() throws Exception {
 	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>("error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("error"))
-		.when(mockObject).validateForDelete();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForDelete();
 
 	boolean result = matcher.matchesSafely(mockObject);
 

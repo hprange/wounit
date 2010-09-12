@@ -5,11 +5,11 @@ public class FooEntity extends _FooEntity {
 
     private boolean canBeSaved = true;
 
-    public void setCanBeDeleted(final boolean canBeDeleted) {
+    public void setCanBeDeleted(boolean canBeDeleted) {
 	this.canBeDeleted = canBeDeleted;
     }
 
-    public void setCanBeSaved(final boolean canBeSaved) {
+    public void setCanBeSaved(boolean canBeSaved) {
 	this.canBeSaved = canBeSaved;
     }
 

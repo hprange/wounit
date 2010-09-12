@@ -44,30 +44,24 @@ public class TestHasBeenSavedMatcher {
 
     @Test
     public void descriptionForHasBeenSaved() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
-	Mockito.when(mockEditingContext.globalIDForObject(mockObject))
-		.thenReturn(mockGlobalId);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
+	Mockito.when(mockEditingContext.globalIDForObject(mockObject)).thenReturn(mockGlobalId);
 	Mockito.when(mockGlobalId.isTemporary()).thenReturn(false);
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(mockDescription.toString(),
-		is("saved object\n     but got: an object with saved changes"));
+	assertThat(mockDescription.toString(), is("saved object\n     but got: an object with saved changes"));
     }
 
     @Test
     public void descriptionForHasNotBeenDeleted() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
 
-	assertThat(
-		mockDescription.toString(),
-		is("saved object\n     but got: an object with unsaved changes"));
+	assertThat(mockDescription.toString(), is("saved object\n     but got: an object with unsaved changes"));
     }
 
     @Test
@@ -82,10 +76,8 @@ public class TestHasBeenSavedMatcher {
 
     @Test
     public void matchesHasBeenSaved() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
-	Mockito.when(mockEditingContext.globalIDForObject(mockObject))
-		.thenReturn(mockGlobalId);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
+	Mockito.when(mockEditingContext.globalIDForObject(mockObject)).thenReturn(mockGlobalId);
 	Mockito.when(mockGlobalId.isTemporary()).thenReturn(false);
 
 	boolean result = matcher.matchesSafely(mockObject);
@@ -95,19 +87,14 @@ public class TestHasBeenSavedMatcher {
 
     @Test
     public void matchesHasNotBeenSavedWithChangesInSnapshot() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
-	Mockito.when(mockEditingContext.globalIDForObject(mockObject))
-		.thenReturn(mockGlobalId);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
+	Mockito.when(mockEditingContext.globalIDForObject(mockObject)).thenReturn(mockGlobalId);
 	Mockito.when(mockGlobalId.isTemporary()).thenReturn(false);
 
-	NSDictionary<String, Object> changes = new NSMutableDictionary<String, Object>(
-		"foo", "bar");
+	NSDictionary<String, Object> changes = new NSMutableDictionary<String, Object>("foo", "bar");
 
-	Mockito.when(mockObject.changesFromSnapshot(changes)).thenReturn(
-		changes);
-	Mockito.when(mockEditingContext.committedSnapshotForObject(mockObject))
-		.thenReturn(changes);
+	Mockito.when(mockObject.changesFromSnapshot(changes)).thenReturn(changes);
+	Mockito.when(mockEditingContext.committedSnapshotForObject(mockObject)).thenReturn(changes);
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -116,10 +103,8 @@ public class TestHasBeenSavedMatcher {
 
     @Test
     public void matchesHasNotBeenSavedWithNullGlobalId() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
-	Mockito.when(mockEditingContext.globalIDForObject(mockObject))
-		.thenReturn(null);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
+	Mockito.when(mockEditingContext.globalIDForObject(mockObject)).thenReturn(null);
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -128,10 +113,8 @@ public class TestHasBeenSavedMatcher {
 
     @Test
     public void matchesHasNotBeenSavedWithTemporaryGlobalId() throws Exception {
-	Mockito.when(mockObject.editingContext())
-		.thenReturn(mockEditingContext);
-	Mockito.when(mockEditingContext.globalIDForObject(mockObject))
-		.thenReturn(mockGlobalId);
+	Mockito.when(mockObject.editingContext()).thenReturn(mockEditingContext);
+	Mockito.when(mockEditingContext.globalIDForObject(mockObject)).thenReturn(mockGlobalId);
 	Mockito.when(mockGlobalId.isTemporary()).thenReturn(true);
 
 	boolean result = matcher.matchesSafely(mockObject);
@@ -145,8 +128,6 @@ public class TestHasBeenSavedMatcher {
 
 	mockDescription = new StringDescription();
 
-	Mockito.when(
-		mockObject.changesFromSnapshot(Matchers.any(NSDictionary.class)))
-		.thenReturn(NSDictionary.emptyDictionary());
+	Mockito.when(mockObject.changesFromSnapshot(Matchers.any(NSDictionary.class))).thenReturn(NSDictionary.emptyDictionary());
     }
 }

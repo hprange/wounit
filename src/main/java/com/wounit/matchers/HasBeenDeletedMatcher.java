@@ -19,16 +19,14 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * @param <T>
  *            a kind of <code>EOEnterpriseObject</code>
  */
-public class HasBeenDeletedMatcher<T extends EOEnterpriseObject> extends
-	TypeSafeMatcher<T> {
+public class HasBeenDeletedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatcher<T> {
     private String status;
 
-    public void describeTo(final Description description) {
-	description.appendText(String.format(
-		"deleted object\n     but got: %s object", status));
+    public void describeTo(Description description) {
+	description.appendText(String.format("deleted object\n     but got: %s object", status));
     }
 
-    private boolean isDeletedEO(final T eo) {
+    private boolean isDeletedEO(T eo) {
 	EOEditingContext editingContext = eo.editingContext();
 
 	if (editingContext == null) {
@@ -39,7 +37,7 @@ public class HasBeenDeletedMatcher<T extends EOEnterpriseObject> extends
     }
 
     @Override
-    public boolean matchesSafely(final T eo) {
+    public boolean matchesSafely(T eo) {
 	boolean isDeleted = isDeletedEO(eo);
 
 	status = isDeleted ? "a deleted" : "an active";

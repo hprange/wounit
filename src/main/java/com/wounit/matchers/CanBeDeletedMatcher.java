@@ -12,17 +12,16 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * @param <T>
  *            a kind of <code>EOEnterpriseObject</code>
  */
-public class CanBeDeletedMatcher<T extends EOEnterpriseObject> extends
-	AbstractEnhancedTypeSafeMatcher<T> {
+public class CanBeDeletedMatcher<T extends EOEnterpriseObject> extends AbstractEnhancedTypeSafeMatcher<T> {
     public CanBeDeletedMatcher() {
 	super();
     }
 
-    public CanBeDeletedMatcher(final String message) {
+    public CanBeDeletedMatcher(String message) {
 	super(message);
     }
 
-    public void describeTo(final Description description) {
+    public void describeTo(Description description) {
 	if (message != null) {
 	    description.appendText("expecting exception other than \"");
 	    description.appendText(message);
@@ -57,7 +56,7 @@ public class CanBeDeletedMatcher<T extends EOEnterpriseObject> extends
     }
 
     @Override
-    protected void matchesWithPossibleException(final T eo) throws Exception {
+    protected void matchesWithPossibleException(T eo) throws Exception {
 	eo.validateForDelete();
     }
 }

@@ -64,13 +64,12 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      * @param modelNames
      *            the name of all models required by unit tests.
      */
-    public TemporaryEnterpriseObjectProvider(final String... modelNames) {
+    public TemporaryEnterpriseObjectProvider(String... modelNames) {
 	fixJavaMemoryDictionary();
 
 	// Use Memory prototypes for tests. We don't want to set this
 	// information in the EOModel dictionary
-	ERXProperties.setStringForKey("EOMemoryPrototypes",
-		"dbEOPrototypesEntityGLOBAL");
+	ERXProperties.setStringForKey("EOMemoryPrototypes", "dbEOPrototypesEntityGLOBAL");
 
 	for (String modelName : modelNames) {
 	    loadModel(modelName);
@@ -152,15 +151,13 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      *            the class of the entity that should be instantiated
      * @return an instance of the given class
      */
-    public <T extends EOEnterpriseObject> T createInstance(final Class<T> clazz) {
+    public <T extends EOEnterpriseObject> T createInstance(Class<T> clazz) {
 	if (clazz == null) {
-	    throw new IllegalArgumentException(
-		    "Cannot create an instance for a null class.");
+	    throw new IllegalArgumentException("Cannot create an instance for a null class.");
 	}
 
 	try {
-	    return ERXEOControlUtilities.createAndInsertObject(
-		    temporaryEditingContext(), clazz);
+	    return ERXEOControlUtilities.createAndInsertObject(temporaryEditingContext(), clazz);
 	} catch (Exception exception) {
 	    // Ops. The entity name cannot be obtained based on the class name.
 	}
@@ -172,9 +169,7 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 
 	    entityName = (String) field.get(null);
 	} catch (Exception exception) {
-	    throw new IllegalArgumentException(
-		    "Cannot create an instance based on the provided class. Please, provide an entity name instead.",
-		    exception);
+	    throw new IllegalArgumentException("Cannot create an instance based on the provided class. Please, provide an entity name instead.", exception);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -195,15 +190,12 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      * @return an instance of the given entity named
      */
     @SuppressWarnings("unchecked")
-    public <T extends EOEnterpriseObject> T createInstance(
-	    final String entityName) {
+    public <T extends EOEnterpriseObject> T createInstance(String entityName) {
 	if (entityName == null) {
-	    throw new IllegalArgumentException(
-		    "Cannot create an instance for a null entity name.");
+	    throw new IllegalArgumentException("Cannot create an instance for a null entity name.");
 	}
 
-	return (T) EOUtilities.createAndInsertInstance(
-		temporaryEditingContext(), entityName);
+	return (T) EOUtilities.createAndInsertInstance(temporaryEditingContext(), entityName);
     }
 
     ERMemoryAdaptorContext currentAdaptorContext() {
@@ -213,19 +205,12 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 	    return null;
 	}
 
-	EODatabaseContext databaseContext = EOUtilities
-		.databaseContextForModelNamed(editingContext,
-			modelNames.objectAtIndex(0));
+	EODatabaseContext databaseContext = EOUtilities.databaseContextForModelNamed(editingContext, modelNames.objectAtIndex(0));
 
 	EOAdaptorContext adaptorContext = databaseContext.adaptorContext();
 
 	if (!(adaptorContext instanceof ERMemoryAdaptorContext)) {
-	    throw new IllegalStateException(
-		    String.format(
-			    "Expected %s, but got %s. Please, use the %s constructor to load all the required models for testing.",
-			    ERMemoryAdaptorContext.class.getName(),
-			    adaptorContext.getClass().getName(), this
-				    .getClass().getSimpleName()));
+	    throw new IllegalStateException(String.format("Expected %s, but got %s. Please, use the %s constructor to load all the required models for testing.", ERMemoryAdaptorContext.class.getName(), adaptorContext.getClass().getName(), this.getClass().getSimpleName()));
 	}
 
 	return (ERMemoryAdaptorContext) adaptorContext;
@@ -234,10 +219,9 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
     /**
      * @param object
      */
-    public void deleteInstance(final EOEnterpriseObject object) {
+    public void deleteInstance(EOEnterpriseObject object) {
 	if (object == null) {
-	    throw new IllegalArgumentException(
-		    "Cannot delete a null instance. Please, provide a valid enterprise object.");
+	    throw new IllegalArgumentException("Cannot delete a null instance. Please, provide a valid enterprise object.");
 	}
 
 	temporaryEditingContext().deleteObject(object);
@@ -250,8 +234,7 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
     private void fixJavaMemoryDictionary() {
 	NSBundle bundle = NSBundle.bundleForName("JavaMemoryAdaptor");
 
-	bundle._infoDictionary().takeValueForKey(
-		ERMemoryAdaptor.class.getName(), "EOAdaptorClassName");
+	bundle._infoDictionary().takeValueForKey(ERMemoryAdaptor.class.getName(), "EOAdaptorClassName");
     }
 
     /**
@@ -263,7 +246,7 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      *             if no model can be found with the specified name
      * @see EOModelGroup#defaultGroup();
      */
-    protected void loadModel(final String modelName) {
+    protected void loadModel(String modelName) {
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
 	EOModel model = modelGroup.modelNamed(modelName);
@@ -272,16 +255,14 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 	    return;
 	}
 
-	URL url = getClass().getResource(
-		"/Resources/" + modelName + ".eomodeld");
+	URL url = getClass().getResource("/Resources/" + modelName + ".eomodeld");
 
 	if (url == null) {
 	    url = getClass().getResource("/" + modelName + ".eomodeld");
 	}
 
 	if (url == null) {
-	    throw new IllegalArgumentException(String.format(
-		    "Cannot load model named '%s'", modelName));
+	    throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
 	}
 
 	modelGroup.addModelWithPathURL(url);
@@ -296,10 +277,7 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      */
     public EOEditingContext temporaryEditingContext() {
 	if (finished) {
-	    throw new IllegalStateException(
-		    String.format(
-			    "You cannot obtain an editing context instance after the %s disposal",
-			    this.getClass().getSimpleName()));
+	    throw new IllegalStateException(String.format("You cannot obtain an editing context instance after the %s disposal", this.getClass().getSimpleName()));
 	}
 
 	if (editingContext == null) {

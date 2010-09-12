@@ -12,17 +12,16 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * @param <T>
  *            a kind of <code>EOEnterpriseObject</code>
  */
-public class CanBeSavedMatcher<T extends EOEnterpriseObject> extends
-	AbstractEnhancedTypeSafeMatcher<T> {
+public class CanBeSavedMatcher<T extends EOEnterpriseObject> extends AbstractEnhancedTypeSafeMatcher<T> {
     public CanBeSavedMatcher() {
 	super();
     }
 
-    public CanBeSavedMatcher(final String message) {
+    public CanBeSavedMatcher(String message) {
 	super(message);
     }
 
-    public void describeTo(final Description description) {
+    public void describeTo(Description description) {
 	if (message == null) {
 	    description.appendText("valid for save enterprise object");
 	    description.appendText("\n     but got: ");
@@ -57,7 +56,7 @@ public class CanBeSavedMatcher<T extends EOEnterpriseObject> extends
     }
 
     @Override
-    protected void matchesWithPossibleException(final T eo) {
+    protected void matchesWithPossibleException(T eo) {
 	eo.validateForSave();
     }
 }

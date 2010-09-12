@@ -12,26 +12,23 @@ import com.webobjects.eocontrol.EOEditingContext;
  * @param <T>
  *            a kind of <code>EOEditingContext</code>.
  */
-public class SaveChangesMatcher<T extends EOEditingContext> extends
-	AbstractEnhancedTypeSafeMatcher<T> {
+public class SaveChangesMatcher<T extends EOEditingContext> extends AbstractEnhancedTypeSafeMatcher<T> {
     public SaveChangesMatcher() {
 	super();
     }
 
-    public SaveChangesMatcher(final String message) {
+    public SaveChangesMatcher(String message) {
 	super(message);
     }
 
-    public void describeTo(final Description description) {
+    public void describeTo(Description description) {
 	if (message != null) {
 	    description.appendText("expecting exception other than \"");
 	    description.appendText(message);
-	    description
-		    .appendText("\" while saving the editing context\n     but got: ");
+	    description.appendText("\" while saving the editing context\n     but got: ");
 
 	    if (exception == null) {
-		description
-			.appendText("no exception and the editing context was successfully saved");
+		description.appendText("no exception and the editing context was successfully saved");
 
 		return;
 	    }
@@ -45,8 +42,7 @@ public class SaveChangesMatcher<T extends EOEditingContext> extends
 	}
 
 	if (exception != null) {
-	    description
-		    .appendText("successfully saved editing context\n     but got: ");
+	    description.appendText("successfully saved editing context\n     but got: ");
 	    description.appendText(exception.getClass().getName());
 	    description.appendText(": \"");
 	    description.appendText(exception.getMessage());
@@ -55,13 +51,11 @@ public class SaveChangesMatcher<T extends EOEditingContext> extends
 	    return;
 	}
 
-	description
-		.appendText("successfully saved editing context\n     but got: a successfully saved editing context");
+	description.appendText("successfully saved editing context\n     but got: a successfully saved editing context");
     }
 
     @Override
-    protected void matchesWithPossibleException(final T editingContext)
-	    throws Exception {
+    protected void matchesWithPossibleException(T editingContext) throws Exception {
 	editingContext.saveChanges();
     }
 }
