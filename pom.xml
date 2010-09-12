@@ -46,7 +46,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.0</version>
 				</plugin>
@@ -54,21 +53,43 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
 					<!-- We must fork processes for each test case because some tests leave EOF in a dirty state -->
 					<forkMode>always</forkMode>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.8.0</version>
+				<configuration>
+					<header>src/etc/header.txt</header>
+					<excludes>
+						<exclude>LICENSE.txt</exclude>
+						<exclude>src/test/resources/**</exclude>
+					</excludes>
+					<properties>
+						<year>${project.inceptionYear}</year>
+						<email>hprange@gmail.com</email>
+					</properties>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -79,6 +100,8 @@
 			<artifactId>ERExtensions</artifactId>
 			<version>${wonder.version}</version>
 			<classifier>wo54</classifier>
+			<!-- Not really optional. But we don't want to require the exclusion of this transitive dependency when using WO 5.3.x -->
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>wonder.eoadaptors</groupId>
@@ -117,36 +140,37 @@
 	<reporting>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.6.1</version>
+				<version>2.7</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<linkJavadoc>true</linkJavadoc>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.4</version>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.3</version>
+				<version>2.5</version>
 				<configuration>
 					<linkXref>true</linkXref>
 					<targetJdk>1.5</targetJdk>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.4.2</version>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jdepend-maven-plugin</artifactId>
+				<version>2.6</version>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.0.1</version>
+				<version>2.3.1</version>
 				<configuration>
 					<xmlOutput>true</xmlOutput>
 					<effort>Max</effort>
