@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!-- Ant build file (http://ant.apache.org/) for Ant 1.6.2 or above. -->
+<!-- ====================================================================== -->
+
+<project name="wounit" default="package" basedir=".">
+
+	<!-- ====================================================================== -->
+	<!-- Build environment properties -->
+	<!-- ====================================================================== -->
+
+	<property file="build.properties" />
+	<property name="webobjects.lib" value="/Library/WebObjects/lib" />
+
+	<!-- ====================================================================== -->
+	<!-- Defining classpaths -->
+	<!-- ====================================================================== -->
+
+	<path id="build.classpath">
+		<pathelement location="${maven.repo.local}/ERExtensions-5.0.0-r10702-wo54.jar" />
+		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.0.0-r10702.jar" />
+		<pathelement location="${webobjects.lib}/JavaFoundation.jar" />
+		<pathelement location="${webobjects.lib}/JavaWebObjects.jar" />
+		<pathelement location="${webobjects.lib}/JavaXML.jar" />
+		<pathelement location="${webobjects.lib}/JavaEOControl.jar" />
+		<pathelement location="${webobjects.lib}/JavaEOAccess.jar" />
+		<pathelement location="${webobjects.lib}/JavaJDBCAdaptor.jar" />
+		<pathelement location="${webobjects.lib}/JavaWOJSPServlet.jar" />
+		<pathelement location="${maven.repo.local}/icu4j-3.8.jar" />
+		<pathelement location="${maven.repo.local}/log4j-1.2.14.jar" />
+		<pathelement location="${maven.repo.local}/slf4j-api-1.5.8.jar" />
+		<pathelement location="${maven.repo.local}/junit-4.8.1.jar" />
+		<pathelement location="${maven.repo.local}/JavaMemoryAdaptor-5.0.0-r10702.jar" />
+		<pathelement location="${maven.repo.local}/ognl-2.6.7.jar" />
+	</path>
+	<path id="build.test.classpath">
+		<pathelement location="${maven.repo.local}/ERExtensions-5.0.0-r10702-wo54.jar" />
+		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.0.0-r10702.jar" />
+		<pathelement location="${webobjects.lib}/JavaFoundation.jar" />
+		<pathelement location="${webobjects.lib}/JavaWebObjects.jar" />
+		<pathelement location="${webobjects.lib}/JavaXML.jar" />
+		<pathelement location="${webobjects.lib}/JavaEOControl.jar" />
+		<pathelement location="${webobjects.lib}/JavaEOAccess.jar" />
+		<pathelement location="${webobjects.lib}/JavaJDBCAdaptor.jar" />
+		<pathelement location="${webobjects.lib}/JavaWOJSPServlet.jar" />
+		<pathelement location="${maven.repo.local}/icu4j-3.8.jar" />
+		<pathelement location="${maven.repo.local}/log4j-1.2.14.jar" />
+		<pathelement location="${maven.repo.local}/slf4j-api-1.5.8.jar" />
+		<pathelement location="${maven.repo.local}/junit-4.8.1.jar" />
+		<pathelement location="${maven.repo.local}/JavaMemoryAdaptor-5.0.0-r10702.jar" />
+		<pathelement location="${maven.repo.local}/ognl-2.6.7.jar" />
+		<pathelement location="${maven.repo.local}/mockito-core-1.8.4.jar" />
+		<pathelement location="${maven.repo.local}/hamcrest-core-1.1.jar" />
+		<pathelement location="${maven.repo.local}/objenesis-1.0.jar" />
+		<pathelement location="${maven.repo.local}/ERPrototypes-5.0.0-r10702.jar" />
+	</path>
+
+	<!-- ====================================================================== -->
+	<!-- Cleaning up target -->
+	<!-- ====================================================================== -->
+
+	<target name="clean" description="Clean the output directory">
+		<delete dir="${maven.build.dir}" />
+	</target>
+
+	<target name="clean-libs" description="Clean the lib directory">
+		<delete dir="${maven.repo.local}" />
+	</target>
+
+	<target name="clean-all" depends="clean-libs, clean" description="Clean the output and lib directories">
+
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- Compilation target -->
+	<!-- ====================================================================== -->
+
+	<target name="compile" depends="get-deps" description="Compile the code">
+		<mkdir dir="${maven.build.outputDir}" />
+		<javac destdir="${maven.build.outputDir}" nowarn="false" debug="true" optimize="false" deprecation="true" target="1.5" verbose="false" fork="false" source="1.5">
+			<src>
+				<pathelement location="${maven.build.srcDir.0}" />
+			</src>
+			<classpath refid="build.classpath" />
+		</javac>
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- Test-compilation target -->
+	<!-- ====================================================================== -->
+
+	<target name="compile-tests" depends="compile" description="Compile the test code" unless="maven.test.skip">
+		<mkdir dir="${maven.build.testOutputDir}" />
+		<javac destdir="${maven.build.testOutputDir}" nowarn="false" debug="true" optimize="false" deprecation="true" target="1.5" verbose="false" fork="false" source="1.5">
+			<src>
+				<pathelement location="${maven.build.testDir.0}" />
+			</src>
+			<classpath>
+				<path refid="build.test.classpath" />
+				<pathelement location="${maven.build.outputDir}" />
+			</classpath>
+		</javac>
+		<copy todir="${maven.build.testOutputDir}">
+			<fileset dir="${maven.build.testResourceDir.0}" />
+		</copy>
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- Run all tests -->
+	<!-- ====================================================================== -->
+
+	<target name="test" depends="compile-tests" unless="junit.skipped" description="Run the test cases">
+		<mkdir dir="${maven.test.reports}" />
+		<junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="true" dir=".">
+			<sysproperty key="basedir" value="." />
+			<formatter type="xml" />
+			<formatter type="plain" usefile="false" />
+			<classpath>
+				<path refid="build.test.classpath" />
+				<pathelement location="${maven.build.outputDir}" />
+				<pathelement location="${maven.build.testOutputDir}" />
+			</classpath>
+			<batchtest todir="${maven.test.reports}" unless="test">
+				<fileset dir="${maven.build.testDir.0}">
+					<include name="**/Test*.java" />
+					<include name="**/*Test.java" />
+					<include name="**/*TestCase.java" />
+					<exclude name="**/*Abstract*Test.java" />
+				</fileset>
+			</batchtest>
+			<batchtest todir="${maven.test.reports}" if="test">
+				<fileset dir="${maven.build.testDir.0}">
+					<include name="**/${test}.java" />
+					<exclude name="**/*Abstract*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="test-junit-present">
+		<available classname="junit.framework.Test" property="junit.present" />
+	</target>
+
+	<target name="test-junit-status" depends="test-junit-present">
+		<condition property="junit.missing">
+			<and>
+				<isfalse value="${junit.present}" />
+				<isfalse value="${maven.test.skip}" />
+			</and>
+		</condition>
+		<condition property="junit.skipped">
+			<or>
+				<isfalse value="${junit.present}" />
+				<istrue value="${maven.test.skip}" />
+			</or>
+		</condition>
+	</target>
+
+	<target name="junit-missing" depends="test-junit-status" if="junit.missing">
+		<echo>=================================== WARNING ===================================</echo>
+		<echo> JUnit is not present in your $ANT_HOME/lib directory. Tests not executed.</echo>
+		<echo>===============================================================================</echo>
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- Javadoc target -->
+	<!-- ====================================================================== -->
+
+	<target name="javadoc" description="Generates the Javadoc of the application">
+		<javadoc sourcepath="${maven.build.srcDir.0}" packagenames="*" destdir="${maven.reporting.outputDirectory}/apidocs" access="protected" old="false" verbose="false" version="true" use="true"
+			author="true" splitindex="false" nodeprecated="false" nodeprecatedlist="false" notree="false" noindex="false" nohelp="false" nonavbar="false" serialwarn="false" charset="ISO-8859-1" linksource="false"
+			breakiterator="false" />
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- Package target -->
+	<!-- ====================================================================== -->
+
+	<target name="package" depends="compile,test" description="Package the application">
+		<jar jarfile="${maven.build.dir}/${maven.build.finalName}.jar" compress="true" index="false" basedir="${maven.build.outputDir}" excludes="**/package.html" />
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- A dummy target for the package named after the type it creates -->
+	<!-- ====================================================================== -->
+
+	<target name="jar" depends="package" description="Builds the jar for the application" />
+
+	<!-- ====================================================================== -->
+	<!-- Download dependencies target -->
+	<!-- ====================================================================== -->
+
+	<target name="test-offline">
+		<condition property="maven.mode.offline">
+			<equals arg1="${maven.settings.offline}" arg2="true" />
+		</condition>
+	</target>
+
+	<target name="get-deps" depends="test-offline" description="Download all dependencies" unless="maven.mode.offline">
+		<mkdir dir="${maven.repo.local}" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERExtensions/5.0.0-r10702/ERExtensions-5.0.0-r10702-wo54.jar" dest="${maven.repo.local}/ERExtensions-5.0.0-r10702-wo54.jar"
+			usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/JavaWOExtensions/5.0.0-r10702/JavaWOExtensions-5.0.0-r10702.jar" dest="${maven.repo.local}/JavaWOExtensions-5.0.0-r10702.jar"
+			usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/com/ibm/icu/icu4j/3.8/icu4j-3.8.jar" dest="${maven.repo.local}/icu4j-3.8.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/log4j/log4j/1.2.14/log4j-1.2.14.jar" dest="${maven.repo.local}/log4j-1.2.14.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar" dest="${maven.repo.local}/slf4j-api-1.5.8.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/junit/junit/4.8.1/junit-4.8.1.jar" dest="${maven.repo.local}/junit-4.8.1.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/eoadaptors/JavaMemoryAdaptor/5.0.0-r10702/JavaMemoryAdaptor-5.0.0-r10702.jar" dest="${maven.repo.local}/JavaMemoryAdaptor-5.0.0-r10702.jar"
+			usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/ognl/ognl/2.6.7/ognl-2.6.7.jar" dest="${maven.repo.local}/ognl-2.6.7.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/org/mockito/mockito-core/1.8.4/mockito-core-1.8.4.jar" dest="${maven.repo.local}/mockito-core-1.8.4.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar" dest="${maven.repo.local}/hamcrest-core-1.1.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://repo1.maven.org/maven2/org/objenesis/objenesis/1.0/objenesis-1.0.jar" dest="${maven.repo.local}/objenesis-1.0.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERPrototypes/5.0.0-r10702/ERPrototypes-5.0.0-r10702.jar" dest="${maven.repo.local}/ERPrototypes-5.0.0-r10702.jar"
+			usetimestamp="true" ignoreerrors="true" />
+	</target>
+
+	<!-- ====================================================================== -->
+	<!-- Help target -->
+	<!-- ====================================================================== -->
+
+	<target name="help">
+		<echo message="Please run: $ant -projecthelp" />
+	</target>
+
+</project>
