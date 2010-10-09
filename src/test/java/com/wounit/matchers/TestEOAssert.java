@@ -37,7 +37,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.webobjects.eocontrol.EOEditingContext;
 import com.wounit.model.FooEntity;
 import com.wounit.rules.TemporaryEditingContext;
 
@@ -46,7 +45,7 @@ import com.wounit.rules.TemporaryEditingContext;
  */
 public class TestEOAssert {
     @Rule
-    public final EOEditingContext editingContext = new TemporaryEditingContext("Test");
+    public final TemporaryEditingContext editingContext = new TemporaryEditingContext("Test");
 
     private FooEntity foo;
 

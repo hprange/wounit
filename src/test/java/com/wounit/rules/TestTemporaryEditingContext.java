@@ -20,6 +20,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +34,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.junit.runners.model.Statement;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -145,6 +150,54 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), notNullValue());
+    }
+
+    @Test
+    public void ensureEditingContextCleanUpIsTriggeredAfterTestExecution() throws Throwable {
+	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext(TEST_MODEL_NAME));
+
+	Statement mockStatement = mock(Statement.class);
+
+	InOrder inOrder = inOrder(editingContext, mockStatement);
+
+	editingContext.apply(mockStatement, null, null).evaluate();
+
+	inOrder.verify(mockStatement).evaluate();
+	inOrder.verify(editingContext).after();
+    }
+
+    @Test
+    public void ensureEditingContextCleanUpIsTriggeredEvenIfTestExecutionThrowsException() throws Throwable {
+	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext(TEST_MODEL_NAME));
+
+	Statement mockStatement = mock(Statement.class);
+
+	doThrow(new Throwable("test error")).when(mockStatement).evaluate();
+
+	InOrder inOrder = inOrder(editingContext, mockStatement);
+
+	try {
+	    editingContext.apply(mockStatement, null, null).evaluate();
+	} catch (Throwable exception) {
+	    // DO NOTHING
+	} finally {
+	    inOrder.verify(mockStatement).evaluate();
+	    inOrder.verify(editingContext).after();
+	}
+    }
+
+    @Test
+    public void ensureEditingContextInitializationIsTriggeredBeforeTestExecution() throws Throwable {
+	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext(TEST_MODEL_NAME));
+
+	Statement mockStatement = mock(Statement.class);
+
+	InOrder inOrder = inOrder(editingContext, mockStatement);
+
+	editingContext.apply(mockStatement, null, null).evaluate();
+
+	inOrder.verify(editingContext).before();
+	inOrder.verify(mockStatement).evaluate();
     }
 
     @Test

@@ -129,9 +129,20 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
 	}
     }
 
-    public Statement apply(Statement base, FrameworkMethod method, Object target) {
-	// TODO Auto-generated method stub
-	return null;
+    public Statement apply(final Statement base, FrameworkMethod method, Object target) {
+	return new Statement() {
+
+	    @Override
+	    public void evaluate() throws Throwable {
+		before();
+
+		try {
+		    base.evaluate();
+		} finally {
+		    after();
+		}
+	    }
+	};
     }
 
     protected void before() {
