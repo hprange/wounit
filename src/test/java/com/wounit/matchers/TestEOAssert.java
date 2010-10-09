@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -39,18 +39,16 @@ import org.junit.rules.ExpectedException;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.wounit.model.FooEntity;
-import com.wounit.rules.TemporaryEnterpriseObjectProvider;
+import com.wounit.rules.TemporaryEditingContext;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 public class TestEOAssert {
-    private EOEditingContext editingContext;
+    @Rule
+    public final EOEditingContext editingContext = new TemporaryEditingContext("Test");
 
     private FooEntity foo;
-
-    @Rule
-    public final TemporaryEnterpriseObjectProvider provider = new TemporaryEnterpriseObjectProvider("Test");
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -332,8 +330,6 @@ public class TestEOAssert {
 
     @Before
     public void setup() {
-	foo = provider.createInstance(FooEntity.class);
-
-	editingContext = provider.temporaryEditingContext();
+	foo = FooEntity.createFooEntity(editingContext);
     }
 }

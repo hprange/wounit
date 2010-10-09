@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,27 +16,25 @@
 
 package com.wounit.rules;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.rules.ExternalResource;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 
 import com.webobjects.eoaccess.EOAdaptorContext;
 import com.webobjects.eoaccess.EODatabaseContext;
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eoaccess.EOUtilities;
-import com.webobjects.eocontrol.EOEditingContext;
-import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSBundle;
 
 import er.extensions.eof.ERXEC;
-import er.extensions.eof.ERXEOControlUtilities;
 import er.extensions.foundation.ERXProperties;
 import er.memoryadaptor.ERMemoryAdaptor;
 import er.memoryadaptor.ERMemoryAdaptorContext;
@@ -65,12 +63,8 @@ import er.memoryadaptor.ERMemoryAdaptorContext;
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public class TemporaryEnterpriseObjectProvider extends ExternalResource {
+public class TemporaryEditingContext extends ERXEC implements MethodRule {
     private final Map<String, String> adaptorsToRestore = new HashMap<String, String>();
-
-    private EOEditingContext editingContext;
-
-    private boolean finished = false;
 
     private final Collection<String> modelsToClear = new ArrayList<String>();
 
@@ -80,7 +74,7 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      * @param modelNames
      *            the name of all models required by unit tests.
      */
-    public TemporaryEnterpriseObjectProvider(String... modelNames) {
+    public TemporaryEditingContext(String... modelNames) {
 	fixJavaMemoryDictionary();
 
 	// Use Memory prototypes for tests. We don't want to set this
@@ -109,7 +103,6 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
      * 
      * @see org.junit.rules.ExternalResource#after()
      */
-    @Override
     protected void after() {
 	ERMemoryAdaptorContext adaptorContext = currentAdaptorContext();
 
@@ -117,10 +110,9 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 	    adaptorContext.resetAllEntities();
 	}
 
-	editingContext.revert();
-	editingContext.unlock();
-	editingContext.dispose();
-	editingContext = null;
+	revert();
+	unlock();
+	dispose();
 
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
@@ -135,83 +127,15 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 
 	    modelGroup.removeModel(model);
 	}
-
-	finished = true;
-
-	super.after();
     }
 
-    /**
-     * Initialize the temporary editing context provided for unit testing.
-     * 
-     * @see org.junit.rules.ExternalResource#before()
-     */
-    @Override
-    protected void before() throws Throwable {
-	super.before();
-
-	temporaryEditingContext();
+    public Statement apply(Statement base, FrameworkMethod method, Object target) {
+	// TODO Auto-generated method stub
+	return null;
     }
 
-    EOEditingContext createEditingContext() {
-	return ERXEC.newEditingContext();
-    }
-
-    /**
-     * Create an instance of the specified class and insert into the temporary
-     * editing context.
-     * 
-     * @param <T>
-     *            the static type of the instance that should be instantiated
-     * @param clazz
-     *            the class of the entity that should be instantiated
-     * @return an instance of the given class
-     */
-    public <T extends EOEnterpriseObject> T createInstance(Class<T> clazz) {
-	if (clazz == null) {
-	    throw new IllegalArgumentException("Cannot create an instance for a null class.");
-	}
-
-	try {
-	    return ERXEOControlUtilities.createAndInsertObject(temporaryEditingContext(), clazz);
-	} catch (Exception exception) {
-	    // Ops. The entity name cannot be obtained based on the class name.
-	}
-
-	String entityName = null;
-
-	try {
-	    Field field = clazz.getField("ENTITY_NAME");
-
-	    entityName = (String) field.get(null);
-	} catch (Exception exception) {
-	    throw new IllegalArgumentException("Cannot create an instance based on the provided class. Please, provide an entity name instead.", exception);
-	}
-
-	@SuppressWarnings("unchecked")
-	T instance = (T) createInstance(entityName);
-
-	return instance;
-    }
-
-    /**
-     * Create an instance of the specified entity named and insert into the
-     * temporary editing context.
-     * 
-     * @param <T>
-     *            the static type of the enterprise object returned by this
-     *            method
-     * @param entityName
-     *            the name of the entity that should be instantiated
-     * @return an instance of the given entity named
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends EOEnterpriseObject> T createInstance(String entityName) {
-	if (entityName == null) {
-	    throw new IllegalArgumentException("Cannot create an instance for a null entity name.");
-	}
-
-	return (T) EOUtilities.createAndInsertInstance(temporaryEditingContext(), entityName);
+    protected void before() {
+	lock();
     }
 
     ERMemoryAdaptorContext currentAdaptorContext() {
@@ -221,7 +145,7 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 	    return null;
 	}
 
-	EODatabaseContext databaseContext = EOUtilities.databaseContextForModelNamed(editingContext, modelNames.objectAtIndex(0));
+	EODatabaseContext databaseContext = EOUtilities.databaseContextForModelNamed(this, modelNames.objectAtIndex(0));
 
 	EOAdaptorContext adaptorContext = databaseContext.adaptorContext();
 
@@ -230,17 +154,6 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 	}
 
 	return (ERMemoryAdaptorContext) adaptorContext;
-    }
-
-    /**
-     * @param object
-     */
-    public void deleteInstance(EOEnterpriseObject object) {
-	if (object == null) {
-	    throw new IllegalArgumentException("Cannot delete a null instance. Please, provide a valid enterprise object.");
-	}
-
-	temporaryEditingContext().deleteObject(object);
     }
 
     /**
@@ -284,24 +197,5 @@ public class TemporaryEnterpriseObjectProvider extends ExternalResource {
 	modelGroup.addModelWithPathURL(url);
 
 	modelsToClear.add(modelName);
-    }
-
-    /**
-     * Get the temporary editing context to be used for unit testing.
-     * 
-     * @return an <code>EOEditingContext</code> that save changes in memory.
-     */
-    public EOEditingContext temporaryEditingContext() {
-	if (finished) {
-	    throw new IllegalStateException(String.format("You cannot obtain an editing context instance after the %s disposal", this.getClass().getSimpleName()));
-	}
-
-	if (editingContext == null) {
-	    editingContext = createEditingContext();
-
-	    editingContext.lock();
-	}
-
-	return editingContext;
     }
 }
