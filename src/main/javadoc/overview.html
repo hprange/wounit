@@ -30,11 +30,11 @@ import static com.wounit.EOAssert.*;
 
 public class TestFoo {
    &#64;Rule
-   public TemporaryEnterpriseObjectProvider provider = new TemporaryEnterpriseObjectProvider(&quot;FooModel&quot;);
+   public TemporaryEditingContext editingContext = new TemporaryEditingContext(&quot;FooModel&quot;);
 
    &#64;Test
    public void cantSaveWithNullProperty() {
-      Foo foo = provider.createInstance(Foo.class);
+      Foo foo = Foo.createFoo(editingContext);
 
       foo.setBar(null);
 

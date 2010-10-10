@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -36,7 +36,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * import static com.wounit.EOAssert.*;
  * </pre>
  * 
- * The <code>EOAssert</code> class provides static methods to checks whether an
+ * The <code>EOAssert</code> class provides static methods to check whether an
  * enterprise object can be saved or deleted and if it has been saved or
  * deleted.
  * <h4>Confirm that an enterprise object can/cannot be saved</h4>
@@ -52,7 +52,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * </pre>
  * 
  * <pre>
- * // Much safer check whether eo cannot be saved
+ * // Safer check whether eo cannot be saved
  * confirm(eo, cannotBeSavedBecause(&quot;The foo property cannot be null&quot;));
  * </pre>
  * 
@@ -69,7 +69,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * </pre>
  * 
  * <pre>
- * // Much safer check whether eo cannot be deleted
+ * // Safer check whether eo cannot be deleted
  * confirm(eo, cannotBeDeletedBecause(&quot;It is a required object&quot;));
  * </pre>
  * 
@@ -112,8 +112,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * </pre>
  * 
  * <pre>
- * // Much safer check whether the editing context does not save changes
- * // successfully
+ * // Safer check whether the editing context does not save changes successfully
  * confirm(editingContext, doNotSaveChangesBecause(&quot;The bar property of Foo cannot be null&quot;));
  * </pre>
  * 

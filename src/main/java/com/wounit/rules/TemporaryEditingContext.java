@@ -40,22 +40,20 @@ import er.memoryadaptor.ERMemoryAdaptor;
 import er.memoryadaptor.ERMemoryAdaptorContext;
 
 /**
- * The TemporaryEnterpriseObjectProvider Rule provide means to create temporary
- * enterprise object for unit testing. It uses an editing context configured
- * with the memory adaptor that is guaranteed to be reset when the test method
- * finishes (whether it passes or fails):
+ * The <code>TemporaryEditingContext</code> class provides means to create
+ * temporary enterprise object for unit testing. It produces an editing context
+ * configured with the memory adaptor settings that is guaranteed to be reset
+ * when the test method finishes (whether it passes or fails):
  * 
  * <pre>
  * public class TestMyModel {
  *     &#064;Rule
- *     public TemporaryEnterpriseObjectProvider provider = new TemporaryEnterpriseObjectProvider();
+ *     public TemporaryEditingContext editingContext = new TemporaryEditingContext(&quot;MyModel&quot;);
  * 
  *     &#064;Test
  *     public void testingMyModelLogic() throws Exception {
- * 	MyEntity instance = provider.createInstance(&quot;MyEntity&quot;);
+ * 	MyEntity instance = MyEntity.createMyEntity(editingContext);
  * 	// Do something with instance...
- * 	EOEditingContext editingContext = provider.temporaryEditingContext();
- * 	// Do something with editingContext...
  *     }
  * }
  * </pre>
@@ -69,7 +67,8 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
     private final Collection<String> modelsToClear = new ArrayList<String>();
 
     /**
-     * Creates a TemporaryEnterpriseObjectProvider rule.
+     * Creates a <code>TemporaryEditingContext</code> and loads all models with
+     * name specified by parameter.
      * 
      * @param modelNames
      *            the name of all models required by unit tests.
@@ -100,8 +99,6 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
 
     /**
      * Reset all changes made into the temporary editing context.
-     * 
-     * @see org.junit.rules.ExternalResource#after()
      */
     protected void after() {
 	ERMemoryAdaptorContext adaptorContext = currentAdaptorContext();
@@ -129,6 +126,12 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
 	}
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.junit.rules.MethodRule#apply(org.junit.runners.model.Statement,
+     * org.junit.runners.model.FrameworkMethod, java.lang.Object)
+     */
     public Statement apply(final Statement base, FrameworkMethod method, Object target) {
 	return new Statement() {
 
@@ -145,6 +148,9 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
 	};
     }
 
+    /**
+     * Set up the temporary editing context in order to execute the test case.
+     */
     protected void before() {
 	lock();
     }
