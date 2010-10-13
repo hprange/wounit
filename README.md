@@ -18,13 +18,13 @@ Requirements
 Features
 --------
 
-No Database Access Needed: all the logic is handled in memory for fast unit testing
+* *No Database Access Needed*: all the logic is handled in memory for fast unit testing
 and integration testing.
 
-Wonderful: developed on top of Wonder classes, make possible the use of the augmented
+* *Wonderful*: developed on top of Wonder classes, make possible the use of the augmented
 transaction process specified by the ERXEnterpriseObject interface.
 
-Easy to use: No extension required for test classes. The WOUnit library make use of
+* *Easy to use*: No extension required for test classes. The WOUnit library make use of
 the MethodRule approach provided by JUnit 4.7. It also load EOModels automatically.
 
 Installation
