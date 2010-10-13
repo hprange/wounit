@@ -11,8 +11,8 @@ Version: 1.0-beta-3
 Requirements
 ------------
 
-* [JUnit] (http://www.junit.org/) 4.7 or later
-* [Project Wonder] (http://wiki.objectstyle.org/confluence/display/WONDER/Home) 5
+* [JUnit](http://www.junit.org/) 4.7 or later
+* [Project Wonder](http://wiki.objectstyle.org/confluence/display/WONDER/Home) 5
 * WebObjects 5
 
 Features
@@ -65,6 +65,6 @@ Usage
 About
 -----
 
-Site: http://github.com/hprange/wounit
-E-mail: hprange at gmail.com
-Twitter: @hprange
+* Site: http://github.com/hprange/wounit
+* E-mail: hprange at gmail.com
+* Twitter: @hprange
