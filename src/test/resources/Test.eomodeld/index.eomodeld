@@ -3,6 +3,7 @@
     adaptorName = JDBC; 
     connectionDictionary = {}; 
     entities = (
+        {className = "com.wounit.model.CompoundKeyEntity"; name = CompoundKeyEntity; }, 
         {
             className = "com.wounit.model.DifferentClassNameForEntity"; 
             name = EntityWithDifferentClassName; 

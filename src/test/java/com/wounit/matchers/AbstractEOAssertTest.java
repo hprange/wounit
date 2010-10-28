@@ -38,14 +38,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.wounit.model.FooEntity;
-import com.wounit.rules.TemporaryEditingContext;
+import com.wounit.rules.AbstractEditingContextRule;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-public class TestEOAssert {
+public abstract class AbstractEOAssertTest {
     @Rule
-    public final TemporaryEditingContext editingContext = new TemporaryEditingContext("Test");
+    public final AbstractEditingContextRule editingContext = createEditingContext("Test");
 
     private FooEntity foo;
 
@@ -173,6 +173,8 @@ public class TestEOAssert {
 
 	confirm(foo, cannotBeSavedBecause("The wrong exception"));
     }
+
+    protected abstract AbstractEditingContextRule createEditingContext(String... modelNames);
 
     @Test
     public void doNotSaveChangesFailure() throws Exception {

@@ -17,48 +17,25 @@
 package com.wounit.rules;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.net.URL;
 
-import org.junit.After;
-import org.junit.Rule;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.model.Statement;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.foundation.NSArray;
-import com.wounit.model.FooEntity;
 
 import er.extensions.foundation.ERXProperties;
-import er.memoryadaptor.ERMemoryAdaptorContext;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
 public class TestTemporaryEditingContext extends AbstractEditingContextTest {
-    private static final String TEST_MODEL_NAME = "Test";
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
-
-    @SuppressWarnings("unused")
     @Test
+    @SuppressWarnings("unused")
     public void changeAdaptorForModelsNotLoadedByTemporaryEditingContext() throws Exception {
 	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
 
@@ -71,8 +48,8 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 	assertThat(model.adaptorName(), is("Memory"));
     }
 
-    @SuppressWarnings("unused")
     @Test
+    @SuppressWarnings("unused")
     public void changeAdaptorIfModelAlreadyLoadedWithDifferentAdaptor() throws Exception {
 	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
 
@@ -85,122 +62,34 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 	assertThat(model.adaptorName(), is("Memory"));
     }
 
-    @Test
-    public void clearEditingContextChangesAfterTestExecution() throws Exception {
-	TemporaryEditingContext editingContext = new TemporaryEditingContext(TEST_MODEL_NAME);
-
-	editingContext.before();
-
-	FooEntity foo = FooEntity.createFooEntity(editingContext);
-
-	foo.setBar("test");
-
-	editingContext.saveChanges();
-
-	editingContext.after();
-
-	editingContext = new TemporaryEditingContext(TEST_MODEL_NAME);
-
-	NSArray<FooEntity> result = FooEntity.fetchAllFooEntities(editingContext);
-
-	assertThat(result.isEmpty(), is(true));
+    @Override
+    protected TemporaryEditingContext createEditingContext(String... modelNames) {
+	return new TemporaryEditingContext(modelNames);
     }
 
     @Test
-    public void disposeEditingContextAfterTestExecution() throws Throwable {
-	TemporaryEditingContext editingContext = Mockito.spy(new TemporaryEditingContext(TEST_MODEL_NAME));
-
-	Mockito.doReturn(Mockito.mock(ERMemoryAdaptorContext.class)).when(editingContext).currentAdaptorContext();
-
-	editingContext.before();
-
-	Mockito.verify(editingContext, Mockito.times(0)).dispose();
-
-	editingContext.after();
-
-	Mockito.verify(editingContext, Mockito.times(1)).dispose();
-    }
-
-    @Test
+    @Ignore("Don't know how to clean the mess in the adaptor context after the test")
     public void doNotClearTheDatabaseContextIfNoModelsLoaded() throws Throwable {
-	TemporaryEditingContext editingContext = new TemporaryEditingContext();
-
-	editingContext.before();
-
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
 	NSArray<EOModel> models = modelGroup.models();
 
-	for (EOModel model : models) {
+	EOModel model = null;
+
+	for (int i = 0; i < models.size(); i++) {
+	    model = models.get(i);
+
 	    modelGroup.removeModel(model);
 	}
-
-	editingContext.after();
-    }
-
-    @Test
-    public void doNotRemoveModelsNotLoadedByTheTemporaryEditingContext() throws Throwable {
-	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
-
-	EOModelGroup.defaultGroup().addModelWithPathURL(url);
 
 	TemporaryEditingContext editingContext = new TemporaryEditingContext();
 
 	editingContext.before();
 	editingContext.after();
-
-	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), notNullValue());
     }
 
     @Test
-    public void ensureEditingContextCleanUpIsTriggeredAfterTestExecution() throws Throwable {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext(TEST_MODEL_NAME));
-
-	Statement mockStatement = mock(Statement.class);
-
-	InOrder inOrder = inOrder(editingContext, mockStatement);
-
-	editingContext.apply(mockStatement, null, null).evaluate();
-
-	inOrder.verify(mockStatement).evaluate();
-	inOrder.verify(editingContext).after();
-    }
-
-    @Test
-    public void ensureEditingContextCleanUpIsTriggeredEvenIfTestExecutionThrowsException() throws Throwable {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext(TEST_MODEL_NAME));
-
-	Statement mockStatement = mock(Statement.class);
-
-	doThrow(new Throwable("test error")).when(mockStatement).evaluate();
-
-	InOrder inOrder = inOrder(editingContext, mockStatement);
-
-	try {
-	    editingContext.apply(mockStatement, null, null).evaluate();
-	} catch (Throwable exception) {
-	    // DO NOTHING
-	} finally {
-	    inOrder.verify(mockStatement).evaluate();
-	    inOrder.verify(editingContext).after();
-	}
-    }
-
-    @Test
-    public void ensureEditingContextInitializationIsTriggeredBeforeTestExecution() throws Throwable {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext(TEST_MODEL_NAME));
-
-	Statement mockStatement = mock(Statement.class);
-
-	InOrder inOrder = inOrder(editingContext, mockStatement);
-
-	editingContext.apply(mockStatement, null, null).evaluate();
-
-	inOrder.verify(editingContext).before();
-	inOrder.verify(mockStatement).evaluate();
-    }
-
-    @Test
+    @Ignore("Don't know how to clean the mess in the adaptor context after the test")
     public void exceptionIfAdaptorContextIsNotMemoryAdaptor() throws Throwable {
 	TemporaryEditingContext editingContext = new TemporaryEditingContext(TEST_MODEL_NAME);
 
@@ -219,56 +108,6 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
-    @SuppressWarnings("unused")
-    public void exceptionIfCannotFindModel() throws Exception {
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Cannot load model named 'UnknownModel'"));
-
-	new TemporaryEditingContext("UnknownModel");
-    }
-
-    @Test
-    @SuppressWarnings("unused")
-    public void loadOneModel() throws Exception {
-	new TemporaryEditingContext(TEST_MODEL_NAME);
-
-	EOModel result = EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME);
-
-	assertThat(result, notNullValue());
-    }
-
-    @Test
-    @SuppressWarnings("unused")
-    public void loadOneModelInsideResourcesFolder() throws Exception {
-	new TemporaryEditingContext("AnotherTest");
-
-	EOModel result = EOModelGroup.defaultGroup().modelNamed("AnotherTest");
-
-	assertThat(result, notNullValue());
-    }
-
-    @Test
-    public void lockEditingContextBeforeRunningTheTestCase() throws Exception {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext());
-
-	verify(editingContext, times(0)).lock();
-
-	editingContext.before();
-
-	verify(editingContext, times(1)).lock();
-    }
-
-    @Test
-    public void removeModelsLoadedByTheTemporaryEditingContextAfterTestExecution() throws Throwable {
-	TemporaryEditingContext editingContext = new TemporaryEditingContext(TEST_MODEL_NAME);
-
-	editingContext.before();
-	editingContext.after();
-
-	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
-    }
-
-    @Test
     public void restoreOriginalAdaptorConfigurationAfterTestExecution() throws Throwable {
 	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
 
@@ -282,44 +121,6 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME).adaptorName(), is("JDBC"));
-    }
-
-    @Test
-    public void revertEditingContextChangesAfterRunningTheTestCases() throws Exception {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext());
-
-	editingContext.before();
-
-	verify(editingContext, times(0)).revert();
-
-	editingContext.after();
-
-	verify(editingContext, times(1)).revert();
-    }
-
-    @After
-    public void tearDown() {
-	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
-
-	EOModel model = modelGroup.modelNamed(TEST_MODEL_NAME);
-
-	if (model != null) {
-	    modelGroup.removeModel(model);
-	}
-    }
-
-    @Test
-    public void unlockEditingContextAfterRunningTheTestCase() throws Exception {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext());
-
-	editingContext.before();
-
-	verify(editingContext, times(0)).unlock();
-
-	editingContext.after();
-
-	// The internal disposal logic calls the unlock too
-	verify(editingContext, times(2)).unlock();
     }
 
     @Test

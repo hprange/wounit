@@ -1,0 +1,17 @@
+{
+    attributes = (
+        {
+            allowsNull = N; 
+            columnName = anotherId; 
+            name = anotherId; 
+            prototypeName = id; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }
+    ); 
+    attributesUsedForLocking = (anotherId, id); 
+    className = "com.wounit.model.CompoundKeyEntity"; 
+    externalName = CompoundKeyEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = CompoundKeyEntity; 
+    primaryKeyAttributes = (anotherId, id); 
+}

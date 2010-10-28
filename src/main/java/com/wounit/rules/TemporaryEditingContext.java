@@ -16,15 +16,8 @@
 
 package com.wounit.rules;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
 
 import com.webobjects.eoaccess.EOAdaptorContext;
 import com.webobjects.eoaccess.EODatabaseContext;
@@ -34,7 +27,6 @@ import com.webobjects.eoaccess.EOUtilities;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSBundle;
 
-import er.extensions.eof.ERXEC;
 import er.extensions.foundation.ERXProperties;
 import er.memoryadaptor.ERMemoryAdaptor;
 import er.memoryadaptor.ERMemoryAdaptorContext;
@@ -61,10 +53,8 @@ import er.memoryadaptor.ERMemoryAdaptorContext;
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public class TemporaryEditingContext extends ERXEC implements MethodRule {
+public class TemporaryEditingContext extends AbstractEditingContextRule {
     private final Map<String, String> adaptorsToRestore = new HashMap<String, String>();
-
-    private final Collection<String> modelsToClear = new ArrayList<String>();
 
     /**
      * Creates a <code>TemporaryEditingContext</code> and loads all models with
@@ -74,15 +64,13 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
      *            the name of all models required by unit tests.
      */
     public TemporaryEditingContext(String... modelNames) {
+	super(modelNames);
+
 	fixJavaMemoryDictionary();
 
 	// Use Memory prototypes for tests. We don't want to set this
 	// information in the EOModel dictionary
 	ERXProperties.setStringForKey("EOMemoryPrototypes", "dbEOPrototypesEntityGLOBAL");
-
-	for (String modelName : modelNames) {
-	    loadModel(modelName);
-	}
 
 	NSArray<EOModel> models = EOModelGroup.defaultGroup().models();
 
@@ -100,16 +88,13 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
     /**
      * Reset all changes made into the temporary editing context.
      */
+    @Override
     protected void after() {
 	ERMemoryAdaptorContext adaptorContext = currentAdaptorContext();
 
 	if (adaptorContext != null) {
 	    adaptorContext.resetAllEntities();
 	}
-
-	revert();
-	unlock();
-	dispose();
 
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
@@ -119,40 +104,7 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
 	    model.setAdaptorName(adaptorsToRestore.get(modelName));
 	}
 
-	for (String modelName : modelsToClear) {
-	    EOModel model = modelGroup.modelNamed(modelName);
-
-	    modelGroup.removeModel(model);
-	}
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.junit.rules.MethodRule#apply(org.junit.runners.model.Statement,
-     * org.junit.runners.model.FrameworkMethod, java.lang.Object)
-     */
-    public Statement apply(final Statement base, FrameworkMethod method, Object target) {
-	return new Statement() {
-
-	    @Override
-	    public void evaluate() throws Throwable {
-		before();
-
-		try {
-		    base.evaluate();
-		} finally {
-		    after();
-		}
-	    }
-	};
-    }
-
-    /**
-     * Set up the temporary editing context in order to execute the test case.
-     */
-    protected void before() {
-	lock();
+	super.after();
     }
 
     ERMemoryAdaptorContext currentAdaptorContext() {
@@ -181,38 +133,5 @@ public class TemporaryEditingContext extends ERXEC implements MethodRule {
 	NSBundle bundle = NSBundle.bundleForName("JavaMemoryAdaptor");
 
 	bundle._infoDictionary().takeValueForKey(ERMemoryAdaptor.class.getName(), "EOAdaptorClassName");
-    }
-
-    /**
-     * Load the model with the specified name into the default model group.
-     * 
-     * @param modelName
-     *            name of the model to be loaded
-     * @throws IllegalArgumentException
-     *             if no model can be found with the specified name
-     * @see EOModelGroup#defaultGroup();
-     */
-    protected void loadModel(String modelName) {
-	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
-
-	EOModel model = modelGroup.modelNamed(modelName);
-
-	if (model != null) {
-	    return;
-	}
-
-	URL url = getClass().getResource("/Resources/" + modelName + ".eomodeld");
-
-	if (url == null) {
-	    url = getClass().getResource("/" + modelName + ".eomodeld");
-	}
-
-	if (url == null) {
-	    throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
-	}
-
-	modelGroup.addModelWithPathURL(url);
-
-	modelsToClear.add(modelName);
     }
 }
