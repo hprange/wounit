@@ -188,6 +188,21 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
+    public void doNotTryToForgetDeletedObjects() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	editingContext.deleteObject(mockFoo);
+
+	editingContext = spy(editingContext);
+
+	editingContext.saveChanges();
+
+	verify(editingContext, never()).forgetObject(mockFoo);
+    }
+
+    @Test
     public void incrementPermanentGlobalIdForEachMockInstance() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 

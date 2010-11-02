@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -30,9 +30,10 @@ import com.webobjects.eocontrol.EOFetchSpecification;
 import com.webobjects.eocontrol.EOGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
 import com.webobjects.eocontrol.EOTemporaryGlobalID;
-import com.webobjects.eocontrol._EOIntegralKeyGlobalID;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSDictionary;
+
+import er.extensions.foundation.ERXArrayUtilities;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
@@ -55,7 +56,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     /**
      * Create an instance of the specified class and insert into the temporary
      * editing context.
-     *
+     * 
      * @param <T>
      *            the static type of the instance that should be instantiated
      * @param clazz
@@ -90,7 +91,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     /**
      * Create an instance of the specified entity named and insert into the
      * temporary editing context.
-     *
+     * 
      * @param <T>
      *            the static type of the enterprise object returned by this
      *            method
@@ -156,20 +157,16 @@ public class MockEditingContext extends AbstractEditingContextRule {
     @Override
     public void saveChanges() {
 	@SuppressWarnings("unchecked")
-	NSArray<EOEnterpriseObject> insertedObjects = insertedObjects();
+	NSArray<EOEnterpriseObject> insertedObjects = ERXArrayUtilities.arrayMinusArray(insertedObjects(), deletedObjects());
 
 	super.saveChanges();
 
 	for (EOEnterpriseObject insertedObject : insertedObjects) {
 	    forgetObject(insertedObject);
 
-	    EOGlobalID gid = new _EOIntegralKeyGlobalID(insertedObject.entityName(), globalFakeId);
+	    EOGlobalID globalId = createPermanentGlobalFakeId(insertedObject.entityName());
 
-	    globalFakeId++;
-
-	    ((EOCustomObject) insertedObject).__setGlobalID(gid);
-
-	    recordObject(insertedObject, gid);
+	    recordObject(insertedObject, globalId);
 	}
     }
 }
