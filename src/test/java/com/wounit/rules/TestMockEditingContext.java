@@ -27,8 +27,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eocontrol.EOEditingContext;
@@ -37,27 +42,30 @@ import com.webobjects.eocontrol.EOFetchSpecification;
 import com.webobjects.eocontrol.EOGlobalID;
 import com.webobjects.eocontrol.EOKeyGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
+import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.CompoundKeyEntity;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
 import com.wounit.model.StubEntity;
+import com.wounit.model.SubFooEntity;
+
+import er.extensions.eof.ERXQ;
+import er.extensions.eof.ERXS;
 
 /**
- * TODO: objectsWithFetchSpecification respects qualifier
- * <p>
- * TODO: objectsWithFetchSpecification respects sort ordering
- * <p>
- * TODO: objectsWithFetchSpecification respects isDeep
- * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TestMockEditingContext extends AbstractEditingContextTest {
+    @Mock
+    private EOFetchSpecification mockFetchSpecification;
+
     @Test
     public void callAwakeFromInsertionOnMockInstance() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	FooEntity entity = editingContext.createMock(FooEntity.class);
+	FooEntity entity = editingContext.createSavedObject(FooEntity.class);
 
 	assertThat(entity.awakeFromInsertionCount(), is(1));
     }
@@ -68,7 +76,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	FooEntity entity = new FooEntity();
 
-	editingContext.insertMock(entity);
+	editingContext.insertSavedObject(entity);
 
 	assertThat(entity.globalIdDuringAwakeFromInsertion().isTemporary(), is(true));
     }
@@ -77,7 +85,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void callAwakeFromInsertionOnMockInstanceWithTemporaryGlobalId() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	FooEntity entity = editingContext.createMock(FooEntity.class);
+	FooEntity entity = editingContext.createSavedObject(FooEntity.class);
 
 	assertThat(entity.globalIdDuringAwakeFromInsertion().isTemporary(), is(true));
     }
@@ -89,7 +97,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expect(IllegalArgumentException.class);
 	thrown.expectMessage(is("Cannot create an instance based on the provided class. Please, provide an entity name instead."));
 
-	editingContext.createMock(StubEntity.class);
+	editingContext.createSavedObject(StubEntity.class);
     }
 
     @Test
@@ -99,7 +107,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expect(IllegalArgumentException.class);
 	thrown.expectMessage(is("Could not find EOClassDescription for entity name 'InvalidEntityName'."));
 
-	editingContext.createMock("InvalidEntityName");
+	editingContext.createSavedObject("InvalidEntityName");
     }
 
     @Test
@@ -109,7 +117,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expect(IllegalArgumentException.class);
 	thrown.expectMessage(is("Cannot create an instance for a null class."));
 
-	editingContext.createMock((Class<EOEnterpriseObject>) null);
+	editingContext.createSavedObject((Class<EOEnterpriseObject>) null);
     }
 
     @Test
@@ -119,7 +127,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expect(IllegalArgumentException.class);
 	thrown.expectMessage(is("Cannot create an instance for a null entity name."));
 
-	editingContext.createMock((String) null);
+	editingContext.createSavedObject((String) null);
     }
 
     @Test
@@ -129,7 +137,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expect(IllegalArgumentException.class);
 	thrown.expectMessage(is("CompoundKeyEntity has a compound primary key and can't be used to create mock instances."));
 
-	editingContext.createMock(CompoundKeyEntity.class);
+	editingContext.createSavedObject(CompoundKeyEntity.class);
     }
 
     @Override
@@ -148,7 +156,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void createMockInstanceForClassWithAnotherEntityNameContainingEntityNameProperty() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	DifferentClassNameForEntity result = editingContext.createMock(DifferentClassNameForEntity.class);
+	DifferentClassNameForEntity result = editingContext.createSavedObject(DifferentClassNameForEntity.class);
 
 	assertThat(result, notNullValue());
 	assertThat(result.editingContext(), is((EOEditingContext) editingContext));
@@ -158,7 +166,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void createMockInstanceForEntityNamed() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	FooEntity result = editingContext.createMock(FooEntity.ENTITY_NAME);
+	FooEntity result = editingContext.createSavedObject(FooEntity.ENTITY_NAME);
 
 	assertThat(result, notNullValue());
 	assertThat(result.editingContext(), is((EOEditingContext) editingContext));
@@ -168,7 +176,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void createMockInstanceForExistingClass() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	FooEntity result = editingContext.createMock(FooEntity.class);
+	FooEntity result = editingContext.createSavedObject(FooEntity.class);
 
 	assertThat(result, notNullValue());
 	assertThat(result.editingContext(), is((EOEditingContext) editingContext));
@@ -179,8 +187,6 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	EOObjectStoreCoordinator mockCoordinator = mock(EOObjectStoreCoordinator.class);
 
 	MockEditingContext editingContext = new MockEditingContext(mockCoordinator, TEST_MODEL_NAME);
-
-	EOFetchSpecification mockFetchSpecification = null;
 
 	editingContext.objectsWithFetchSpecification(mockFetchSpecification, editingContext);
 
@@ -207,7 +213,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
 	for (int i = 0; i < 10; i++) {
-	    FooEntity entity = editingContext.createMock(FooEntity.class);
+	    FooEntity entity = editingContext.createSavedObject(FooEntity.class);
 
 	    EOKeyGlobalID result = (EOKeyGlobalID) editingContext.globalIDForObject(entity);
 
@@ -221,7 +227,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	FooEntity mockInstance = spy(new FooEntity());
 
-	editingContext.insertMock(mockInstance);
+	editingContext.insertSavedObject(mockInstance);
 
 	verify(mockInstance, times(1)).awakeFromInsertion(editingContext);
     }
@@ -233,9 +239,11 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	FooEntity mockInstance = new FooEntity();
 
-	editingContext.insertMock(mockInstance);
+	editingContext.insertSavedObject(mockInstance);
 
-	assertThat(editingContext.registeredObjects(), hasItem(mockInstance));
+	NSArray<FooEntity> result = editingContext.registeredObjects();
+
+	assertThat(result, hasItem(mockInstance));
     }
 
     @Test
@@ -249,7 +257,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void mockInstanceHasPermanentGlobalId() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	FooEntity entity = editingContext.createMock(FooEntity.class);
+	FooEntity entity = editingContext.createSavedObject(FooEntity.class);
 
 	EOGlobalID result = editingContext.globalIDForObject(entity);
 
@@ -257,10 +265,156 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
+    public void objectsWithFetchSpecificationDoesNotReturnDeletedObjects() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	editingContext.deleteObject(mockFoo);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.isEmpty(), is(true));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationDoNotReturnSubEntityObjectsIfNotIsDeep() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity.createFooEntity(editingContext);
+	SubFooEntity.createSubFooEntity(editingContext);
+
+	when(mockFetchSpecification.isDeep()).thenReturn(false);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(1));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationFilterObjectsByEntityName() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	DifferentClassNameForEntity.createEntityWithDifferentClassName(editingContext);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(1));
+	assertThat(result, hasItem(mockFoo));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationFilterObjectsByQualifier() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	mockFoo.setBar("wrong");
+
+	mockFoo = FooEntity.createFooEntity(editingContext);
+
+	mockFoo.setBar("correct");
+
+	EOQualifier qualifier = ERXQ.is(FooEntity.BAR_KEY, "correct");
+
+	when(mockFetchSpecification.qualifier()).thenReturn(qualifier);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(1));
+	assertThat(result, hasItem(mockFoo));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationRespectsFetchLimit() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	for (int i = 0; i < 10; i++) {
+	    FooEntity.createFooEntity(editingContext);
+	}
+
+	when(mockFetchSpecification.fetchLimit()).thenReturn(5);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(5));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationReturnsInsertedObjects() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(1));
+	assertThat(result, hasItem(mockFoo));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationReturnsMockObjects() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = editingContext.createSavedObject(FooEntity.class);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(1));
+	assertThat(result, hasItem(mockFoo));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationReturnSubEntityObjectsIfIsDeep() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity.createFooEntity(editingContext);
+	SubFooEntity.createSubFooEntity(editingContext);
+
+	when(mockFetchSpecification.isDeep()).thenReturn(true);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(2));
+    }
+
+    @Test
+    public void objectsWithFetchSpecificationSortObjectsBySortingOrder() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	for (int i = 9; i > 0; i--) {
+	    FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	    mockFoo.setBar(Integer.toString(i));
+	}
+
+	when(mockFetchSpecification.sortOrderings()).thenReturn(ERXS.ascs(FooEntity.BAR_KEY));
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	for (int i = 0; i < 9; i++) {
+	    FooEntity foo = result.get(i);
+
+	    assertThat(foo.bar(), is(Integer.toString(i + 1)));
+	}
+    }
+
+    @Test
     public void recordMockInstanceForFutureFetching() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	FooEntity mockEntity = editingContext.createMock(FooEntity.class);
+	FooEntity mockEntity = editingContext.createSavedObject(FooEntity.class);
 
 	EOFetchSpecification fetchSpecification = new EOFetchSpecification(FooEntity.ENTITY_NAME, null, null);
 
@@ -302,7 +456,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	editingContext.before();
 
-	editingContext.createMock(FooEntity.class);
+	editingContext.createSavedObject(FooEntity.class);
 
 	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
 
@@ -323,10 +477,15 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	editingContext.saveChanges();
 
-	FooEntity mockFoo = editingContext.createMock(FooEntity.class);
+	FooEntity mockFoo = editingContext.createSavedObject(FooEntity.class);
 
 	assertThat((Integer) ((EOKeyGlobalID) mockFoo.__globalID()).keyValues()[0], is(2));
 
 	editingContext.after();
+    }
+
+    @Before
+    public void setup() {
+	when(mockFetchSpecification.entityName()).thenReturn(FooEntity.ENTITY_NAME);
     }
 }

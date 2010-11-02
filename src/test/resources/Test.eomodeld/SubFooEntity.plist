@@ -5,11 +5,12 @@
         {allowsNull = Y; columnName = type; name = type; prototypeName = intNumber; }
     ); 
     attributesUsedForLocking = (id); 
-    className = "com.wounit.model.FooEntity"; 
+    className = "com.wounit.model.SubFooEntity"; 
     classProperties = (bar, type); 
     externalName = "foo_entity"; 
     fetchSpecificationDictionary = {}; 
-    name = FooEntity; 
+    name = SubFooEntity; 
+    parent = FooEntity; 
     primaryKeyAttributes = (id); 
-    restrictingQualifier = "type = 1"; 
+    restrictingQualifier = "type = 2"; 
 }

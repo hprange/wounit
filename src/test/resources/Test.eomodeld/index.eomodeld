@@ -8,7 +8,12 @@
             className = "com.wounit.model.DifferentClassNameForEntity"; 
             name = EntityWithDifferentClassName; 
         }, 
-        {className = "com.wounit.model.FooEntity"; name = FooEntity; }
+        {className = "com.wounit.model.FooEntity"; name = FooEntity; }, 
+        {
+            className = "com.wounit.model.SubFooEntity"; 
+            name = SubFooEntity; 
+            parent = FooEntity; 
+        }
     ); 
     userInfo = {
         "_EntityModeler" = {

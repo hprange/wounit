@@ -29,10 +29,14 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOFetchSpecification;
 import com.webobjects.eocontrol.EOGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
+import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.eocontrol.EOTemporaryGlobalID;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSDictionary;
+import com.webobjects.foundation.NSRange;
 
+import er.extensions.eof.ERXQ;
+import er.extensions.eof.ERXS;
 import er.extensions.foundation.ERXArrayUtilities;
 
 /**
@@ -40,6 +44,7 @@ import er.extensions.foundation.ERXArrayUtilities;
  * @since 1.0
  */
 public class MockEditingContext extends AbstractEditingContextRule {
+    private static final String ENTITY_NAME_KEY = "entityName";
     private int globalFakeId = 1;
 
     /**
@@ -54,7 +59,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     }
 
     /**
-     * Create an instance of the specified class and insert into the temporary
+     * Create an instance of the specified class and insert into the mock
      * editing context.
      * 
      * @param <T>
@@ -64,7 +69,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
      * @return an instance of the given class
      */
     @SuppressWarnings("unchecked")
-    public <T extends EOEnterpriseObject> T createMock(Class<T> clazz) {
+    public <T extends EOEnterpriseObject> T createSavedObject(Class<T> clazz) {
 	if (clazz == null) {
 	    throw new IllegalArgumentException("Cannot create an instance for a null class.");
 	}
@@ -72,7 +77,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	String entityName = clazz.getSimpleName();
 
 	if (EOModelGroup.defaultGroup().entityNamed(entityName) != null) {
-	    return (T) createMock(entityName);
+	    return (T) createSavedObject(entityName);
 	}
 
 	try {
@@ -83,14 +88,14 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	    throw new IllegalArgumentException("Cannot create an instance based on the provided class. Please, provide an entity name instead.", exception);
 	}
 
-	T instance = (T) createMock(entityName);
+	T instance = (T) createSavedObject(entityName);
 
 	return instance;
     }
 
     /**
-     * Create an instance of the specified entity named and insert into the
-     * temporary editing context.
+     * Create an instance of the specified entity named and insert into the mock
+     * editing context.
      * 
      * @param <T>
      *            the static type of the enterprise object returned by this
@@ -99,7 +104,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
      *            the name of the entity that should be instantiated
      * @return an instance of the given entity named
      */
-    public <T extends EOEnterpriseObject> T createMock(String entityName) {
+    public <T extends EOEnterpriseObject> T createSavedObject(String entityName) {
 	if (entityName == null) {
 	    throw new IllegalArgumentException("Cannot create an instance for a null entity name.");
 	}
@@ -113,7 +118,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	@SuppressWarnings("unchecked")
 	T eo = (T) classDescription.createInstanceWithEditingContext(this, null);
 
-	insertMock(eo);
+	insertSavedObject(eo);
 
 	return eo;
     }
@@ -136,7 +141,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	return entity.globalIDForRow(primaryKeyDictionary);
     }
 
-    public void insertMock(EOEnterpriseObject eo) {
+    public void insertSavedObject(EOEnterpriseObject eo) {
 	EOGlobalID globalId = createPermanentGlobalFakeId(eo.entityName());
 
 	recordObject(eo, globalId);
@@ -149,9 +154,33 @@ public class MockEditingContext extends AbstractEditingContextRule {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public NSArray<EOEnterpriseObject> objectsWithFetchSpecification(EOFetchSpecification eofetchspecification, EOEditingContext eoeditingcontext) {
-	return registeredObjects();
+    public NSArray<EOEnterpriseObject> objectsWithFetchSpecification(EOFetchSpecification fetchSpecification, EOEditingContext editingContext) {
+	@SuppressWarnings("unchecked")
+	NSArray<EOEnterpriseObject> availableObjects = ERXArrayUtilities.arrayMinusArray(registeredObjects(), deletedObjects());
+
+	String entityName = fetchSpecification.entityName();
+
+	EOQualifier qualifier = ERXQ.is(ENTITY_NAME_KEY, entityName);
+
+	if (fetchSpecification.isDeep()) {
+	    NSArray<EOEntity> subEntities = EOUtilities.entityNamed(editingContext, entityName).subEntities();
+
+	    for (EOEntity entity : subEntities) {
+		qualifier = ERXQ.or(qualifier, ERXQ.is(ENTITY_NAME_KEY, entity.name()));
+	    }
+	}
+
+	qualifier = ERXQ.and(qualifier, fetchSpecification.qualifier());
+
+	availableObjects = ERXQ.filtered(availableObjects, qualifier);
+
+	availableObjects = ERXS.sorted(availableObjects, fetchSpecification.sortOrderings());
+
+	if (fetchSpecification.fetchLimit() > 0) {
+	    return availableObjects.subarrayWithRange(new NSRange(0, fetchSpecification.fetchLimit()));
+	}
+
+	return availableObjects;
     }
 
     @Override

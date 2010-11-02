@@ -1,3 +1,19 @@
+/**
+ * Copyright (C) 2009 hprange <hprange@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 // $LastChangedRevision: 5773 $ DO NOT EDIT.  Make changes to FooEntity.java instead.
 package com.wounit.model;
 
@@ -14,6 +30,7 @@ public abstract class _FooEntity extends er.extensions.eof.ERXGenericRecord {
 
 	// Attributes
 	public static final String BAR_KEY = "bar";
+	public static final String TYPE_KEY = "type";
 
 	// Relationships
 
@@ -36,6 +53,17 @@ public abstract class _FooEntity extends er.extensions.eof.ERXGenericRecord {
     	_FooEntity.LOG.debug( "updating bar from " + bar() + " to " + value);
     }
     takeStoredValueForKey(value, "bar");
+  }
+
+  public Integer type() {
+    return (Integer) storedValueForKey("type");
+  }
+
+  public void setType(Integer value) {
+    if (_FooEntity.LOG.isDebugEnabled()) {
+    	_FooEntity.LOG.debug( "updating type from " + type() + " to " + value);
+    }
+    takeStoredValueForKey(value, "type");
   }
 
 

@@ -16,5 +16,8 @@
 
 package com.wounit.model;
 
-public class CompoundKeyEntity extends _CompoundKeyEntity {
+import org.apache.log4j.Logger;
+
+public class SubFooEntity extends _SubFooEntity {
+  private static Logger log = Logger.getLogger(SubFooEntity.class);
 }
