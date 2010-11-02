@@ -265,4 +265,53 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
     }
+
+    @Test
+    public void savedObjectHasNonTemporaryGlobalId() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	editingContext.saveChanges();
+
+	assertThat(mockFoo.__globalID().isTemporary(), is(false));
+
+	editingContext.after();
+    }
+
+    @Test
+    public void savedObjectIncrementsGlobalFakeId() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	editingContext.createMock(FooEntity.class);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	editingContext.saveChanges();
+
+	assertThat((Integer) ((EOKeyGlobalID) mockFoo.__globalID()).keyValues()[0], is(2));
+
+	editingContext.after();
+    }
+
+    @Test
+    public void savedObjectUsesGlobalFakeId() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	FooEntity.createFooEntity(editingContext);
+
+	editingContext.saveChanges();
+
+	FooEntity mockFoo = editingContext.createMock(FooEntity.class);
+
+	assertThat((Integer) ((EOKeyGlobalID) mockFoo.__globalID()).keyValues()[0], is(2));
+
+	editingContext.after();
+    }
 }
