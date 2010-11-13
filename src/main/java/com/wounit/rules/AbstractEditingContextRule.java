@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -31,14 +31,26 @@ import com.webobjects.eocontrol.EOObjectStore;
 import er.extensions.eof.ERXEC;
 
 /**
+ * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
+ * that implements the {@link MethodRule} interface, providing means for fast
+ * in-memory testing of <code>EOEnterpriseObject</code>s.
+ * <p>
+ * 
+ * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
 
-    private final Collection<String> modelsToClear = new ArrayList<String>();
+    /**
+     * Collection of models to unload after the test execution.
+     */
+    private final Collection<String> modelToUnload = new ArrayList<String>();
 
-    public AbstractEditingContextRule(EOObjectStore objectStore, String... modelNames) {
+    /**
+     * Constructor only for test purposes.
+     */
+    AbstractEditingContextRule(EOObjectStore objectStore, String... modelNames) {
 	super(objectStore);
 
 	for (String modelName : modelNames) {
@@ -46,10 +58,21 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	}
     }
 
+    /**
+     * Create a new instance of this editing context loading the models
+     * specified by parameter.
+     * 
+     * @param modelNames
+     *            the name of the models to be loaded before the test execution.
+     */
     public AbstractEditingContextRule(String... modelNames) {
 	this(defaultParentObjectStore(), modelNames);
     }
 
+    /**
+     * Reset all changes made into this editing context and unload all models
+     * loaded by this class at the beginning of the test execution.
+     */
     protected void after() {
 	revert();
 	unlock();
@@ -57,7 +80,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
-	for (String modelName : modelsToClear) {
+	for (String modelName : modelToUnload) {
 	    EOModel model = modelGroup.modelNamed(modelName);
 
 	    modelGroup.removeModel(model);
@@ -87,7 +110,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     }
 
     /**
-     * Set up the editing context in order to execute the test case.
+     * Set up this editing context in order to execute the test case.
      */
     protected void before() {
 	lock();
@@ -123,7 +146,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
 	modelGroup.addModelWithPathURL(url);
 
-	modelsToClear.add(modelName);
+	modelToUnload.add(modelName);
     }
 
 }

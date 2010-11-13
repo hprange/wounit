@@ -22,6 +22,7 @@ import er.extensions.eof.ERXObjectStoreCoordinator;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
+ * @since 1.0
  */
 class MockObjectStoreCoordinator extends ERXObjectStoreCoordinator {
     @Override

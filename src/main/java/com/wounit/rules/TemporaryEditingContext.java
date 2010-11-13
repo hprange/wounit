@@ -86,7 +86,7 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
     }
 
     /**
-     * Reset all changes made into the temporary editing context.
+     * Reset all changes made into this temporary editing context.
      */
     @Override
     protected void after() {
