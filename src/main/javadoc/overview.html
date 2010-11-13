@@ -27,6 +27,29 @@
     Here is a simple test case written using WOUnit capabilities.
     <PRE>
 import static com.wounit.EOAssert.*;
+import com.wounit.rules.MockEditingContext;
+
+public class TestFoo {
+   &#64;Rule
+   public MockEditingContext editingContext = new MockEditingContext(&quot;FooModel&quot;);
+
+   &#64;Test
+   public void cantSaveFooWithOnlyOneBar() {
+      Foo foo = Foo.createFoo(editingContext);
+
+      Bar mockBar = editingContext.createSavedObject(Bar.class);
+
+      foo.addToBarRelationship(mockBar);
+
+      confirm(foo, cannotBeSavedBecause(&quot;Foo must have at least 2 bars related to it&quot;));
+   }
+}
+    </PRE>
+    <P>
+    Here is another test case written using WOUnit capabilities.
+    <PRE>
+import static com.wounit.EOAssert.*;
+import com.wounit.rules.TemporaryEditingContext;
 
 public class TestFoo {
    &#64;Rule

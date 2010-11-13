@@ -21,10 +21,19 @@ import com.webobjects.eocontrol.EOEditingContext;
 import er.extensions.eof.ERXObjectStoreCoordinator;
 
 /**
+ * <code>MockObjectStoreCoordinator</code> is a subclass of
+ * <code>ERXObjectStoreCoordinator</code> that reimplements some methods in
+ * order to avoid database access during the test execution.
+ * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
 class MockObjectStoreCoordinator extends ERXObjectStoreCoordinator {
+    /**
+     * Reimplemented to do nothing.
+     * 
+     * @see com.webobjects.eocontrol.EOObjectStoreCoordinator#saveChangesInEditingContext(com.webobjects.eocontrol.EOEditingContext)
+     */
     @Override
     public void saveChangesInEditingContext(EOEditingContext context) {
 	// DO NOTHING

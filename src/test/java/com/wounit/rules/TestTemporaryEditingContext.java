@@ -35,7 +35,6 @@ import er.extensions.foundation.ERXProperties;
  */
 public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     @Test
-    @SuppressWarnings("unused")
     public void changeAdaptorForModelsNotLoadedByTemporaryEditingContext() throws Exception {
 	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
 
@@ -49,7 +48,6 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
-    @SuppressWarnings("unused")
     public void changeAdaptorIfModelAlreadyLoadedWithDifferentAdaptor() throws Exception {
 	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
 
@@ -124,7 +122,6 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
-    @SuppressWarnings("unused")
     public void useMemoryAdaptorForAllModels() throws Exception {
 	new TemporaryEditingContext(TEST_MODEL_NAME);
 
@@ -134,7 +131,6 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
-    @SuppressWarnings("unused")
     public void useMemoryPrototypesForAllModels() throws Exception {
 	new TemporaryEditingContext();
 

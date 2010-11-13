@@ -32,15 +32,16 @@ import er.extensions.eof.ERXEC;
 
 /**
  * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
- * that implements the {@link MethodRule} interface, providing means for fast
- * in-memory testing of <code>EOEnterpriseObject</code>s.
- * <p>
- * 
+ * that implements the {@link MethodRule} interface. This class provides the
+ * required infrastructure to properly initialize/dispose the <code>ERXEC</code>
+ * before/after the test execution.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Collection of models to unload after the test execution.

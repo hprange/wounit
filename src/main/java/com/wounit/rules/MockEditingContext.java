@@ -40,11 +40,36 @@ import er.extensions.eof.ERXS;
 import er.extensions.foundation.ERXArrayUtilities;
 
 /**
+ * <code>MockEditingContext</code> is a subclass of
+ * {@link AbstractEditingContextRule} that provides means for fast in-memory
+ * testing of <code>EOEnterpriseObject</code>s.
+ * <p>
+ * This class is useful for unit testing because it allows the creation of saved
+ * objects that don't participate in the augmented transaction process. This
+ * kind of feature is useful to validate the behavior of a unit in isolation.
+ * 
+ * <pre>
+ * public class TestMyModel {
+ *     &#064;Rule
+ *     public MockEditingContext editingContext = new MockEditingContext(&quot;MyModel&quot;);
+ * 
+ *     &#064;Test
+ *     public void testingMyModelLogic() throws Exception {
+ * 	MyEntity instance = MyEntity.createMyEntity(editingContext);
+ * 
+ * 	AnotherEntity mockInstance = editingContext.createSavedObject(AnotherEntity.class);
+ * 
+ * 	// Do something with instance using the mockInstance...
+ *     }
+ * }
+ * </pre>
+ * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
 public class MockEditingContext extends AbstractEditingContextRule {
     private static final String ENTITY_NAME_KEY = "entityName";
+    private static final long serialVersionUID = 6385728714740347428L;
     private int globalFakeId = 1;
 
     /**
@@ -54,8 +79,33 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	super(objectStore, modelNames);
     }
 
+    /**
+     * Creates a <code>MockEditingContext</code> and loads all models with name
+     * specified by parameter.
+     * 
+     * @param modelNames
+     *            the name of all models required by unit tests.
+     */
     public MockEditingContext(String... modelNames) {
 	this(new MockObjectStoreCoordinator(), modelNames);
+    }
+
+    private EOGlobalID createPermanentGlobalFakeId(String entityName) {
+	EOEntity entity = EOUtilities.entityNamed(this, entityName);
+
+	NSArray<EOAttribute> primaryKeyAttributes = entity.primaryKeyAttributes();
+
+	if (primaryKeyAttributes.count() != 1) {
+	    throw new IllegalArgumentException(String.format("%s has a compound primary key and can't be used to create mock instances.", entityName));
+	}
+
+	String primaryKeyName = (primaryKeyAttributes.objectAtIndex(0)).name();
+
+	NSDictionary<String, Integer> primaryKeyDictionary = new NSDictionary<String, Integer>(globalFakeId, primaryKeyName);
+
+	globalFakeId++;
+
+	return entity.globalIDForRow(primaryKeyDictionary);
     }
 
     /**
@@ -123,24 +173,12 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	return eo;
     }
 
-    private EOGlobalID createPermanentGlobalFakeId(String entityName) {
-	EOEntity entity = EOUtilities.entityNamed(this, entityName);
-
-	NSArray<EOAttribute> primaryKeyAttributes = entity.primaryKeyAttributes();
-
-	if (primaryKeyAttributes.count() != 1) {
-	    throw new IllegalArgumentException(String.format("%s has a compound primary key and can't be used to create mock instances.", entityName));
-	}
-
-	String primaryKeyName = (primaryKeyAttributes.objectAtIndex(0)).name();
-
-	NSDictionary<String, Integer> primaryKeyDictionary = new NSDictionary<String, Integer>(globalFakeId, primaryKeyName);
-
-	globalFakeId++;
-
-	return entity.globalIDForRow(primaryKeyDictionary);
-    }
-
+    /**
+     * Insert the instance specified by parameter into the mock editing context.
+     * 
+     * @param eo
+     *            The <code>EOEnterpriseObject</code> that should inserted
+     */
     public void insertSavedObject(EOEnterpriseObject eo) {
 	EOGlobalID globalId = createPermanentGlobalFakeId(eo.entityName());
 
@@ -153,6 +191,13 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	((EOCustomObject) eo).__setGlobalID(globalId);
     }
 
+    /**
+     * Reimplementation of the original method to return only the objects
+     * registered in memory.
+     * 
+     * @see er.extensions.eof.ERXEC#objectsWithFetchSpecification(com.webobjects.eocontrol.EOFetchSpecification,
+     *      com.webobjects.eocontrol.EOEditingContext)
+     */
     @Override
     public NSArray<EOEnterpriseObject> objectsWithFetchSpecification(EOFetchSpecification fetchSpecification, EOEditingContext editingContext) {
 	@SuppressWarnings("unchecked")
@@ -183,6 +228,13 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	return availableObjects;
     }
 
+    /**
+     * Reimplementation of the original method to set a fake
+     * <code>EOGlobalID</code> for inserted objects being saved for the first
+     * time.
+     * 
+     * @see er.extensions.eof.ERXEC#saveChanges()
+     */
     @Override
     public void saveChanges() {
 	@SuppressWarnings("unchecked")

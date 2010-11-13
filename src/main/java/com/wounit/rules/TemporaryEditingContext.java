@@ -33,9 +33,14 @@ import er.memoryadaptor.ERMemoryAdaptorContext;
 
 /**
  * The <code>TemporaryEditingContext</code> class provides means to create
- * temporary enterprise object for unit testing. It produces an editing context
+ * temporary enterprise object for unit testing. It is an editing context
  * configured with the memory adaptor settings that is guaranteed to be reset
- * when the test method finishes (whether it passes or fails):
+ * when the test method finishes (whether it passes or fails).
+ * <p>
+ * This class is useful for integration testing because it mimics the internal
+ * behavior of the <code>ERXEC</code>. Every <code>EOEnterpriseObject</code>
+ * inserted in the <code>TemporaryEditingContext</code> behaves as a real EO.
+ * This kind of feature is useful to validate the behavior of a group of EOs.
  * 
  * <pre>
  * public class TestMyModel {
@@ -54,6 +59,12 @@ import er.memoryadaptor.ERMemoryAdaptorContext;
  * @since 1.0
  */
 public class TemporaryEditingContext extends AbstractEditingContextRule {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Map of original adaptor name for each loaded <code>EOModel</code> to be
+     * restored at the end of the test execution.
+     */
     private final Map<String, String> adaptorsToRestore = new HashMap<String, String>();
 
     /**
@@ -86,7 +97,8 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
     }
 
     /**
-     * Reset all changes made into this temporary editing context.
+     * Reset all changes made into this temporary editing context, restoring the
+     * original adaptor name of each loaded <code>EOModel</code>.
      */
     @Override
     protected void after() {

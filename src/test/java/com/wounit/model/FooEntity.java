@@ -19,6 +19,7 @@ package com.wounit.model;
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOGlobalID;
 
+@SuppressWarnings("serial")
 public class FooEntity extends _FooEntity {
     private int awakeFromInsertionCount = 0;
 

@@ -45,6 +45,28 @@ Usage
 -----
 
 	import static com.wounit.matchers.EOAssert.*;
+	import com.wounit.rules.MockEditingContext;
+
+	public class TestMyEntity {
+		@Rule
+		public MockEditingContext ec = new MockEditingContext("MyModel");
+
+		@Test
+		public void cantSaveFooWithOnlyOneBar() {
+			Foo foo = Foo.createFoo(ec);
+
+			Bar mockBar = editingContext.createSavedObject(Bar.class);
+
+			foo.addToBarRelationship(mockBar);
+
+			confirm(foo, cannotBeSavedBecause("Foo must have at least 2 bars related to it"));
+		}
+	}
+
+OR
+
+	import static com.wounit.matchers.EOAssert.*;
+	import com.wounit.rules.TemporaryEditingContext;
 
 	public class TestMyEntity {
 		@Rule
@@ -59,6 +81,12 @@ Usage
 			confirm(foo, cannotBeSavedBecause("The bar property cannot be null"));
 		}
 	}
+
+Acknowledge
+-----------
+
+This project is an evolution of the original [WOUnitTest 2](http://wounittest.sourceforge.net/)
+framework and is heavily inspired by it.
 
 About
 -----
