@@ -34,7 +34,7 @@ Maven users have to add the dependency declaration:
 		<groupId>com.wounit</groupId>
 		<artifactId>wounit</artifactId>
 		<version>1.0-beta-4</version>
-	</dependecy>
+	</dependency>
 
 Non Maven users have to:
 
