@@ -55,7 +55,7 @@ Usage
 		public void cantSaveFooWithOnlyOneBar() {
 			Foo foo = Foo.createFoo(ec);
 
-			Bar mockBar = editingContext.createSavedObject(Bar.class);
+			Bar mockBar = ec.createSavedObject(Bar.class);
 
 			foo.addToBarRelationship(mockBar);
 
