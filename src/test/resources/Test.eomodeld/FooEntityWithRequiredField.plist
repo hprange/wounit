@@ -1,0 +1,29 @@
+{
+    attributes = (
+        {
+            allowsNull = Y; 
+            columnName = fooEntityId; 
+            name = fooEntityId; 
+            prototypeName = id; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }, 
+        {columnName = required; name = required; prototypeName = intNumber; }
+    ); 
+    attributesUsedForLocking = (fooEntityId, id); 
+    className = "com.wounit.model.FooEntityWithRequiredField"; 
+    classProperties = (fooEntity, required); 
+    externalName = FooEntityWithRequiredField; 
+    fetchSpecificationDictionary = {}; 
+    name = FooEntityWithRequiredField; 
+    primaryKeyAttributes = (id); 
+    relationships = (
+        {
+            deleteRule = EODeleteRuleCascade; 
+            destination = FooEntity; 
+            isToMany = N; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = id; sourceAttribute = fooEntityId; }); 
+            name = fooEntity; 
+        }
+    ); 
+}
