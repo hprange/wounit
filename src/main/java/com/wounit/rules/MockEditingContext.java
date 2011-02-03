@@ -18,7 +18,6 @@ package com.wounit.rules;
 
 import java.lang.reflect.Field;
 
-import com.webobjects.eoaccess.EOAttribute;
 import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eoaccess.EOUtilities;
@@ -31,8 +30,9 @@ import com.webobjects.eocontrol.EOGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
 import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.eocontrol.EOTemporaryGlobalID;
+import com.webobjects.eocontrol._EOIntegralKeyGlobalID;
 import com.webobjects.foundation.NSArray;
-import com.webobjects.foundation.NSDictionary;
+import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 
 import er.extensions.eof.ERXQ;
@@ -68,9 +68,20 @@ import er.extensions.foundation.ERXArrayUtilities;
  * @since 1.0
  */
 public class MockEditingContext extends AbstractEditingContextRule {
+    /**
+     * Entity name key representation.
+     */
     private static final String ENTITY_NAME_KEY = "entityName";
-    private static final long serialVersionUID = 6385728714740347428L;
-    private int globalFakeId = 1;
+
+    /**
+     * A counter for fake global IDs.
+     */
+    private int globalFakeId = 0;
+
+    /**
+     * An array of objects whose changes must be ignored during the test cycle.
+     */
+    final NSMutableArray<EOEnterpriseObject> ignoredObjects = new NSMutableArray<EOEnterpriseObject>();
 
     /**
      * Constructor only for test purposes.
@@ -90,22 +101,17 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	this(new MockObjectStoreCoordinator(), modelNames);
     }
 
+    @Override
+    protected void after() {
+	ignoredObjects.clear();
+
+	super.after();
+    }
+
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {
-	EOEntity entity = EOUtilities.entityNamed(this, entityName);
-
-	NSArray<EOAttribute> primaryKeyAttributes = entity.primaryKeyAttributes();
-
-	if (primaryKeyAttributes.count() != 1) {
-	    throw new IllegalArgumentException(String.format("%s has a compound primary key and can't be used to create mock instances.", entityName));
-	}
-
-	String primaryKeyName = (primaryKeyAttributes.objectAtIndex(0)).name();
-
-	NSDictionary<String, Integer> primaryKeyDictionary = new NSDictionary<String, Integer>(globalFakeId, primaryKeyName);
-
 	globalFakeId++;
 
-	return entity.globalIDForRow(primaryKeyDictionary);
+	return new _EOIntegralKeyGlobalID(entityName, globalFakeId);
     }
 
     /**
@@ -180,6 +186,8 @@ public class MockEditingContext extends AbstractEditingContextRule {
      *            The <code>EOEnterpriseObject</code> that should inserted
      */
     public void insertSavedObject(EOEnterpriseObject eo) {
+	ignoredObjects.add(eo);
+
 	EOGlobalID globalId = createPermanentGlobalFakeId(eo.entityName());
 
 	recordObject(eo, globalId);
@@ -192,8 +200,8 @@ public class MockEditingContext extends AbstractEditingContextRule {
     }
 
     /**
-     * Reimplementation of the original method to return only the objects
-     * registered in memory.
+     * Overrides the original method to return only the objects registered in
+     * memory.
      * 
      * @see er.extensions.eof.ERXEC#objectsWithFetchSpecification(com.webobjects.eocontrol.EOFetchSpecification,
      *      com.webobjects.eocontrol.EOEditingContext)
@@ -229,9 +237,27 @@ public class MockEditingContext extends AbstractEditingContextRule {
     }
 
     /**
-     * Reimplementation of the original method to set a fake
-     * <code>EOGlobalID</code> for inserted objects being saved for the first
-     * time.
+     * Overrides the implementation inherited from
+     * <code>EOEditingContext<code> to not call the super behavior for objects
+     * registered with {@link #insertSavedObject(EOEnterpriseObject)} or {@link #createSavedObject(Class)}.
+     * 
+     * @param anObject
+     *            the object whose state is to be recorded
+     * 
+     * @see er.extensions.eof.ERXEC#objectWillChange(java.lang.Object)
+     */
+    @Override
+    public void objectWillChange(Object object) {
+	if (!ignoredObjects.contains(object)) {
+	    super.objectWillChange(object);
+	}
+    }
+
+    /**
+     * Overrides the original method to set a fake <code>EOGlobalID</code> for
+     * inserted objects being saved for the first time. A fake permanent
+     * <code>EOGlobalID</code> is required to determine if an object was saved
+     * or not.
      * 
      * @see er.extensions.eof.ERXEC#saveChanges()
      */

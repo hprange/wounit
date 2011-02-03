@@ -43,9 +43,9 @@ import com.wounit.rules.AbstractEditingContextRule;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-public abstract class AbstractEOAssertTest {
+public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule> {
     @Rule
-    public final AbstractEditingContextRule editingContext = createEditingContext("Test");
+    public final T editingContext = createEditingContext("Test");
 
     private FooEntity foo;
 
@@ -174,7 +174,7 @@ public abstract class AbstractEOAssertTest {
 	confirm(foo, cannotBeSavedBecause("The wrong exception"));
     }
 
-    protected abstract AbstractEditingContextRule createEditingContext(String... modelNames);
+    protected abstract T createEditingContext(String... modelNames);
 
     @Test
     public void doNotSaveChangesFailure() throws Exception {
@@ -182,21 +182,6 @@ public abstract class AbstractEOAssertTest {
 
 	thrown.expect(AssertionError.class);
 	thrown.expectMessage(is("\nExpected: not successfully saved editing context\n     but got: a successfully saved editing context"));
-
-	// int i = 0;
-	//
-	// for (EOCooperatingObjectStore store : EOObjectStoreCoordinator
-	// .defaultCoordinator().cooperatingObjectStores()) {
-	//
-	// if (i > 0) {
-	// EOObjectStoreCoordinator.defaultCoordinator()
-	// .removeCooperatingObjectStore(store);
-	// }
-	//
-	// System.out.println(store);
-	//
-	// i++;
-	// }
 
 	confirm(editingContext, doNotSaveChanges());
     }

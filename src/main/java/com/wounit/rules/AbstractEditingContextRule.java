@@ -75,7 +75,6 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * loaded by this class at the beginning of the test execution.
      */
     protected void after() {
-	revert();
 	unlock();
 	dispose();
 

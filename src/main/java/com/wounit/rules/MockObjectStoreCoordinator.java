@@ -30,7 +30,7 @@ import er.extensions.eof.ERXObjectStoreCoordinator;
  */
 class MockObjectStoreCoordinator extends ERXObjectStoreCoordinator {
     /**
-     * Reimplemented to do nothing.
+     * Overrides the original method to do nothing.
      * 
      * @see com.webobjects.eocontrol.EOObjectStoreCoordinator#saveChangesInEditingContext(com.webobjects.eocontrol.EOEditingContext)
      */

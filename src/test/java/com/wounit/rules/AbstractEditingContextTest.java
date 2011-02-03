@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import java.net.URL;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -207,6 +208,7 @@ public abstract class AbstractEditingContextTest {
     }
 
     @Test
+    @Ignore(value = "Revert may not be necessary")
     public void revertEditingContextChangesAfterRunningTheTestCases() throws Exception {
 	AbstractEditingContextRule editingContext = spy(createEditingContext());
 

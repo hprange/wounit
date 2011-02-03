@@ -21,6 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -47,6 +49,7 @@ import com.webobjects.foundation.NSArray;
 import com.wounit.model.CompoundKeyEntity;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
+import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
 
@@ -131,6 +134,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
+    @Ignore("Why create this restriction if we can simply ignore the fact?")
     public void cannotMockInstaceOfEntityWithCompoundPrimaryKey() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
@@ -138,6 +142,21 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expectMessage(is("CompoundKeyEntity has a compound primary key and can't be used to create mock instances."));
 
 	editingContext.createSavedObject(CompoundKeyEntity.class);
+    }
+
+    @Test
+    public void clearIgnoredObjectsArrayAfterTestExecution() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	FooEntity entity = new FooEntity();
+
+	editingContext.insertSavedObject(entity);
+
+	editingContext.after();
+
+	assertThat(editingContext.ignoredObjects.isEmpty(), is(true));
     }
 
     @Override
@@ -180,6 +199,25 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	assertThat(result, notNullValue());
 	assertThat(result.editingContext(), is((EOEditingContext) editingContext));
+    }
+
+    @Test
+    public void doNotCallObjectWillChangeOnIgnoredObjects() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntityWithRequiredField mockObject = new FooEntityWithRequiredField();
+
+	editingContext.insertSavedObject(mockObject);
+
+	mockObject.setRequired(null);
+
+	editingContext.createSavedObject(FooEntityWithRequiredField.class);
+
+	try {
+	    editingContext.saveChanges();
+	} catch (Throwable exception) {
+	    fail("The mock object required field should be ignored");
+	}
     }
 
     @Test

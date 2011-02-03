@@ -10,6 +10,10 @@
         }, 
         {className = "com.wounit.model.FooEntity"; name = FooEntity; }, 
         {
+            className = "com.wounit.model.FooEntityWithRequiredField"; 
+            name = FooEntityWithRequiredField; 
+        }, 
+        {
             className = "com.wounit.model.SubFooEntity"; 
             name = SubFooEntity; 
             parent = FooEntity; 
