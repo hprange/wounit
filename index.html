@@ -23,18 +23,13 @@
 			font-style: italic;}
 			.download { float: right; }
 			hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-			li { margin-top: 10px; margin-bottom: 10px; }				
+			li { margin-top: 10px; margin-bottom: 10px; } 
 			.footer { text-align:center; padding-top:30px; font-style: italic; }
 		</style>
-		<!-- Include required JS files -->
 		<script type="text/javascript" src="js/shCore.js"></script>
-		<!--
-		At least one brush, here we choose JS. You need to include a brush for every 
-		language you want to highlight
-		-->
 		<script type="text/javascript" src="js/shBrushXml.js"></script>
 		<script type="text/javascript" src="js/shBrushBash.js"></script>
-		<!-- Include *at least* the core style and default theme -->
+		<script type="text/javascript" src="js/shBrushJava.js"></script>
 		<link href="css/shCore.css" rel="stylesheet" type="text/css" />
 		<link href="css/shThemeDefault.css" rel="stylesheet" type="text/css" />
 	</head>
@@ -47,7 +42,7 @@
 				<a href="https://github.com/downloads/hprange/wounit/wounit-1.0.jar">
 					<img border="0" width="90" src="images/jar.png" alt="" /></a>
 			</div>
-			<h1><a href="http://github.com/hprange/wounit"><img border="0" src="images/wounit.png" alt="" /></a></h1>
+			<h1><a href="index.html"><img border="0" src="images/wounit.png" alt="" /></a></h1>
 			<div class="description">
 				The WOUnit framework contains a set of utilities for testing WebObjects 
 				applications using JUnit 4.7 or later capabilities.
@@ -71,6 +66,28 @@
 					<li>Project Wonder 5</li>
 					<li>WebObjects 5</li>
 				</ul>
+			</p>
+			<h2>Usage</h2>
+			<p>
+				<pre class="brush: java; toolbar: false; gutter: false;">
+					import static com.wounit.matchers.EOAssert.*;
+					import com.wounit.rules.MockEditingContext;
+					
+					public class TestMyEntity {
+						@Rule
+						public MockEditingContext ec = new MockEditingContext("MyModel");
+						
+						@Test
+						public void cantSaveFooWithNullProperty() {
+							Foo foo = Foo.createFoo(ec);
+							
+							foo.setProperty(null);
+							
+							confirm(foo, cannotBeSavedBecause("Foo must have a property"));
+						}
+					}
+				</pre>
+				See the <a href="usage.html">Complete Guide</a> for more details about the WOUnit usage.
 			</p>
 			<h2>Install</h2>
 			<p>Maven users have to add the dependency declaration:
@@ -101,7 +118,7 @@
 			</p>
 			<h2>License</h2>
 			<p>Apache 2</p>
-			<h2>Authors</h2>
+			<h2>Author</h2>
 			<p>Henrique Prange (hprange at gmail.com)
 				<br />
 			</p>
