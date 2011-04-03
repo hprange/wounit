@@ -31,25 +31,158 @@
 				The WOUnit framework contains a set of utilities for testing WebObjects 
 				applications using JUnit 4.7 or later capabilities.
 			</div>
+			<h2>WOUnit Basics</h2>
+			<p>
+				The WOUnit framework provides implemetations of the MethodRule interface defined by JUnit. You don't have to know the internals of the MethodRule in order to write tests with WOUnit. It is enough to know that you need to annotate a public field in your test class with the <code>@Rule</code> (lines 7 and 8). In this case, annotating the MockEditingContext field is sufficient to ensure that the editing context will be initialized before and disposed after each test case has been executed.
+			</p>
+			<p>
+				<pre class="brush: java; toolbar: false; highlight: [1,7,8,16];">
+import static com.wounit.matchers.EOAssert.*;
+import com.wounit.rules.MockEditingContext;
+import org.junit.Rule;
+import org.junit.Test;
+
+public class TestMyEntity {
+	@Rule
+	public MockEditingContext ec = new MockEditingContext("MyModel");
+	
+	@Test
+	public void cantSaveFooWithNullProperty() {
+		Foo foo = Foo.createFoo(ec);
+		
+		foo.setProperty(null);
+		
+		confirm(foo, cannotBeSaved());
+	}
+}</pre>
+			</p>
+			<p>
+				Another feature of the WOUnit framework is a collection of matchers to facilitate the verification of conditions related to enterprise objets and editing contexts. If you static import the <code>EOAssert</code> methods then you'll be able write more readable assertions (lines 1 and 16).
+			</p>
 			<h2>Unit Test with MockEditingContext</h2>
 			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur tempor risus at sem posuere laoreet. Pellentesque fringilla porta rutrum. Praesent euismod, est sit amet varius lacinia, libero ante consectetur turpis, at imperdiet erat justo non metus. Phasellus ac lectus posuere metus pulvinar rhoncus. Aenean lectus purus, sollicitudin non dignissim sed, dapibus sed enim. Praesent viverra molestie nisi, ut accumsan ipsum malesuada ac. Maecenas eget sollicitudin sapien. Curabitur porttitor lacinia mi eget scelerisque. Duis quis consectetur lacus. Sed justo nibh, euismod id mollis ut, faucibus nec mi. Ut at erat sit amet justo suscipit interdum ac varius eros. Suspendisse potenti. In enim turpis, fermentum et rhoncus ac, mollis quis nisi. Nulla ornare tempus ullamcorper. Nam ut leo eget tellus hendrerit varius id non dui. Nulla nisi sapien, ultricies sit amet rhoncus quis, suscipit molestie dui. Nam faucibus laoreet egestas. Donec placerat magna sit amet est hendrerit ornare.</p><p>
-
-Etiam lacus enim, rutrum eu sagittis ut, pharetra at mauris. Pellentesque ante enim, semper ut dignissim eget, laoreet sit amet tortor. Donec in tincidunt sapien. Vestibulum dictum augue libero, vel congue est. Aliquam erat volutpat. Aenean tortor ligula, hendrerit id sollicitudin id, dapibus sit amet risus. Suspendisse rhoncus eleifend ante eu consequat. Suspendisse porttitor posuere lacinia. Donec auctor vehicula bibendum. In pellentesque elit dictum dolor pharetra blandit. Mauris sed tortor ut est dapibus lacinia. In tortor orci, posuere a rhoncus a, faucibus ut eros. Suspendisse potenti. Pellentesque eget orci ut libero euismod mattis. Nulla pharetra lorem sed turpis suscipit luctus. Suspendisse lacinia elit id lorem scelerisque hendrerit posuere lectus lobortis. Vivamus interdum semper arcu eget porttitor. Sed ornare urna et nisl luctus commodo. Suspendisse fringilla neque nec sem hendrerit vulputate. Sed euismod purus fermentum ligula eleifend interdum.</p><p>
-
-Curabitur a lacus vel mi vulputate iaculis. Fusce ultrices ligula congue sapien consequat tempus. Pellentesque in pellentesque risus. Nullam facilisis egestas nisi fermentum auctor. Nam pellentesque vulputate tellus. Pellentesque sit amet leo nec risus dapibus tempor id ut eros. In tincidunt, purus nec tincidunt suscipit, nisl tellus fringilla sem, eget luctus quam lectus at nisi. Fusce orci dui, lacinia vel adipiscing eget, malesuada et mi. Donec condimentum massa non nisl egestas blandit. Donec vestibulum lacinia sem vel elementum. Sed sollicitudin nisl ac tellus lacinia condimentum. Proin molestie scelerisque sem, non suscipit neque aliquet vel. Aliquam quis felis ut felis malesuada venenatis et vel enim. Cras cursus turpis et libero aliquam in vulputate risus fringilla. Mauris mauris lectus, tempus nec aliquam vel, suscipit et est.
+				The MockEditingContext class provides means for fast in-memory testing of EOEnterpriseObjects. This class is useful for unit testing because it allows the creation of dummy objects that don't participate in the augmented transaction process. This kind of feature is useful to validate the behavior of a unit in isolation.
+			</p>
+			<p>
+				You can pass an array of model names as parameter of the MockEditingContext and it will try to load the models automatically.
+			</p>
+			<p>
+				<pre class="brush: java; toolbar: false;">
+public class TestMyModel {
+	@Rule
+	public MockEditingContext ec = new MockEditingContext("MyModel");
+	...
+}</pre>
+			</p>
+			<p>
+				You can create real objects in the same way you are used to do in your application (line 3). Then you can create dummy objects to interact with the real objects (line 5). The MockEditingContext do not track changes on dummy objects.
+			</p>
+			<p>
+				<pre class="brush: java; toolbar: false; highlight: [3,5];">
+@Test
+public void testingFooLogic() {
+	Foo foo = Foo.createFoo(ec);
+	
+	Bar mockBar = ec.createSavedObject(Bar.class);
+	
+	// Do something with foo using the dummy object...
+}</pre>
+			</p>
+			<p>
+				You can also create and insert a dummy object. Very useful if you need to 
+				decorate or spy dummy objects.
+			</p>
+			<p>
+				<pre class="brush: java; toolbar: false;">
+@Test
+public void testingAnotherFooLogic() {
+	Foo foo = Foo.createFoo(ec);
+	
+	// Decorate or spy a dummy object before inserting
+	Bar mockBar = spy(new Bar());
+	
+	ec.insertSavedObject(mockBar);
+	
+	// Do something with foo using the dummy object...
+}</pre>
 			</p>
 			<h2>Integration Test with TemporaryEditingContext</h2>
 			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat congue cursus. Phasellus quis posuere lacus. In ac erat velit, non aliquet quam. Mauris quis tellus varius diam iaculis facilisis. Etiam quis augue tellus, vitae vulputate dui. Nullam id rutrum velit. Nullam convallis auctor est vel tincidunt. Cras ut commodo augue. Integer vitae lacus pulvinar odio dignissim gravida. Vivamus sed viverra ipsum.
-
-</p><p>Nullam pellentesque egestas augue rutrum vehicula. Aenean augue sem, mattis ut auctor vitae, laoreet sit amet enim. Quisque tincidunt mi ac velit faucibus elementum. Fusce venenatis nunc non lacus mattis in pretium mi aliquet. Integer porta, metus eget laoreet posuere, turpis diam pharetra enim, eget convallis lectus nisi convallis quam. Proin sollicitudin tortor at dui tincidunt ac convallis nisi semper. Sed tincidunt ante nec erat commodo ultricies. Sed mollis lacus non risus tristique vel hendrerit orci dignissim. Nunc molestie, magna et tempor lacinia, quam nisl eleifend dui, eget iaculis nisl odio at massa. Nam vestibulum, metus id dapibus semper, eros velit placerat tellus, in sodales mi justo in lectus. Donec erat lectus, adipiscing in gravida lobortis, facilisis commodo tellus. Sed viverra porta sagittis.
+				The TemporaryEditingContext class provides means to create temporary 
+				enterprise object for unit testing. It is an editing context configured with 
+				the memory 
+				adaptor settings that is guaranteed to be reset when the test method finishes 
+				(whether it passes or fails).
+			</p>
+			<p>This class is useful for integration testing because it mimics the internal 
+				behavior of the ERXEC. Every EOEnterpriseObject inserted in the 
+				TemporaryEditingContext behaves as a real EO. This kind of feature is useful to 
+				validate the 
+				behavior of a group of EOs.
+				<pre class="brush: java; toolbar: false;">
+public class TestMyModel {
+	@Rule
+	public TemporaryEditingContext ec = 
+			new TemporaryEditingContext("MyModel");
+	
+	@Test
+	public void testingMyModelLogic() throws Exception {
+		Foo foo = Foo.createFoo(ec);
+		
+		Bar bar = Bar.createBar(ec);
+		
+		// Do something with foo and bar...
+		
+		// Verify a condition of foo and bar...
+	}
+}</pre>
 			</p>
 			<h2>Assertion with EOAssert</h2>
 			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat congue cursus. Phasellus quis posuere lacus. In ac erat velit, non aliquet quam. Mauris quis tellus varius diam iaculis facilisis. Etiam quis augue tellus, vitae vulputate dui. Nullam id rutrum velit. Nullam convallis auctor est vel tincidunt. Cras ut commodo augue. Integer vitae lacus pulvinar odio dignissim gravida. Vivamus sed viverra ipsum.</p>
-<p>
-Nullam pellentesque egestas augue rutrum vehicula. Aenean augue sem, mattis ut auctor vitae, laoreet sit amet enim. Quisque tincidunt mi ac velit faucibus elementum. Fusce venenatis nunc non lacus mattis in pretium mi aliquet. Integer porta, metus eget laoreet posuere, turpis diam pharetra enim, eget convallis lectus nisi convallis quam. Proin sollicitudin tortor at dui tincidunt ac convallis nisi semper. Sed tincidunt ante nec erat commodo ultricies. Sed mollis lacus non risus tristique vel hendrerit orci dignissim. Nunc molestie, magna et tempor lacinia, quam nisl eleifend dui, eget iaculis nisl odio at massa. Nam vestibulum, metus id dapibus semper, eros velit placerat tellus, in sodales mi justo in lectus. Donec erat lectus, adipiscing in gravida lobortis, facilisis commodo tellus. Sed viverra porta sagittis.
+				The <code>EOAssert</code> class is the entry point for writing assertions to WebObjects related unit tests. This class provides static methods to check conditions against enterprise objects and editing contexts.
+				<h3>Enterprise Object State</h3>
+				<pre class="brush: java; toolbar: false;">
+// Checks whether the eo has been saved and has no pending changes
+confirm(eo, hasBeenSaved());
+
+// Checks whether the eo has not been saved
+confirm(eo, hasNotBeenSaved());
+
+// Checks whether the eo has been deleted
+confirm(eo, hasBeenDeleted());
+
+// Checks whether the eo has not been deleted
+confirm(eo, hasNotBeenDeleted());</pre>
+				<h3>Enterprise Object Validity</h3>
+				<pre class="brush: java; toolbar: false;">
+// Checks whether the eo can be saved
+confirm(eo, canBeSaved());
+
+// Checks whether the eo cannot be saved
+confirm(eo, cannotBeSaved());
+
+// Safer check whether eo cannot be saved
+confirm(eo, cannotBeSavedBecause("The foo property can't be null"));
+
+// Checks whether the eo can be deleted
+confirm(eo, canBeDeleted());
+
+// Checks whether the eo cannot be deleted
+confirm(eo, cannotBeDeleted());
+
+// Safer check whether eo cannot be deleted
+confirm(eo, cannotBeDeletedBecause("It is a required object"));</pre>
+				<h3>Editing Context Save Changes</h3>
+				<pre class="brush: java; toolbar: false;">
+// Checks whether the editing context save changes successfully
+confirm(editingContext, saveChanges());
+
+// Checks whether the editing context does not save changes
+confirm(editingContext, doNotSaveChanges());
+
+// Safer check whether the editing context does not save changes
+confirm(editingContext, doNotSaveChangesBecause(
+		"The bar property of Foo cannot be null"));</pre>
 			</p>
 			<div class="footer">
 				get the source code on GitHub : <a href="http://github.com/hprange/wounit">hprange/wounit</a>
