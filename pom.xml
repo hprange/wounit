@@ -59,7 +59,7 @@
 	</scm>
 
 	<properties>
-		<wonder.version>5.0.0-r10702</wonder.version>
+		<wonder.version>5.4-SNAPSHOT</wonder.version>
 		<webobjects.version>5.4.3</webobjects.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -246,9 +246,6 @@
 			<groupId>wonder.core</groupId>
 			<artifactId>ERExtensions</artifactId>
 			<version>${wonder.version}</version>
-			<classifier>wo54</classifier>
-			<!-- Not really optional. But we don't want to require the exclusion of this transitive dependency when using WO 5.3.x -->
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>wonder.eoadaptors</groupId>
@@ -272,13 +269,13 @@
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
+			<artifactId>junit-dep</artifactId>
+			<version>4.8.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>1.8.4</version>
+			<version>1.8.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
