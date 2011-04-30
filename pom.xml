@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.wounit</groupId>
+    <artifactId>wounit-site</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    <name>WOUnit Site</name>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<name>oss.sonatype.org</name>
+			<id>oss.sonatype.org</id>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+						<sourceDirectory>src/main</sourceDirectory>
+						<includes>
+							<include>**/*.js</include>
+							<include>**/*.css</include>
+						</includes>
+						<nomunge>true</nomunge>
+						<aggregations>
+							<aggregation>
+								<output>${project.build.directory}/all-min.js</output>
+								<includes>
+									<include>**/shBrushBash-min.js</include>
+									<include>**/shBrushJava-min.js</include>
+									<include>**/shBrushXml-min.js</include>
+								</includes>
+							</aggregation>
+							<aggregation>
+								<output>${project.build.directory}/all-min.css</output>
+								<includes>
+									<include>**/shCore-min.css</include>
+									<include>**/shCoreDefault-min.css</include>
+									<include>**/wounit-min.css</include>
+								</includes>
+							</aggregation>
+						</aggregations>
+				</configuration>
+			</plugin>        
+		</plugins>
+    </build>
+</project>
