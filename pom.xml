@@ -217,16 +217,20 @@
 			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
-				<version>1.8.0</version>
+				<version>1.9.0</version>
 				<configuration>
 					<header>src/etc/header.txt</header>
+                    <strictCheck>true</strictCheck>
 					<excludes>
 						<exclude>LICENSE.txt</exclude>
 						<exclude>build.*</exclude>
+                        <exclude>README.md</exclude>
+                        <exclude>.gitignore</exclude>
 						<exclude>src/test/resources/**</exclude>
 					</excludes>
 					<properties>
 						<year>${project.inceptionYear}</year>
+                        <owner>hprange</owner>
 						<email>hprange@gmail.com</email>
 					</properties>
 				</configuration>
