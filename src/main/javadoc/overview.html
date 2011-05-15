@@ -28,16 +28,18 @@
     <PRE>
 import static com.wounit.EOAssert.*;
 import com.wounit.rules.MockEditingContext;
+import com.wounit.annotations.Dummy;
 
 public class TestFoo {
    &#64;Rule
    public MockEditingContext editingContext = new MockEditingContext(&quot;FooModel&quot;);
 
+   &#64;Dummy
+   private Bar mockBar;
+
    &#64;Test
    public void cantSaveFooWithOnlyOneBar() {
       Foo foo = Foo.createFoo(editingContext);
-
-      Bar mockBar = editingContext.createSavedObject(Bar.class);
 
       foo.addToBarRelationship(mockBar);
 

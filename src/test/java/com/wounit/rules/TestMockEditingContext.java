@@ -46,22 +46,20 @@ import com.webobjects.eocontrol.EOKeyGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
 import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.foundation.NSArray;
+import com.wounit.exceptions.WOUnitException;
 import com.wounit.model.CompoundKeyEntity;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
-import com.wounit.stubs.PrivateAnnotationStubTestCase;
-import com.wounit.stubs.StubTestCase;
-import com.wounit.stubs.WrongTypeStubTestCase;
+import com.wounit.stubs.StubTestCaseClass;
+import com.wounit.stubs.WrongTypeStubTestCaseClass;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
 
 /**
- * TODO: Error if field annotated by @Dummy is not an EOEnterpriseObject
- * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -102,10 +100,10 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void cannotCreateDummyObjectForNonEnterpriseObjectField() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	WrongTypeStubTestCase stubTestCase = new WrongTypeStubTestCase();
+	WrongTypeStubTestCaseClass stubTestCase = new WrongTypeStubTestCaseClass();
 
-	thrown.expect(UnsupportedOperationException.class);
-	thrown.expectMessage(is("Cannot create dummy object. The field wrongTypeProperty of java.lang.String type is not a com.webobjects.eocontrol.EOEnterpriseObject."));
+	thrown.expect(WOUnitException.class);
+	thrown.expectMessage(is("Cannot create dummy object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
 
 	editingContext.before(stubTestCase);
     }
@@ -222,25 +220,11 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void createSavedObjectForFieldAnnotatedAsDummy() throws Throwable {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	StubTestCase stubTestCase = new StubTestCase();
+	StubTestCaseClass stubTestCase = new StubTestCaseClass();
 
 	editingContext.before(stubTestCase);
 
-	EOEnterpriseObject savedObject = stubTestCase.foo;
-
-	assertThat(savedObject, notNullValue());
-	assertThat(editingContext.ignoredObjects, hasItem(savedObject));
-    }
-
-    @Test
-    public void createSavedObjectForPrivateFieldAnnotatedAsDummy() throws Throwable {
-	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
-
-	PrivateAnnotationStubTestCase stubTestCase = new PrivateAnnotationStubTestCase();
-
-	editingContext.before(stubTestCase);
-
-	EOEnterpriseObject savedObject = stubTestCase.privateProperty();
+	EOEnterpriseObject savedObject = stubTestCase.foo();
 
 	assertThat(savedObject, notNullValue());
 	assertThat(editingContext.ignoredObjects, hasItem(savedObject));

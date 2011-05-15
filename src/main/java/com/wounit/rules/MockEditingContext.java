@@ -35,6 +35,7 @@ import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 import com.wounit.annotations.Dummy;
+import com.wounit.exceptions.WOUnitException;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
@@ -102,6 +103,11 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	this(new MockObjectStoreCoordinator(), modelNames);
     }
 
+    /**
+     * Clear the ignored objects array after the test execution.
+     * 
+     * @see com.wounit.rules.AbstractEditingContextRule#after(java.lang.Object)
+     */
     @Override
     protected void after(Object target) {
 	ignoredObjects.clear();
@@ -109,6 +115,12 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	super.after(target);
     }
 
+    /**
+     * Create dummy objects for fields annotated with @Dummy before the test
+     * execution.
+     * 
+     * @see com.wounit.rules.AbstractEditingContextRule#before(java.lang.Object)
+     */
     @Override
     protected void before(Object target) {
 	super.before(target);
@@ -116,26 +128,27 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	Field fields[] = target.getClass().getDeclaredFields();
 
 	for (Field field : fields) {
-	    if (field.isAnnotationPresent(Dummy.class)) {
-		if (!EOEnterpriseObject.class.isAssignableFrom(field.getType())) {
-		    throw new UnsupportedOperationException("Cannot create object for field annotated with @Dummy. The field " + field.getName() + " of type java.lang.String  is not a com.webobjects.eocontrol.EOEnterpriseObject.");
-		}
+	    if (!field.isAnnotationPresent(Dummy.class)) {
+		continue;
+	    }
 
-		@SuppressWarnings("unchecked")
-		EOEnterpriseObject savedObject = createSavedObject((Class<EOEnterpriseObject>) field.getType());
+	    Class<?> type = field.getType();
 
-		if (!field.isAccessible()) {
-		    field.setAccessible(true);
-		}
+	    if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
+		throw new WOUnitException("Cannot create dummy object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + Dummy.class.getSimpleName() + ".");
+	    }
 
-		try {
-		    field.set(target, savedObject);
-		} catch (Exception exception) {
-		    throw new RuntimeException(exception);
-		}
+	    @SuppressWarnings("unchecked")
+	    EOEnterpriseObject savedObject = createSavedObject((Class<EOEnterpriseObject>) type);
+
+	    field.setAccessible(true);
+
+	    try {
+		field.set(target, savedObject);
+	    } catch (Exception exception) {
+		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
 	    }
 	}
-
     }
 
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {
