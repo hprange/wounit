@@ -22,7 +22,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,17 +33,27 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
 
+@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractEditingContextTest {
     protected static final String TEST_MODEL_NAME = "Test";
+
+    @Mock
+    protected Statement mockStatement;
+
+    @Mock
+    protected Object mockTarget;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -53,7 +62,7 @@ public abstract class AbstractEditingContextTest {
     public void clearEditingContextChangesAfterTestExecution() throws Exception {
 	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	FooEntity foo = FooEntity.createFooEntity(editingContext);
 
@@ -61,7 +70,7 @@ public abstract class AbstractEditingContextTest {
 
 	editingContext.saveChanges();
 
-	editingContext.after();
+	editingContext.after(mockTarget);
 
 	editingContext = createEditingContext(TEST_MODEL_NAME);
 
@@ -76,11 +85,11 @@ public abstract class AbstractEditingContextTest {
     public void disposeEditingContextAfterTestExecution() throws Throwable {
 	AbstractEditingContextRule editingContext = Mockito.spy(createEditingContext(TEST_MODEL_NAME));
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	Mockito.verify(editingContext, Mockito.times(0)).dispose();
 
-	editingContext.after();
+	editingContext.after(mockTarget);
 
 	Mockito.verify(editingContext, Mockito.times(1)).dispose();
     }
@@ -93,8 +102,8 @@ public abstract class AbstractEditingContextTest {
 
 	AbstractEditingContextRule editingContext = createEditingContext();
 
-	editingContext.before();
-	editingContext.after();
+	editingContext.before(mockTarget);
+	editingContext.after(mockTarget);
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), notNullValue());
     }
@@ -103,33 +112,29 @@ public abstract class AbstractEditingContextTest {
     public void ensureEditingContextCleanUpIsTriggeredAfterTestExecution() throws Throwable {
 	AbstractEditingContextRule editingContext = spy(createEditingContext(TEST_MODEL_NAME));
 
-	Statement mockStatement = mock(Statement.class);
-
 	InOrder inOrder = inOrder(editingContext, mockStatement);
 
-	editingContext.apply(mockStatement, null, null).evaluate();
+	editingContext.apply(mockStatement, null, mockTarget).evaluate();
 
 	inOrder.verify(mockStatement).evaluate();
-	inOrder.verify(editingContext).after();
+	inOrder.verify(editingContext).after(mockTarget);
     }
 
     @Test
     public void ensureEditingContextCleanUpIsTriggeredEvenIfTestExecutionThrowsException() throws Throwable {
 	AbstractEditingContextRule editingContext = spy(createEditingContext(TEST_MODEL_NAME));
 
-	Statement mockStatement = mock(Statement.class);
-
 	doThrow(new Throwable("test error")).when(mockStatement).evaluate();
 
 	InOrder inOrder = inOrder(editingContext, mockStatement);
 
 	try {
-	    editingContext.apply(mockStatement, null, null).evaluate();
+	    editingContext.apply(mockStatement, null, mockTarget).evaluate();
 	} catch (Throwable exception) {
 	    // DO NOTHING
 	} finally {
 	    inOrder.verify(mockStatement).evaluate();
-	    inOrder.verify(editingContext).after();
+	    inOrder.verify(editingContext).after(mockTarget);
 	}
     }
 
@@ -137,13 +142,11 @@ public abstract class AbstractEditingContextTest {
     public void ensureEditingContextInitializationIsTriggeredBeforeTestExecution() throws Throwable {
 	AbstractEditingContextRule editingContext = spy(createEditingContext(TEST_MODEL_NAME));
 
-	Statement mockStatement = mock(Statement.class);
-
 	InOrder inOrder = inOrder(editingContext, mockStatement);
 
-	editingContext.apply(mockStatement, null, null).evaluate();
+	editingContext.apply(mockStatement, null, mockTarget).evaluate();
 
-	inOrder.verify(editingContext).before();
+	inOrder.verify(editingContext).before(mockTarget);
 	inOrder.verify(mockStatement).evaluate();
     }
 
@@ -192,7 +195,7 @@ public abstract class AbstractEditingContextTest {
 
 	verify(editingContext, times(0)).lock();
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	verify(editingContext, times(1)).lock();
     }
@@ -201,8 +204,8 @@ public abstract class AbstractEditingContextTest {
     public void removeModelsLoadedByTheTemporaryEditingContextAfterTestExecution() throws Throwable {
 	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
-	editingContext.after();
+	editingContext.before(mockTarget);
+	editingContext.after(mockTarget);
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
     }
@@ -212,11 +215,11 @@ public abstract class AbstractEditingContextTest {
     public void revertEditingContextChangesAfterRunningTheTestCases() throws Exception {
 	AbstractEditingContextRule editingContext = spy(createEditingContext());
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	verify(editingContext, times(0)).revert();
 
-	editingContext.after();
+	editingContext.after(mockTarget);
 
 	verify(editingContext, times(1)).revert();
     }
@@ -236,11 +239,11 @@ public abstract class AbstractEditingContextTest {
     public void unlockEditingContextAfterRunningTheTestCase() throws Exception {
 	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext());
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	verify(editingContext, times(0)).unlock();
 
-	editingContext.after();
+	editingContext.after(mockTarget);
 
 	// The internal disposal logic calls the unlock too
 	verify(editingContext, times(2)).unlock();

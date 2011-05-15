@@ -34,6 +34,7 @@ import com.webobjects.eocontrol._EOIntegralKeyGlobalID;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
+import com.wounit.annotations.Dummy;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
@@ -102,10 +103,39 @@ public class MockEditingContext extends AbstractEditingContextRule {
     }
 
     @Override
-    protected void after() {
+    protected void after(Object target) {
 	ignoredObjects.clear();
 
-	super.after();
+	super.after(target);
+    }
+
+    @Override
+    protected void before(Object target) {
+	super.before(target);
+
+	Field fields[] = target.getClass().getDeclaredFields();
+
+	for (Field field : fields) {
+	    if (field.isAnnotationPresent(Dummy.class)) {
+		if (!EOEnterpriseObject.class.isAssignableFrom(field.getType())) {
+		    throw new UnsupportedOperationException("Cannot create object for field annotated with @Dummy. The field " + field.getName() + " of type java.lang.String  is not a com.webobjects.eocontrol.EOEnterpriseObject.");
+		}
+
+		@SuppressWarnings("unchecked")
+		EOEnterpriseObject savedObject = createSavedObject((Class<EOEnterpriseObject>) field.getType());
+
+		if (!field.isAccessible()) {
+		    field.setAccessible(true);
+		}
+
+		try {
+		    field.set(target, savedObject);
+		} catch (Exception exception) {
+		    throw new RuntimeException(exception);
+		}
+	    }
+	}
+
     }
 
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {

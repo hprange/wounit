@@ -101,7 +101,7 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
      * original adaptor name of each loaded <code>EOModel</code>.
      */
     @Override
-    protected void after() {
+    protected void after(Object target) {
 	ERMemoryAdaptorContext adaptorContext = currentAdaptorContext();
 
 	if (adaptorContext != null) {
@@ -116,7 +116,7 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 	    model.setAdaptorName(adaptorsToRestore.get(modelName));
 	}
 
-	super.after();
+	super.after(target);
     }
 
     ERMemoryAdaptorContext currentAdaptorContext() {

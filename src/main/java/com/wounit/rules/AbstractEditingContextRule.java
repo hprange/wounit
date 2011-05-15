@@ -73,8 +73,11 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     /**
      * Reset all changes made into this editing context and unload all models
      * loaded by this class at the beginning of the test execution.
+     * 
+     * @param target
+     *            The object on with the method has run.
      */
-    protected void after() {
+    protected void after(Object target) {
 	unlock();
 	dispose();
 
@@ -93,17 +96,16 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * @see org.junit.rules.MethodRule#apply(org.junit.runners.model.Statement,
      * org.junit.runners.model.FrameworkMethod, java.lang.Object)
      */
-    public Statement apply(final Statement base, FrameworkMethod method, Object target) {
+    public final Statement apply(final Statement base, FrameworkMethod method, final Object target) {
 	return new Statement() {
-
 	    @Override
 	    public void evaluate() throws Throwable {
-		before();
+		before(target);
 
 		try {
 		    base.evaluate();
 		} finally {
-		    after();
+		    after(target);
 		}
 	    }
 	};
@@ -111,8 +113,11 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
     /**
      * Set up this editing context in order to execute the test case.
+     * 
+     * @param target
+     *            The object on with the method will be run.
      */
-    protected void before() {
+    protected void before(Object target) {
 	lock();
     }
 

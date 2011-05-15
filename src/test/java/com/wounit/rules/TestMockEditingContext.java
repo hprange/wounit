@@ -52,11 +52,16 @@ import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
+import com.wounit.stubs.PrivateAnnotationStubTestCase;
+import com.wounit.stubs.StubTestCase;
+import com.wounit.stubs.WrongTypeStubTestCase;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
 
 /**
+ * TODO: Error if field annotated by @Dummy is not an EOEnterpriseObject
+ * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -91,6 +96,18 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	FooEntity entity = editingContext.createSavedObject(FooEntity.class);
 
 	assertThat(entity.globalIdDuringAwakeFromInsertion().isTemporary(), is(true));
+    }
+
+    @Test
+    public void cannotCreateDummyObjectForNonEnterpriseObjectField() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	WrongTypeStubTestCase stubTestCase = new WrongTypeStubTestCase();
+
+	thrown.expect(UnsupportedOperationException.class);
+	thrown.expectMessage(is("Cannot create dummy object. The field wrongTypeProperty of java.lang.String type is not a com.webobjects.eocontrol.EOEnterpriseObject."));
+
+	editingContext.before(stubTestCase);
     }
 
     @Test
@@ -148,13 +165,13 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void clearIgnoredObjectsArrayAfterTestExecution() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	FooEntity entity = new FooEntity();
 
 	editingContext.insertSavedObject(entity);
 
-	editingContext.after();
+	editingContext.after(mockTarget);
 
 	assertThat(editingContext.ignoredObjects.isEmpty(), is(true));
     }
@@ -199,6 +216,34 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	assertThat(result, notNullValue());
 	assertThat(result.editingContext(), is((EOEditingContext) editingContext));
+    }
+
+    @Test
+    public void createSavedObjectForFieldAnnotatedAsDummy() throws Throwable {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	StubTestCase stubTestCase = new StubTestCase();
+
+	editingContext.before(stubTestCase);
+
+	EOEnterpriseObject savedObject = stubTestCase.foo;
+
+	assertThat(savedObject, notNullValue());
+	assertThat(editingContext.ignoredObjects, hasItem(savedObject));
+    }
+
+    @Test
+    public void createSavedObjectForPrivateFieldAnnotatedAsDummy() throws Throwable {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	PrivateAnnotationStubTestCase stubTestCase = new PrivateAnnotationStubTestCase();
+
+	editingContext.before(stubTestCase);
+
+	EOEnterpriseObject savedObject = stubTestCase.privateProperty();
+
+	assertThat(savedObject, notNullValue());
+	assertThat(editingContext.ignoredObjects, hasItem(savedObject));
     }
 
     @Test
@@ -467,8 +512,8 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void removeModelsLoadedAfterTestExecution() throws Throwable {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
-	editingContext.after();
+	editingContext.before(mockTarget);
+	editingContext.after(mockTarget);
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
     }
@@ -477,7 +522,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void savedObjectHasNonTemporaryGlobalId() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
 
@@ -485,14 +530,14 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	assertThat(mockFoo.__globalID().isTemporary(), is(false));
 
-	editingContext.after();
+	editingContext.after(mockTarget);
     }
 
     @Test
     public void savedObjectIncrementsGlobalFakeId() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	editingContext.createSavedObject(FooEntity.class);
 
@@ -502,14 +547,14 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	assertThat((Integer) ((EOKeyGlobalID) mockFoo.__globalID()).keyValues()[0], is(2));
 
-	editingContext.after();
+	editingContext.after(mockTarget);
     }
 
     @Test
     public void savedObjectUsesGlobalFakeId() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before();
+	editingContext.before(mockTarget);
 
 	FooEntity.createFooEntity(editingContext);
 
@@ -519,7 +564,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	assertThat((Integer) ((EOKeyGlobalID) mockFoo.__globalID()).keyValues()[0], is(2));
 
-	editingContext.after();
+	editingContext.after(mockTarget);
     }
 
     @Before
