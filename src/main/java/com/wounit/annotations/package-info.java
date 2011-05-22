@@ -16,8 +16,9 @@
 
 /**
  * This package contains annotations to be used in companion of the
- * {@link com.wounit.rules.MockEditingContext}. They assist in writing more
- * readable and less verbose unit tests.
+ * {@link com.wounit.rules.MockEditingContext} or the
+ * {@link com.wounit.rules.TemporaryEditingContext} rules. They assist in
+ * writing more readable and less verbose unit tests.
  * 
  * @since 1.1
  */

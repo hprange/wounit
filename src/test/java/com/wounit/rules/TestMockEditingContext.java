@@ -54,7 +54,7 @@ import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
 import com.wounit.stubs.StubTestCaseClass;
-import com.wounit.stubs.WrongTypeStubTestCaseClass;
+import com.wounit.stubs.WrongTypeForDummyStubTestCaseClass;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
@@ -100,7 +100,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void cannotCreateDummyObjectForNonEnterpriseObjectField() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	WrongTypeStubTestCaseClass stubTestCase = new WrongTypeStubTestCaseClass();
+	WrongTypeForDummyStubTestCaseClass stubTestCase = new WrongTypeForDummyStubTestCaseClass();
 
 	thrown.expect(WOUnitException.class);
 	thrown.expectMessage(is("Cannot create dummy object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));

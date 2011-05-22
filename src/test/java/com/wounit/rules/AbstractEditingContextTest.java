@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
@@ -42,8 +43,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
+import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
+import com.wounit.exceptions.WOUnitException;
 import com.wounit.model.FooEntity;
+import com.wounit.stubs.StubTestCaseClass;
+import com.wounit.stubs.WrongTypeForUnderTestStubTestCaseClass;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractEditingContextTest {
@@ -57,6 +62,18 @@ public abstract class AbstractEditingContextTest {
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void cannotCreateObjectUnderTestForNonEnterpriseObjectFields() throws Exception {
+	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+
+	WrongTypeForUnderTestStubTestCaseClass mockTarget = new WrongTypeForUnderTestStubTestCaseClass();
+
+	thrown.expect(WOUnitException.class);
+	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @UnderTest."));
+
+	editingContext.before(mockTarget);
+    }
 
     @Test
     public void clearEditingContextChangesAfterTestExecution() throws Exception {
@@ -77,6 +94,24 @@ public abstract class AbstractEditingContextTest {
 	NSArray<FooEntity> result = FooEntity.fetchAllFooEntities(editingContext);
 
 	assertThat(result.isEmpty(), is(true));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createAndInsertObjectForFieldAnnotatedWithUnderTest() throws Exception {
+	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+
+	StubTestCaseClass mockTestCase = new StubTestCaseClass();
+
+	editingContext.before(mockTestCase);
+
+	EOEnterpriseObject objectUnderTest = mockTestCase.objectUnderTest();
+
+	assertThat(objectUnderTest, notNullValue());
+
+	NSArray<EOEnterpriseObject> insertedObjects = editingContext.insertedObjects();
+
+	assertThat(insertedObjects, hasItem(objectUnderTest));
     }
 
     protected abstract AbstractEditingContextRule createEditingContext(String... modelNames);
