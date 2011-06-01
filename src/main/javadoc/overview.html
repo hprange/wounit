@@ -29,6 +29,7 @@
 import static com.wounit.EOAssert.*;
 import com.wounit.rules.MockEditingContext;
 import com.wounit.annotations.Dummy;
+import com.wounit.annotations.UnderTest;
 
 public class TestFoo {
    &#64;Rule
@@ -37,10 +38,11 @@ public class TestFoo {
    &#64;Dummy
    private Bar mockBar;
 
+   &#64;UnderTest
+   private Foo foo;
+
    &#64;Test
    public void cantSaveFooWithOnlyOneBar() {
-      Foo foo = Foo.createFoo(editingContext);
-
       foo.addToBarRelationship(mockBar);
 
       confirm(foo, cannotBeSavedBecause(&quot;Foo must have at least 2 bars related to it&quot;));
@@ -52,15 +54,17 @@ public class TestFoo {
     <PRE>
 import static com.wounit.EOAssert.*;
 import com.wounit.rules.TemporaryEditingContext;
+import com.wounit.annotations.UnderTest;
 
 public class TestFoo {
    &#64;Rule
    public TemporaryEditingContext editingContext = new TemporaryEditingContext(&quot;FooModel&quot;);
 
+   &#64;UnderTest
+   private Foo foo;
+
    &#64;Test
    public void cantSaveWithNullProperty() {
-      Foo foo = Foo.createFoo(editingContext);
-
       foo.setBar(null);
 
       confirm(foo, cannotBeSavedBecause(&quot;The bar property cannot be null&quot;));
