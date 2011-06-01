@@ -35,7 +35,6 @@ import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 import com.wounit.annotations.Dummy;
-import com.wounit.exceptions.WOUnitException;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
@@ -70,6 +69,17 @@ import er.extensions.foundation.ERXArrayUtilities;
  * @since 1.0
  */
 public class MockEditingContext extends AbstractEditingContextRule {
+
+    /**
+     * This factory creates dummy enterprise objects using the
+     * {@link MockEditingContext#createSavedObject(Class)} method.
+     */
+    static class DummyFactory implements EnterpriseObjectFactory {
+	public EOEnterpriseObject create(EOEditingContext editingContext, Class<? extends EOEnterpriseObject> type) {
+	    return ((MockEditingContext) editingContext).createSavedObject(type);
+	}
+    }
+
     /**
      * Entity name key representation.
      */
@@ -125,30 +135,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     protected void before(Object target) {
 	super.before(target);
 
-	Field fields[] = target.getClass().getDeclaredFields();
-
-	for (Field field : fields) {
-	    if (!field.isAnnotationPresent(Dummy.class)) {
-		continue;
-	    }
-
-	    Class<?> type = field.getType();
-
-	    if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
-		throw new WOUnitException("Cannot create dummy object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + Dummy.class.getSimpleName() + ".");
-	    }
-
-	    @SuppressWarnings("unchecked")
-	    EOEnterpriseObject savedObject = createSavedObject((Class<EOEnterpriseObject>) type);
-
-	    field.setAccessible(true);
-
-	    try {
-		field.set(target, savedObject);
-	    } catch (Exception exception) {
-		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
-	    }
-	}
+	processAnnotations(target, Dummy.class, new DummyFactory());
     }
 
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {

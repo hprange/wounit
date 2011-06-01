@@ -103,7 +103,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	WrongTypeForDummyStubTestCaseClass stubTestCase = new WrongTypeForDummyStubTestCaseClass();
 
 	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create dummy object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
 
 	editingContext.before(stubTestCase);
     }

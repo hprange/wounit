@@ -16,6 +16,7 @@
 
 package com.wounit.rules;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,8 +26,11 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
+import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
+import com.webobjects.eoaccess.EOUtilities;
+import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.annotations.UnderTest;
@@ -44,6 +48,25 @@ import er.extensions.eof.ERXEC;
  * @since 1.0
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
+
+    /**
+     * This interface represents a simple factory to create enterprise objects.
+     */
+    static interface EnterpriseObjectFactory {
+	EOEnterpriseObject create(EOEditingContext editingContext, Class<? extends EOEnterpriseObject> type);
+    }
+
+    /**
+     * This factory creates enterprise objects and inserts them into the
+     * specified editing context.
+     */
+    static class UnderTestFactory implements EnterpriseObjectFactory {
+	public EOEnterpriseObject create(EOEditingContext editingContext, Class<? extends EOEnterpriseObject> type) {
+	    EOEntity entity = EOUtilities.entityForClass(editingContext, type);
+
+	    return EOUtilities.createAndInsertInstance(editingContext, entity.name());
+	}
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -124,37 +147,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     protected void before(Object target) {
 	lock();
 
-	Field fields[] = target.getClass().getDeclaredFields();
-
-	for (Field field : fields) {
-	    if (!field.isAnnotationPresent(UnderTest.class)) {
-		continue;
-	    }
-
-	    Class<?> type = field.getType();
-
-	    if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
-		throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + UnderTest.class.getSimpleName() + ".");
-	    }
-
-	    EOEnterpriseObject object;
-
-	    try {
-		object = (EOEnterpriseObject) type.getConstructor().newInstance();
-
-		insertObject(object);
-	    } catch (Exception exception) {
-		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
-	    }
-
-	    field.setAccessible(true);
-
-	    try {
-		field.set(target, object);
-	    } catch (Exception exception) {
-		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
-	    }
-	}
+	processAnnotations(target, UnderTest.class, new UnderTestFactory());
     }
 
     /**
@@ -190,4 +183,29 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	modelToUnload.add(modelName);
     }
 
+    protected void processAnnotations(Object target, Class<? extends Annotation> annotation, EnterpriseObjectFactory factory) {
+	Field fields[] = target.getClass().getDeclaredFields();
+
+	for (Field field : fields) {
+	    if (!field.isAnnotationPresent(annotation)) {
+		continue;
+	    }
+
+	    Class<?> type = field.getType();
+
+	    if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
+		throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
+	    }
+
+	    EOEnterpriseObject object = factory.create(this, type.asSubclass(EOEnterpriseObject.class));
+
+	    field.setAccessible(true);
+
+	    try {
+		field.set(target, object);
+	    } catch (Exception exception) {
+		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
+	    }
+	}
+    }
 }
