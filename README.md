@@ -6,7 +6,7 @@ applications using JUnit 4.7 or later capabilities. This library can be
 useful if you write unit/integration tests for Enterprise Objects or
 employ the TDD technique on your projects.
 
-**Version**: 1.0
+**Version**: 1.1
 
 Requirements
 ------------
@@ -22,8 +22,11 @@ Features
 and integration testing.
 * **Wonderful**: developed on top of Wonder classes, make possible the use of the augmented
 transaction process specified by the ERXEnterpriseObject interface.
-* **Easy to use**: No extension required for test classes. The WOUnit library make use of
-the MethodRule approach provided by JUnit 4.7. It also load EOModels automatically.
+* **Easy to use**: no extension required for test classes. The WOUnit library make use of
+generics, annotations and the rule approach provided by JUnit 4.7.
+* **Simple but not simpler**: only one line of code and you are ready to start writing tests.
+The rules are responsible for loading eomodels, initializing and cleaning up before/after
+test executions.
 
 Installation
 ------------
@@ -33,7 +36,7 @@ Maven users have to add the dependency declaration:
 	<dependency>
 		<groupId>com.wounit</groupId>
 		<artifactId>wounit</artifactId>
-		<version>1.0</version>
+		<version>1.1</version>
 	</dependency>
 
 Non Maven users have to:
@@ -46,18 +49,22 @@ Usage
 
 	import static com.wounit.matchers.EOAssert.*;
 	import com.wounit.rules.MockEditingContext;
+	import com.wounit.annotations.Dummy;
+    import com.wounit.annotations.UnderTest;
 
-	public class TestMyEntity {
+	public class MyEntityTest {
 		@Rule
 		public MockEditingContext ec = new MockEditingContext("MyModel");
 
+		@Dummy
+		private Bar dummyBar;
+
+		@UnderTest
+		private Foo foo;
+
 		@Test
 		public void cantSaveFooWithOnlyOneBar() {
-			Foo foo = Foo.createFoo(ec);
-
-			Bar mockBar = ec.createSavedObject(Bar.class);
-
-			foo.addToBarRelationship(mockBar);
+			foo.addToBarRelationship(dummyBar);
 
 			confirm(foo, cannotBeSavedBecause("Foo must have at least 2 bars related to it"));
 		}
@@ -67,15 +74,17 @@ OR
 
 	import static com.wounit.matchers.EOAssert.*;
 	import com.wounit.rules.TemporaryEditingContext;
+	import com.wounit.annotations.UnderTest;
 
-	public class TestMyEntity {
+	public class MyEntityTest {
 		@Rule
 		public TemporaryEditingContext ec = new TemporaryEditingContext("MyModel");
 
+		@UnderTest
+		private Foo foo;
+
 		@Test
 		public void cannotSaveFooIfBarIsNull() {
-			Foo foo = Foo.createFoo(ec);
-
 			foo.setBar(null);
 
 			confirm(foo, cannotBeSavedBecause("The bar property cannot be null"));
