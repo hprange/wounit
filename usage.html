@@ -21,9 +21,9 @@
 		<a href="http://github.com/hprange/wounit"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 		<div id="container">
 			<div class="download">
-				<a href="http://github.com/hprange/wounit/zipball/wounit-1.0">
+				<a href="http://github.com/hprange/wounit/zipball/wounit-1.1">
 					<img border="0" width="90" src="images/zip.png" alt="" /></a>
-				<a href="https://github.com/downloads/hprange/wounit/wounit-1.0.jar">
+				<a href="https://github.com/downloads/hprange/wounit/wounit-1.1.jar">
 					<img border="0" width="90" src="images/jar.png" alt="" /></a>
 			</div>
 			<h1><a href="index.html"><img border="0" src="images/wounit.png" alt="" /></a></h1>
@@ -33,23 +33,25 @@
 			</div>
 			<h2>WOUnit Basics</h2>
 			<p>
-				The WOUnit framework provides implemetations of the MethodRule interface defined by JUnit. You don't have to know the internals of the MethodRule in order to write tests with WOUnit. It is enough to know that you need to annotate a public field in your test class with the <code>@Rule</code> (lines 7 and 8). Annotating the MockEditingContext field is sufficient to ensure that the editing context will be initialized before and disposed after each test case has been executed.
+				The WOUnit framework provides implemetations of the MethodRule interface defined by JUnit. You don't have to know the internals of the MethodRule in order to write tests with WOUnit. It is enough to know that you need to annotate a public field in your test class with the <code>@Rule</code> (lines 8 and 9). Annotating the MockEditingContext field is sufficient to ensure that the editing context will be initialized before and disposed after each test case has been executed.
 			</p>
 			<p>
-				<pre class="brush: java; toolbar: false; highlight: [1,7,8,16];">
+				<pre class="brush: java; toolbar: false; highlight: [1,8,9,11,12,18];">
 import static com.wounit.matchers.EOAssert.*;
 import com.wounit.rules.MockEditingContext;
+import com.wounit.annotations.UnderTest;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TestMyEntity {
+public class FooTest {
 	@Rule
 	public MockEditingContext ec = new MockEditingContext("MyModel");
 	
+	@UnderTest
+	private Foo foo;
+	
 	@Test
 	public void cantSaveFooWithNullProperty() {
-		Foo foo = Foo.createFoo(ec);
-		
 		foo.setProperty(null);
 		
 		confirm(foo, cannotBeSaved());
@@ -57,7 +59,10 @@ public class TestMyEntity {
 }</pre>
 			</p>
 			<p>
-				Another feature of the WOUnit framework is a collection of matchers to facilitate the verification of conditions related to enterprise objets and editing contexts. If you static import the <code>EOAssert</code> methods then you'll be able write more readable assertions (lines 1 and 16).
+				From version 1.1 of WOUnit framework, the <code>@UnderTest</code> and <code>@Dummy</code> annotations were added to simplify the creation of enterprise objects. Fields annotated with one of those annotations are automatically populated with an inserted instance of the expected enterprise object type (lines 11 and 12).
+			</p>
+			<p>
+				Another feature of the WOUnit framework is a collection of matchers to facilitate the verification of conditions related to enterprise objets and editing contexts. If you static import the <code>EOAssert</code> methods then you'll be able to write more readable assertions (lines 1 and 18).
 			</p>
 			<h2>Unit Test with MockEditingContext</h2>
 			<p>
@@ -83,7 +88,7 @@ public class TestMyModel {
 public void testingFooLogic() {
 	Foo foo = Foo.createFoo(ec);
 	
-	Bar mockBar = ec.createSavedObject(Bar.class);
+	Bar dummyBar = ec.createSavedObject(Bar.class);
 	
 	// Do something with foo using the dummy object...
 }</pre>
@@ -99,9 +104,9 @@ public void testingAnotherFooLogic() {
 	Foo foo = Foo.createFoo(ec);
 	
 	// Decorate or spy a dummy object before inserting
-	Bar mockBar = spy(new Bar());
+	Bar dummyBar = spy(new Bar());
 	
-	ec.insertSavedObject(mockBar);
+	ec.insertSavedObject(dummyBar);
 	
 	// Do something with foo using the dummy object...
 }</pre>
@@ -119,7 +124,7 @@ public void testingAnotherFooLogic() {
 				TemporaryEditingContext behaves as a real EO. This kind of feature is useful to 
 				validate the behavior of a group of EOs.
 				<pre class="brush: java; toolbar: false;">
-public class TestMyModel {
+public class MyModelTest {
 	@Rule
 	public TemporaryEditingContext ec = 
 			new TemporaryEditingContext("MyModel");
@@ -135,6 +140,96 @@ public class TestMyModel {
 		// Verify a condition of foo and bar...
 	}
 }</pre>
+			</p>
+			<h2><code>@Dummy</code> and <code>@UnderTest</code> Annotations</h2>
+			<p>
+				Creating the object under test and related dummy objects for each test case can
+				be very monotonous task.
+				<pre class="brush: java; toolbar: false;">
+public class FooTest {
+	@Test
+	public void testOneLogic() throws Exception {
+		Foo foo = Foo.createFoo(ec);
+		
+		Bar dummyBar = ec.createSavedObject(Bar.class);
+		
+		// Do something with foo...
+		
+		// Verify a condition of foo or bar...
+	}
+	
+	@Test
+	public void testAnotherLogic() throws Exception {
+		Foo foo = Foo.createFoo(ec);
+		
+		Bar dummyBar = ec.createSavedObject(Bar.class);
+		
+		// Do something else with foo...
+		
+		// Verify another condition of foo or bar...
+	}
+}</pre>
+			</p>
+				JUnit provides the <code>@Before</code> annotation to aliviate
+				the repetive task of creating test fixtures.
+				<pre class="brush: java; toolbar: false;">
+public class FooTest {
+	private Foo foo;
+	private Bar dummyBar;
+	
+	@Before
+	public void setup() {
+		foo = Foo.createFoo(ec);
+		dummyBar = ec.createSavedObject(Bar.class);
+	}
+	
+	@Test
+	public void testOneLogic() throws Exception {
+		// Do something with foo...
+		
+		// Verify a condition of foo or bar...
+	}
+	
+	@Test
+	public void testAnotherLogic() throws Exception {
+		// Do something else with foo...
+		
+		// Verify another condition of foo or bar...
+	}
+}</pre>
+			</p>
+			<p>
+				But even that solution requires a bit of boilerplate code.
+				The <code>@UnderTest</code> and <code>@Dummy</code> annotations were developed
+				to simplify the creation of enterprise objects
+				<pre class="brush: java; toolbar: false;">
+public class FooTest {
+	@UnderTest
+	private Foo foo;
+	
+	@Dummy
+	private Bar dummyBar;
+	
+	@Test
+	public void testOneLogic() throws Exception {
+		// Do something with foo...
+		
+		// Verify a condition of foo or bar...
+	}
+	
+	@Test
+	public void testAnotherLogic() throws Exception {
+		// Do something else with foo...
+		
+		// Verify another condition of foo or bar...
+	}
+}</pre>
+			</p>
+			<p>
+				The <code>@UnderTest</code> annotation can be used to create real enterprise objects and insert them into the editing context rule. Usually, unit tests will have only one field annotated with <code>@UnderTest</code> and the need for more than one field annotated can be considered a test smell. This annotation can be used with both <code>MockEditingContext</code> or <code>TemporaryEditingContext</code> rules.
+			</p>
+			<p>
+				The <code>@Dummy</code> annotation can be used to create saved enterprise objects and insert them into the editing context rule. You can have as many fileds annotated with <code>@Dummy</code> as required to test the object under test in isolation. This annotation only works with the <code>MockEditingContext</code> rule.
 			</p>
 			<h2>Assertion with EOAssert</h2>
 			<p>
