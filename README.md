@@ -22,7 +22,7 @@ Features
 and integration testing.
 * **Wonderful**: developed on top of Wonder classes, make possible the use of the augmented
 transaction process specified by the ERXEnterpriseObject interface.
-* **Easy to use**: no extension required for test classes. The WOUnit library make use of
+* **Easy to use**: no extension required for test classes. The WOUnit library makes use of
 generics, annotations and the rule approach provided by JUnit 4.7.
 * **Simple but not simpler**: only one line of code and you are ready to start writing tests.
 The rules are responsible for loading eomodels, initializing and cleaning up before/after
