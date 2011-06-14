@@ -1,2 +1,4 @@
+com.wounit.annotations
+com.wounit.exceptions
 com.wounit.matchers
 com.wounit.rules
