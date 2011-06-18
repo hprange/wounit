@@ -53,8 +53,9 @@ import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
-import com.wounit.stubs.StubTestCaseClass;
-import com.wounit.stubs.WrongTypeForDummyStubTestCaseClass;
+import com.wounit.stubs.ChildStubTestCase;
+import com.wounit.stubs.StubTestCase;
+import com.wounit.stubs.WrongTypeForDummyStubTestCase;
 
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
@@ -100,7 +101,7 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void cannotCreateDummyObjectForNonEnterpriseObjectField() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	WrongTypeForDummyStubTestCaseClass stubTestCase = new WrongTypeForDummyStubTestCaseClass();
+	WrongTypeForDummyStubTestCase stubTestCase = new WrongTypeForDummyStubTestCase();
 
 	thrown.expect(WOUnitException.class);
 	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
@@ -220,7 +221,21 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void createSavedObjectForFieldAnnotatedAsDummy() throws Throwable {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	StubTestCaseClass stubTestCase = new StubTestCaseClass();
+	StubTestCase stubTestCase = new StubTestCase();
+
+	editingContext.before(stubTestCase);
+
+	EOEnterpriseObject savedObject = stubTestCase.foo();
+
+	assertThat(savedObject, notNullValue());
+	assertThat(editingContext.ignoredObjects, hasItem(savedObject));
+    }
+
+    @Test
+    public void createSavedObjectForInheritedFieldAnnotatedAsDummy() throws Throwable {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	ChildStubTestCase stubTestCase = new ChildStubTestCase();
 
 	editingContext.before(stubTestCase);
 

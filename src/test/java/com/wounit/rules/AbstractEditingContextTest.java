@@ -47,8 +47,9 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
 import com.wounit.exceptions.WOUnitException;
 import com.wounit.model.FooEntity;
-import com.wounit.stubs.StubTestCaseClass;
-import com.wounit.stubs.WrongTypeForUnderTestStubTestCaseClass;
+import com.wounit.stubs.ChildStubTestCase;
+import com.wounit.stubs.StubTestCase;
+import com.wounit.stubs.WrongTypeForUnderTestStubTestCase;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractEditingContextTest {
@@ -67,7 +68,7 @@ public abstract class AbstractEditingContextTest {
     public void cannotCreateObjectUnderTestForNonEnterpriseObjectFields() throws Exception {
 	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
 
-	WrongTypeForUnderTestStubTestCaseClass mockTarget = new WrongTypeForUnderTestStubTestCaseClass();
+	WrongTypeForUnderTestStubTestCase mockTarget = new WrongTypeForUnderTestStubTestCase();
 
 	thrown.expect(WOUnitException.class);
 	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @UnderTest."));
@@ -97,11 +98,10 @@ public abstract class AbstractEditingContextTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void createAndInsertObjectForFieldAnnotatedWithUnderTest() throws Exception {
 	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
 
-	StubTestCaseClass mockTestCase = new StubTestCaseClass();
+	StubTestCase mockTestCase = new StubTestCase();
 
 	editingContext.before(mockTestCase);
 
@@ -109,6 +109,25 @@ public abstract class AbstractEditingContextTest {
 
 	assertThat(objectUnderTest, notNullValue());
 
+	@SuppressWarnings("unchecked")
+	NSArray<EOEnterpriseObject> insertedObjects = editingContext.insertedObjects();
+
+	assertThat(insertedObjects, hasItem(objectUnderTest));
+    }
+
+    @Test
+    public void createAndInsertObjectForInheritedFieldAnnotatedWithUnderTest() throws Exception {
+	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+
+	ChildStubTestCase mockTestCase = new ChildStubTestCase();
+
+	editingContext.before(mockTestCase);
+
+	EOEnterpriseObject objectUnderTest = mockTestCase.objectUnderTest();
+
+	assertThat(objectUnderTest, notNullValue());
+
+	@SuppressWarnings("unchecked")
 	NSArray<EOEnterpriseObject> insertedObjects = editingContext.insertedObjects();
 
 	assertThat(insertedObjects, hasItem(objectUnderTest));

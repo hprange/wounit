@@ -20,7 +20,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -150,6 +152,16 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	processAnnotations(target, UnderTest.class, new UnderTestFactory());
     }
 
+    private List<Field> getAllFields(Class<?> type) {
+	List<Field> fields = new ArrayList<Field>();
+
+	for (Class<?> clazz = type; clazz != null; clazz = clazz.getSuperclass()) {
+	    fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+	}
+
+	return fields;
+    }
+
     /**
      * Load the model with the specified name into the default model group.
      * 
@@ -184,7 +196,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     }
 
     protected void processAnnotations(Object target, Class<? extends Annotation> annotation, EnterpriseObjectFactory factory) {
-	Field fields[] = target.getClass().getDeclaredFields();
+	List<Field> fields = getAllFields(target.getClass());
 
 	for (Field field : fields) {
 	    if (!field.isAnnotationPresent(annotation)) {
