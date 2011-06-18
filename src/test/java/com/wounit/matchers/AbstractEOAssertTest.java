@@ -32,11 +32,11 @@ import static com.wounit.matchers.EOAssert.hasNotBeenSaved;
 import static com.wounit.matchers.EOAssert.saveChanges;
 import static org.hamcrest.CoreMatchers.is;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.wounit.annotations.UnderTest;
 import com.wounit.model.FooEntity;
 import com.wounit.rules.AbstractEditingContextRule;
 
@@ -47,6 +47,7 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     @Rule
     public final T editingContext = createEditingContext("Test");
 
+    @UnderTest
     private FooEntity foo;
 
     @Rule
@@ -312,10 +313,5 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
 	foo.setCanBeSaved(true);
 
 	confirm(editingContext, saveChanges());
-    }
-
-    @Before
-    public void setup() {
-	foo = FooEntity.createFooEntity(editingContext);
     }
 }
