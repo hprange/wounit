@@ -126,7 +126,6 @@
 				<fileset dir="${maven.build.testDir.0}">
 					<include name="**/Test*.java" />
 					<include name="**/*Test.java" />
-					<include name="**/*TestCase.java" />
 					<exclude name="**/*Abstract*Test.java" />
 				</fileset>
 			</batchtest>

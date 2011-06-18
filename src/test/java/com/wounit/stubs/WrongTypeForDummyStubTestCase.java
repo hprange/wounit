@@ -13,27 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package com.wounit.stubs;
 
 import com.wounit.annotations.Dummy;
-import com.wounit.annotations.UnderTest;
-import com.wounit.model.FooEntity;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-public class StubTestCaseClass {
+public class WrongTypeForDummyStubTestCase {
     @Dummy
-    private FooEntity foo;
-
-    @UnderTest
-    private FooEntity object;
-
-    public FooEntity foo() {
-	return foo;
-    }
-
-    public FooEntity objectUnderTest() {
-	return object;
-    }
+    public String wrongTypeProperty;
 }

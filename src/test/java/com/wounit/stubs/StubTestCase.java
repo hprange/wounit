@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,12 +15,25 @@
  */
 package com.wounit.stubs;
 
+import com.wounit.annotations.Dummy;
 import com.wounit.annotations.UnderTest;
+import com.wounit.model.FooEntity;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-public class WrongTypeForUnderTestStubTestCaseClass {
+public class StubTestCase {
+    @Dummy
+    private FooEntity foo;
+
     @UnderTest
-    public String wrongTypeProperty;
+    private FooEntity object;
+
+    public FooEntity foo() {
+	return foo;
+    }
+
+    public FooEntity objectUnderTest() {
+	return object;
+    }
 }
