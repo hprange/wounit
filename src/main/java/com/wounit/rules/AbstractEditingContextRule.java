@@ -83,6 +83,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     AbstractEditingContextRule(EOObjectStore objectStore, String... modelNames) {
 	super(objectStore);
 
+	System.setProperty("NSProjectBundleEnabled", "true");
+
 	for (String modelName : modelNames) {
 	    loadModel(modelName);
 	}

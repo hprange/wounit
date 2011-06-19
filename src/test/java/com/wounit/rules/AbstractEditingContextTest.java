@@ -65,6 +65,17 @@ public abstract class AbstractEditingContextTest {
     public final ExpectedException thrown = ExpectedException.none();
 
     @Test
+    public void alwaysEnableNSProjectBundleConfiguration() throws Exception {
+	System.setProperty("NSProjectBundleEnabled", "false");
+
+	createEditingContext(TEST_MODEL_NAME);
+
+	String property = System.getProperty("NSProjectBundleEnabled");
+
+	assertThat(property, is("true"));
+    }
+
+    @Test
     public void cannotCreateObjectUnderTestForNonEnterpriseObjectFields() throws Exception {
 	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
 
