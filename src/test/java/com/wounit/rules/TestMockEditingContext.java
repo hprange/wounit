@@ -430,6 +430,20 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
+    public void objectsWithFetchSpecificationReturnsAllObjectsIfFetchingLimitGreaterThanNumberOfObjects() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity.createFooEntity(editingContext);
+
+	when(mockFetchSpecification.fetchLimit()).thenReturn(2);
+
+	@SuppressWarnings("unchecked")
+	NSArray<FooEntity> result = editingContext.objectsWithFetchSpecification(mockFetchSpecification);
+
+	assertThat(result.size(), is(1));
+    }
+
+    @Test
     public void objectsWithFetchSpecificationReturnsInsertedObjects() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 

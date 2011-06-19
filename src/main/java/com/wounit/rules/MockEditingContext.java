@@ -259,8 +259,14 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
 	availableObjects = ERXS.sorted(availableObjects, fetchSpecification.sortOrderings());
 
-	if (fetchSpecification.fetchLimit() > 0) {
-	    return availableObjects.subarrayWithRange(new NSRange(0, fetchSpecification.fetchLimit()));
+	int limit = fetchSpecification.fetchLimit();
+
+	if (limit > 0) {
+	    if (limit > availableObjects.size()) {
+		limit = availableObjects.size();
+	    }
+
+	    return availableObjects.subarrayWithRange(new NSRange(0, limit));
 	}
 
 	return availableObjects;
