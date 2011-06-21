@@ -261,11 +261,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
 	int limit = fetchSpecification.fetchLimit();
 
-	if (limit > 0) {
-	    if (limit > availableObjects.size()) {
-		limit = availableObjects.size();
-	    }
-
+	if (limit > 0 && limit < availableObjects.size()) {
 	    return availableObjects.subarrayWithRange(new NSRange(0, limit));
 	}
 
