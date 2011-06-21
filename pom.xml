@@ -131,6 +131,12 @@
     </profiles>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -159,7 +165,7 @@
                     <!-- We must fork processes for each test case because some tests leave EOF in a dirty state -->
                     <forkMode>always</forkMode>
                     <excludes>
-                     <exclude>**/*StubTestCase.java</exclude>
+                        <exclude>**/*StubTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
