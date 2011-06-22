@@ -6,7 +6,7 @@ applications using JUnit 4.7 or later capabilities. This library can be
 useful if you write unit/integration tests for Enterprise Objects or
 employ the TDD technique on your projects.
 
-**Version**: 1.1
+**Version**: 1.1.1
 
 Requirements
 ------------
@@ -36,7 +36,7 @@ Maven users have to add the dependency declaration:
 	<dependency>
 		<groupId>com.wounit</groupId>
 		<artifactId>wounit</artifactId>
-		<version>1.1</version>
+		<version>1.1.1</version>
 	</dependency>
 
 Non Maven users have to:
@@ -100,6 +100,6 @@ framework and is heavily inspired by it.
 About
 -----
 
-* **Site**: http://github.com/hprange/wounit
+* **Site**: http://hprange.github.com/wounit
 * **E-mail**: hprange at gmail.com
 * **Twitter**: @hprange
