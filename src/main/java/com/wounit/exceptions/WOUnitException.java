@@ -23,6 +23,8 @@ package com.wounit.exceptions;
  * @since 1.1
  */
 public class WOUnitException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     public WOUnitException(String message) {
 	super(message);
     }
