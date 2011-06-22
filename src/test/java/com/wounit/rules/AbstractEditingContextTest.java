@@ -45,15 +45,15 @@ import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
-import com.wounit.exceptions.WOUnitException;
 import com.wounit.model.FooEntity;
-import com.wounit.stubs.ChildStubTestCase;
 import com.wounit.stubs.StubTestCase;
-import com.wounit.stubs.WrongTypeForUnderTestStubTestCase;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractEditingContextTest {
     protected static final String TEST_MODEL_NAME = "Test";
+
+    @Mock
+    private AnnotationProcessor mockProcessor;
 
     @Mock
     protected Statement mockStatement;
@@ -68,7 +68,7 @@ public abstract class AbstractEditingContextTest {
     public void alwaysEnableNSProjectBundleConfiguration() throws Exception {
 	System.setProperty("NSProjectBundleEnabled", "false");
 
-	createEditingContext(TEST_MODEL_NAME);
+	initEditingContext(TEST_MODEL_NAME);
 
 	String property = System.getProperty("NSProjectBundleEnabled");
 
@@ -76,22 +76,10 @@ public abstract class AbstractEditingContextTest {
     }
 
     @Test
-    public void cannotCreateObjectUnderTestForNonEnterpriseObjectFields() throws Exception {
-	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
-
-	WrongTypeForUnderTestStubTestCase mockTarget = new WrongTypeForUnderTestStubTestCase();
-
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @UnderTest."));
-
-	editingContext.before(mockTarget);
-    }
-
-    @Test
     public void clearEditingContextChangesAfterTestExecution() throws Exception {
-	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before(mockTarget);
+	editingContext.before();
 
 	FooEntity foo = FooEntity.createFooEntity(editingContext);
 
@@ -99,9 +87,9 @@ public abstract class AbstractEditingContextTest {
 
 	editingContext.saveChanges();
 
-	editingContext.after(mockTarget);
+	editingContext.after();
 
-	editingContext = createEditingContext(TEST_MODEL_NAME);
+	editingContext = initEditingContext(TEST_MODEL_NAME);
 
 	NSArray<FooEntity> result = FooEntity.fetchAllFooEntities(editingContext);
 
@@ -110,11 +98,13 @@ public abstract class AbstractEditingContextTest {
 
     @Test
     public void createAndInsertObjectForFieldAnnotatedWithUnderTest() throws Exception {
-	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
 
 	StubTestCase mockTestCase = new StubTestCase();
 
-	editingContext.before(mockTestCase);
+	editingContext.processor = new AnnotationProcessor(mockTestCase);
+
+	editingContext.before();
 
 	EOEnterpriseObject objectUnderTest = mockTestCase.objectUnderTest();
 
@@ -126,35 +116,25 @@ public abstract class AbstractEditingContextTest {
 	assertThat(insertedObjects, hasItem(objectUnderTest));
     }
 
-    @Test
-    public void createAndInsertObjectForInheritedFieldAnnotatedWithUnderTest() throws Exception {
-	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+    protected final AbstractEditingContextRule initEditingContext(String... modelNames) {
+	AbstractEditingContextRule editingContext = createEditingContext(modelNames);
 
-	ChildStubTestCase mockTestCase = new ChildStubTestCase();
+	editingContext.processor = mockProcessor;
 
-	editingContext.before(mockTestCase);
-
-	EOEnterpriseObject objectUnderTest = mockTestCase.objectUnderTest();
-
-	assertThat(objectUnderTest, notNullValue());
-
-	@SuppressWarnings("unchecked")
-	NSArray<EOEnterpriseObject> insertedObjects = editingContext.insertedObjects();
-
-	assertThat(insertedObjects, hasItem(objectUnderTest));
+	return editingContext;
     }
 
     protected abstract AbstractEditingContextRule createEditingContext(String... modelNames);
 
     @Test
     public void disposeEditingContextAfterTestExecution() throws Throwable {
-	AbstractEditingContextRule editingContext = Mockito.spy(createEditingContext(TEST_MODEL_NAME));
+	AbstractEditingContextRule editingContext = Mockito.spy(initEditingContext(TEST_MODEL_NAME));
 
-	editingContext.before(mockTarget);
+	editingContext.before();
 
 	Mockito.verify(editingContext, Mockito.times(0)).dispose();
 
-	editingContext.after(mockTarget);
+	editingContext.after();
 
 	Mockito.verify(editingContext, Mockito.times(1)).dispose();
     }
@@ -165,29 +145,29 @@ public abstract class AbstractEditingContextTest {
 
 	EOModelGroup.defaultGroup().addModelWithPathURL(url);
 
-	AbstractEditingContextRule editingContext = createEditingContext();
+	AbstractEditingContextRule editingContext = initEditingContext();
 
-	editingContext.before(mockTarget);
-	editingContext.after(mockTarget);
+	editingContext.before();
+	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), notNullValue());
     }
 
     @Test
     public void ensureEditingContextCleanUpIsTriggeredAfterTestExecution() throws Throwable {
-	AbstractEditingContextRule editingContext = spy(createEditingContext(TEST_MODEL_NAME));
+	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
 	InOrder inOrder = inOrder(editingContext, mockStatement);
 
 	editingContext.apply(mockStatement, null, mockTarget).evaluate();
 
 	inOrder.verify(mockStatement).evaluate();
-	inOrder.verify(editingContext).after(mockTarget);
+	inOrder.verify(editingContext).after();
     }
 
     @Test
     public void ensureEditingContextCleanUpIsTriggeredEvenIfTestExecutionThrowsException() throws Throwable {
-	AbstractEditingContextRule editingContext = spy(createEditingContext(TEST_MODEL_NAME));
+	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
 	doThrow(new Throwable("test error")).when(mockStatement).evaluate();
 
@@ -199,19 +179,19 @@ public abstract class AbstractEditingContextTest {
 	    // DO NOTHING
 	} finally {
 	    inOrder.verify(mockStatement).evaluate();
-	    inOrder.verify(editingContext).after(mockTarget);
+	    inOrder.verify(editingContext).after();
 	}
     }
 
     @Test
     public void ensureEditingContextInitializationIsTriggeredBeforeTestExecution() throws Throwable {
-	AbstractEditingContextRule editingContext = spy(createEditingContext(TEST_MODEL_NAME));
+	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
 	InOrder inOrder = inOrder(editingContext, mockStatement);
 
 	editingContext.apply(mockStatement, null, mockTarget).evaluate();
 
-	inOrder.verify(editingContext).before(mockTarget);
+	inOrder.verify(editingContext).before();
 	inOrder.verify(mockStatement).evaluate();
     }
 
@@ -220,12 +200,12 @@ public abstract class AbstractEditingContextTest {
 	thrown.expect(IllegalArgumentException.class);
 	thrown.expectMessage(is("Cannot load model named 'UnknownModel'"));
 
-	createEditingContext("UnknownModel");
+	initEditingContext("UnknownModel");
     }
 
     @Test
     public void loadMoreThanOneModel() throws Exception {
-	createEditingContext(TEST_MODEL_NAME, "AnotherTest");
+	initEditingContext(TEST_MODEL_NAME, "AnotherTest");
 
 	EOModel result = EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME);
 
@@ -238,7 +218,7 @@ public abstract class AbstractEditingContextTest {
 
     @Test
     public void loadOneModel() throws Exception {
-	createEditingContext(TEST_MODEL_NAME);
+	initEditingContext(TEST_MODEL_NAME);
 
 	EOModel result = EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME);
 
@@ -247,7 +227,7 @@ public abstract class AbstractEditingContextTest {
 
     @Test
     public void loadOneModelInsideResourcesFolder() throws Exception {
-	createEditingContext("AnotherTest");
+	initEditingContext("AnotherTest");
 
 	EOModel result = EOModelGroup.defaultGroup().modelNamed("AnotherTest");
 
@@ -256,21 +236,21 @@ public abstract class AbstractEditingContextTest {
 
     @Test
     public void lockEditingContextBeforeRunningTheTestCase() throws Exception {
-	AbstractEditingContextRule editingContext = spy(createEditingContext());
+	AbstractEditingContextRule editingContext = spy(initEditingContext());
 
 	verify(editingContext, times(0)).lock();
 
-	editingContext.before(mockTarget);
+	editingContext.before();
 
 	verify(editingContext, times(1)).lock();
     }
 
     @Test
     public void removeModelsLoadedByTheTemporaryEditingContextAfterTestExecution() throws Throwable {
-	AbstractEditingContextRule editingContext = createEditingContext(TEST_MODEL_NAME);
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
 
-	editingContext.before(mockTarget);
-	editingContext.after(mockTarget);
+	editingContext.before();
+	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
     }
@@ -278,13 +258,13 @@ public abstract class AbstractEditingContextTest {
     @Test
     @Ignore(value = "Revert may not be necessary")
     public void revertEditingContextChangesAfterRunningTheTestCases() throws Exception {
-	AbstractEditingContextRule editingContext = spy(createEditingContext());
+	AbstractEditingContextRule editingContext = spy(initEditingContext());
 
-	editingContext.before(mockTarget);
+	editingContext.before();
 
 	verify(editingContext, times(0)).revert();
 
-	editingContext.after(mockTarget);
+	editingContext.after();
 
 	verify(editingContext, times(1)).revert();
     }
@@ -302,13 +282,13 @@ public abstract class AbstractEditingContextTest {
 
     @Test
     public void unlockEditingContextAfterRunningTheTestCase() throws Exception {
-	TemporaryEditingContext editingContext = spy(new TemporaryEditingContext());
+	AbstractEditingContextRule editingContext = spy(initEditingContext());
 
-	editingContext.before(mockTarget);
+	editingContext.before();
 
 	verify(editingContext, times(0)).unlock();
 
-	editingContext.after(mockTarget);
+	editingContext.after();
 
 	// The internal disposal logic calls the unlock too
 	verify(editingContext, times(2)).unlock();

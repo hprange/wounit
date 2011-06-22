@@ -82,8 +82,8 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 
 	TemporaryEditingContext editingContext = new TemporaryEditingContext();
 
-	editingContext.before(mockTarget);
-	editingContext.after(mockTarget);
+	editingContext.before();
+	editingContext.after();
     }
 
     @Test
@@ -97,12 +97,12 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 	    model.setAdaptorName("JDBC");
 	}
 
-	editingContext.before(mockTarget);
+	editingContext.before();
 
 	thrown.expect(IllegalStateException.class);
 	thrown.expectMessage(is("Expected er.memoryadaptor.ERMemoryAdaptorContext, but got com.webobjects.jdbcadaptor.JDBCContext. Please, use the TemporaryEditingContext constructor to load all the required models for testing."));
 
-	editingContext.after(mockTarget);
+	editingContext.after();
     }
 
     @Test
@@ -113,10 +113,10 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 
 	model.setAdaptorName("JDBC");
 
-	TemporaryEditingContext editingContext = new TemporaryEditingContext();
+	AbstractEditingContextRule editingContext = initEditingContext();
 
-	editingContext.before(mockTarget);
-	editingContext.after(mockTarget);
+	editingContext.before();
+	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME).adaptorName(), is("JDBC"));
     }

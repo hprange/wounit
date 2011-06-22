@@ -16,13 +16,9 @@
 
 package com.wounit.rules;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -36,7 +32,6 @@ import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.annotations.UnderTest;
-import com.wounit.exceptions.WOUnitException;
 
 import er.extensions.eof.ERXEC;
 
@@ -50,20 +45,17 @@ import er.extensions.eof.ERXEC;
  * @since 1.0
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
-
-    /**
-     * This interface represents a simple factory to create enterprise objects.
-     */
-    static interface EnterpriseObjectFactory {
-	EOEnterpriseObject create(EOEditingContext editingContext, Class<? extends EOEnterpriseObject> type);
-    }
-
     /**
      * This factory creates enterprise objects and inserts them into the
      * specified editing context.
      */
-    static class UnderTestFactory implements EnterpriseObjectFactory {
-	public EOEnterpriseObject create(EOEditingContext editingContext, Class<? extends EOEnterpriseObject> type) {
+    static class UnderTestFactory extends AbstractEnterpriseObjectFactory {
+	public UnderTestFactory(EOEditingContext editingContext) {
+	    super(editingContext);
+	}
+
+	@Override
+	public EOEnterpriseObject create(Class<? extends EOEnterpriseObject> type) {
 	    EOEntity entity = EOUtilities.entityForClass(editingContext, type);
 
 	    return EOUtilities.createAndInsertInstance(editingContext, entity.name());
@@ -76,6 +68,11 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * Collection of models to unload after the test execution.
      */
     private final Collection<String> modelToUnload = new ArrayList<String>();
+
+    /**
+     * A processor for fields with special annotations.
+     */
+    protected AnnotationProcessor processor;
 
     /**
      * Constructor only for test purposes.
@@ -104,11 +101,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     /**
      * Reset all changes made into this editing context and unload all models
      * loaded by this class at the beginning of the test execution.
-     * 
-     * @param target
-     *            The object on with the method has run.
      */
-    protected void after(Object target) {
+    protected void after() {
 	unlock();
 	dispose();
 
@@ -128,15 +122,17 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * org.junit.runners.model.FrameworkMethod, java.lang.Object)
      */
     public final Statement apply(final Statement base, FrameworkMethod method, final Object target) {
+	processor = new AnnotationProcessor(target);
+
 	return new Statement() {
 	    @Override
 	    public void evaluate() throws Throwable {
-		before(target);
+		before();
 
 		try {
 		    base.evaluate();
 		} finally {
-		    after(target);
+		    after();
 		}
 	    }
 	};
@@ -144,24 +140,14 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
     /**
      * Set up this editing context in order to execute the test case.
-     * 
-     * @param target
-     *            The object on with the method will be run.
+     * <p>
+     * Create and insert objects for fields annotated with @UnderTest before the
+     * test execution.
      */
-    protected void before(Object target) {
+    protected void before() {
 	lock();
 
-	processAnnotations(target, UnderTest.class, new UnderTestFactory());
-    }
-
-    private List<Field> getAllFields(Class<?> type) {
-	List<Field> fields = new ArrayList<Field>();
-
-	for (Class<?> clazz = type; clazz != null; clazz = clazz.getSuperclass()) {
-	    fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-	}
-
-	return fields;
+	processor.process(UnderTest.class, new UnderTestFactory(this));
     }
 
     /**
@@ -197,29 +183,4 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	modelToUnload.add(modelName);
     }
 
-    protected void processAnnotations(Object target, Class<? extends Annotation> annotation, EnterpriseObjectFactory factory) {
-	List<Field> fields = getAllFields(target.getClass());
-
-	for (Field field : fields) {
-	    if (!field.isAnnotationPresent(annotation)) {
-		continue;
-	    }
-
-	    Class<?> type = field.getType();
-
-	    if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
-		throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
-	    }
-
-	    EOEnterpriseObject object = factory.create(this, type.asSubclass(EOEnterpriseObject.class));
-
-	    field.setAccessible(true);
-
-	    try {
-		field.set(target, object);
-	    } catch (Exception exception) {
-		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
-	    }
-	}
-    }
 }

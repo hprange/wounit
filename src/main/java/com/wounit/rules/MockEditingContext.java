@@ -69,13 +69,17 @@ import er.extensions.foundation.ERXArrayUtilities;
  * @since 1.0
  */
 public class MockEditingContext extends AbstractEditingContextRule {
-
     /**
      * This factory creates dummy enterprise objects using the
      * {@link MockEditingContext#createSavedObject(Class)} method.
      */
-    static class DummyFactory implements EnterpriseObjectFactory {
-	public EOEnterpriseObject create(EOEditingContext editingContext, Class<? extends EOEnterpriseObject> type) {
+    static class DummyFactory extends AbstractEnterpriseObjectFactory {
+	public DummyFactory(EOEditingContext editingContext) {
+	    super(editingContext);
+	}
+
+	@Override
+	public EOEnterpriseObject create(Class<? extends EOEnterpriseObject> type) {
 	    return ((MockEditingContext) editingContext).createSavedObject(type);
 	}
     }
@@ -84,6 +88,8 @@ public class MockEditingContext extends AbstractEditingContextRule {
      * Entity name key representation.
      */
     private static final String ENTITY_NAME_KEY = "entityName";
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * A counter for fake global IDs.
@@ -119,10 +125,10 @@ public class MockEditingContext extends AbstractEditingContextRule {
      * @see com.wounit.rules.AbstractEditingContextRule#after(java.lang.Object)
      */
     @Override
-    protected void after(Object target) {
+    protected void after() {
 	ignoredObjects.clear();
 
-	super.after(target);
+	super.after();
     }
 
     /**
@@ -132,10 +138,10 @@ public class MockEditingContext extends AbstractEditingContextRule {
      * @see com.wounit.rules.AbstractEditingContextRule#before(java.lang.Object)
      */
     @Override
-    protected void before(Object target) {
-	super.before(target);
+    protected void before() {
+	super.before();
 
-	processAnnotations(target, Dummy.class, new DummyFactory());
+	processor.process(Dummy.class, new DummyFactory(this));
     }
 
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {
