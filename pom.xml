@@ -235,7 +235,7 @@
                         <exclude>build.*</exclude>
                         <exclude>README.md</exclude>
                         <exclude>.gitignore</exclude>
-                        <exclude>.maven</exclude>
+                        <exclude>.maven/**</exclude>
                         <exclude>src/test/resources/**</exclude>
                     </excludes>
                     <properties>
