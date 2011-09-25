@@ -125,8 +125,8 @@
 			<formatter type="plain" usefile="false" />
 			<classpath>
 				<path refid="build.test.classpath" />
-				<pathelement location="${maven.build.outputDir}" />
 				<pathelement location="${maven.build.testOutputDir}" />
+				<pathelement location="${maven.build.outputDir}" />
 			</classpath>
 			<batchtest todir="${maven.test.reports}" unless="test">
 				<fileset dir="${maven.build.testDir.0}">
