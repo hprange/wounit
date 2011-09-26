@@ -32,6 +32,7 @@ import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.annotations.UnderTest;
+import com.wounit.foundation.WOUnitBundleFactory;
 
 import er.extensions.eof.ERXEC;
 
@@ -81,6 +82,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	super(objectStore);
 
 	System.setProperty("NSProjectBundleEnabled", "true");
+
+	System.setProperty("NSBundleFactories", "(" + WOUnitBundleFactory.class.getName() + ")");
 
 	for (String modelName : modelNames) {
 	    loadModel(modelName);

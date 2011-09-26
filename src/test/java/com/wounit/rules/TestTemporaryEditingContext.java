@@ -19,6 +19,7 @@ package com.wounit.rules;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 
 import org.junit.Ignore;
@@ -27,6 +28,9 @@ import org.junit.Test;
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.foundation.NSArray;
+import com.webobjects.foundation.NSBundle;
+import com.webobjects.foundation.NSDictionary;
+import com.wounit.exceptions.WOUnitException;
 
 import er.extensions.foundation.ERXProperties;
 
@@ -34,6 +38,8 @@ import er.extensions.foundation.ERXProperties;
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 public class TestTemporaryEditingContext extends AbstractEditingContextTest {
+    private static final String JAVA_MEMORY_ADAPTOR_BUNDLE_NAME = "JavaMemoryAdaptor";
+
     @Test
     public void changeAdaptorForModelsNotLoadedByTemporaryEditingContext() throws Exception {
 	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
@@ -101,6 +107,42 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 
 	thrown.expect(IllegalStateException.class);
 	thrown.expectMessage(is("Expected er.memoryadaptor.ERMemoryAdaptorContext, but got com.webobjects.jdbcadaptor.JDBCContext. Please, use the TemporaryEditingContext constructor to load all the required models for testing."));
+
+	editingContext.after();
+    }
+
+    @Test
+    public void exceptionIfJavaMemoryAdaptorBundleNotFound() throws Exception {
+	Field field = NSBundle.class.getDeclaredField("BundlesNamesTable");
+
+	field.setAccessible(true);
+
+	@SuppressWarnings("unchecked")
+	NSDictionary<String, NSBundle> bundles = (NSDictionary<String, NSBundle>) field.get(null);
+
+	NSBundle bundleToRestore = bundles.remove(JAVA_MEMORY_ADAPTOR_BUNDLE_NAME);
+
+	thrown.expect(WOUnitException.class);
+	thrown.expectMessage("The JavaMemoryAdaptor bundle is not loaded. Are you sure the JavaMemoryAdaptor framework is in the test classpath?");
+
+	try {
+	    new TemporaryEditingContext();
+	} catch (Exception exception) {
+	    bundles.takeValueForKey(bundleToRestore, JAVA_MEMORY_ADAPTOR_BUNDLE_NAME);
+
+	    throw exception;
+	}
+    }
+
+    @Test
+    public void ignoreMissingModelWhileRestoringAdaptorConfiguration() throws Exception {
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
+
+	modelGroup.removeModel(modelGroup.modelNamed(TEST_MODEL_NAME));
 
 	editingContext.after();
     }

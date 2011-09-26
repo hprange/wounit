@@ -26,6 +26,7 @@ import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eoaccess.EOUtilities;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSBundle;
+import com.wounit.exceptions.WOUnitException;
 
 import er.extensions.foundation.ERXProperties;
 import er.memoryadaptor.ERMemoryAdaptor;
@@ -113,6 +114,12 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 	for (String modelName : adaptorsToRestore.keySet()) {
 	    EOModel model = modelGroup.modelNamed(modelName);
 
+	    if (model == null) {
+		System.out.println("[WARN] Cannot restore the adaptor configuration for model named " + modelName);
+
+		continue;
+	    }
+
 	    model.setAdaptorName(adaptorsToRestore.get(modelName));
 	}
 
@@ -143,6 +150,10 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
      */
     private void fixJavaMemoryDictionary() {
 	NSBundle bundle = NSBundle.bundleForName("JavaMemoryAdaptor");
+
+	if (bundle == null) {
+	    throw new WOUnitException("The JavaMemoryAdaptor bundle is not loaded. Are you sure the JavaMemoryAdaptor framework is in the test classpath?");
+	}
 
 	bundle._infoDictionary().takeValueForKey(ERMemoryAdaptor.class.getName(), "EOAdaptorClassName");
     }

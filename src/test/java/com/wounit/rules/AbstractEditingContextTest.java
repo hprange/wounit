@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import java.net.URL;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -63,6 +62,17 @@ public abstract class AbstractEditingContextTest {
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void alwaysConfigureWOUnitBundleFactory() throws Exception {
+	System.clearProperty("NSBundleFactories");
+
+	initEditingContext();
+
+	String factories = System.getProperty("NSBundleFactories");
+
+	assertThat(factories, is("(com.wounit.foundation.WOUnitBundleFactory)"));
+    }
 
     @Test
     public void alwaysEnableNSProjectBundleConfiguration() throws Exception {
@@ -114,14 +124,6 @@ public abstract class AbstractEditingContextTest {
 	NSArray<EOEnterpriseObject> insertedObjects = editingContext.insertedObjects();
 
 	assertThat(insertedObjects, hasItem(objectUnderTest));
-    }
-
-    protected final AbstractEditingContextRule initEditingContext(String... modelNames) {
-	AbstractEditingContextRule editingContext = createEditingContext(modelNames);
-
-	editingContext.processor = mockProcessor;
-
-	return editingContext;
     }
 
     protected abstract AbstractEditingContextRule createEditingContext(String... modelNames);
@@ -203,6 +205,14 @@ public abstract class AbstractEditingContextTest {
 	initEditingContext("UnknownModel");
     }
 
+    protected final AbstractEditingContextRule initEditingContext(String... modelNames) {
+	AbstractEditingContextRule editingContext = createEditingContext(modelNames);
+
+	editingContext.processor = mockProcessor;
+
+	return editingContext;
+    }
+
     @Test
     public void loadMoreThanOneModel() throws Exception {
 	initEditingContext(TEST_MODEL_NAME, "AnotherTest");
@@ -253,20 +263,6 @@ public abstract class AbstractEditingContextTest {
 	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
-    }
-
-    @Test
-    @Ignore(value = "Revert may not be necessary")
-    public void revertEditingContextChangesAfterRunningTheTestCases() throws Exception {
-	AbstractEditingContextRule editingContext = spy(initEditingContext());
-
-	editingContext.before();
-
-	verify(editingContext, times(0)).revert();
-
-	editingContext.after();
-
-	verify(editingContext, times(1)).revert();
     }
 
     @After

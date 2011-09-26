@@ -18,6 +18,7 @@
 	<!-- ====================================================================== -->
 
 	<path id="build.classpath">
+		<pathelement location="${maven.repo.local}/ERFoundation-1.0.jar" />
 		<pathelement location="${maven.repo.local}/ERExtensions-5.4.2.jar" />
 		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.4.2.jar" />
 		<pathelement location="${webobjects.lib}/JavaFoundation.jar" />
@@ -36,6 +37,7 @@
 		<pathelement location="${maven.repo.local}/ognl-2.6.7.jar" />
 	</path>
 	<path id="build.test.classpath">
+		<pathelement location="${maven.repo.local}/ERFoundation-1.0.jar" />
 		<pathelement location="${maven.repo.local}/ERExtensions-5.4.2.jar" />
 		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.4.2.jar" />
 		<pathelement location="${webobjects.lib}/JavaFoundation.jar" />
@@ -203,6 +205,7 @@
 
 	<target name="get-deps" depends="test-offline" description="Download all dependencies" unless="maven.mode.offline">
 		<mkdir dir="${maven.repo.local}" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERFoundation/1.0/ERFoundation-1.0.jar" dest="${maven.repo.local}/ERFoundation-1.0.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERExtensions/5.4.2/ERExtensions-5.4.2.jar" dest="${maven.repo.local}/ERExtensions-5.4.2.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/JavaWOExtensions/5.4.2/JavaWOExtensions-5.4.2.jar" dest="${maven.repo.local}/JavaWOExtensions-5.4.2.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/com/ibm/icu/icu4j/3.8/icu4j-3.8.jar" dest="${maven.repo.local}/icu4j-3.8.jar" usetimestamp="true" ignoreerrors="true" />

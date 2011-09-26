@@ -31,7 +31,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -46,7 +45,6 @@ import com.webobjects.eocontrol.EOKeyGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
 import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.foundation.NSArray;
-import com.wounit.model.CompoundKeyEntity;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
@@ -132,17 +130,6 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	thrown.expectMessage(is("Cannot create an instance for a null entity name."));
 
 	editingContext.createSavedObject((String) null);
-    }
-
-    @Test
-    @Ignore("Why create this restriction if we can simply ignore the fact?")
-    public void cannotMockInstaceOfEntityWithCompoundPrimaryKey() throws Exception {
-	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
-
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("CompoundKeyEntity has a compound primary key and can't be used to create mock instances."));
-
-	editingContext.createSavedObject(CompoundKeyEntity.class);
     }
 
     @Test
