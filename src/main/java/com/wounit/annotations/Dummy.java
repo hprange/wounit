@@ -59,4 +59,5 @@ import com.wounit.rules.TemporaryEditingContext;
 @Target(ElementType.FIELD)
 @Documented
 public @interface Dummy {
+    int size() default 1;
 }

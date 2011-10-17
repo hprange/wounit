@@ -16,12 +16,14 @@
 
 package com.wounit.annotations;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.rules.MockEditingContext;
@@ -30,6 +32,9 @@ import com.wounit.rules.MockEditingContext;
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 public class TestDummy {
+    @Dummy(size = 2)
+    private NSArray<FooEntity> dummies;
+
     @Rule
     public final MockEditingContext mockEditingContext = new MockEditingContext("Test");
 
@@ -38,6 +43,12 @@ public class TestDummy {
 
     @Dummy
     private FooEntityWithRequiredField mockEntity3;
+
+    @Test
+    public void verifyArrayContainsTheSpecifiedNumberOfDummyObjects() throws Exception {
+	assertThat(dummies, notNullValue());
+	assertThat(dummies.size(), is(2));
+    }
 
     @Test
     public void verifyDummyObjectsCreation() throws Exception {

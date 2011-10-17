@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2009 hprange <hprange@gmail.com>
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,11 +17,14 @@ package com.wounit.rules;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.webobjects.eocontrol.EOEnterpriseObject;
+import com.webobjects.foundation.NSArray;
+import com.webobjects.foundation.NSMutableArray;
 import com.wounit.exceptions.WOUnitException;
 
 /**
@@ -64,6 +67,27 @@ class AnnotationProcessor {
 	this.fields = getAllFields(target.getClass());
     }
 
+    private Object createObjectForType(Class<?> type, Field field, AbstractEnterpriseObjectFactory factory) {
+	if (NSArray.class.isAssignableFrom(type)) {
+	    ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+	    type = (Class<?>) genericType.getActualTypeArguments()[0];
+
+	    NSMutableArray<EOEnterpriseObject> objects = new NSMutableArray<EOEnterpriseObject>();
+
+	    EOEnterpriseObject object = factory.create(type.asSubclass(EOEnterpriseObject.class));
+
+	    objects.add(object);
+
+	    return objects;
+	}
+
+	if (EOEnterpriseObject.class.isAssignableFrom(type)) {
+	    return factory.create(type.asSubclass(EOEnterpriseObject.class));
+	}
+
+	return null;
+    }
+
     /**
      * Examine the fields of this target object and create enterprise objects
      * for the fields which the given annotation is present.
@@ -81,11 +105,11 @@ class AnnotationProcessor {
 
 	    Class<?> type = field.getType();
 
-	    if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
+	    Object object = createObjectForType(type, field, factory);
+
+	    if (object == null) {
 		throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
 	    }
-
-	    EOEnterpriseObject object = factory.create(type.asSubclass(EOEnterpriseObject.class));
 
 	    field.setAccessible(true);
 
@@ -94,6 +118,7 @@ class AnnotationProcessor {
 	    } catch (Exception exception) {
 		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
 	    }
+
 	}
     }
 
