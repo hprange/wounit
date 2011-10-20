@@ -18,6 +18,7 @@ package com.wounit.rules;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,48 @@ import com.wounit.exceptions.WOUnitException;
  * @since 1.1
  */
 class AnnotationProcessor {
+    private static EOEnterpriseObject createEOForType(Class<?> type, Class<? extends Annotation> annotation, AbstractEnterpriseObjectFactory factory) {
+	if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
+	    throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
+	}
+
+	return factory.create(type.asSubclass(EOEnterpriseObject.class));
+    }
+
+    private static Object createObjectForField(Field field, Class<? extends Annotation> annotation, AbstractEnterpriseObjectFactory factory) {
+	Class<?> type = field.getType();
+
+	int size = getAnnotationSize(field.getAnnotation(annotation));
+
+	if (NSArray.class.isAssignableFrom(type)) {
+	    Type objectType = field.getGenericType();
+
+	    if (!(objectType instanceof ParameterizedType)) {
+		throw new WOUnitException("Cannot create object for a raw type " + type.getName() + ". Please, provide a generic type.");
+	    }
+
+	    ParameterizedType genericType = (ParameterizedType) objectType;
+	    type = (Class<?>) genericType.getActualTypeArguments()[0];
+
+	    NSMutableArray<EOEnterpriseObject> objects = new NSMutableArray<EOEnterpriseObject>();
+
+	    for (int i = 0; i < size; i++) {
+		EOEnterpriseObject object = createEOForType(type, annotation, factory);
+
+		objects.add(object);
+	    }
+
+	    return objects;
+	}
+
+	if (size != 1) {
+	    System.out.println("[WARN] The field " + field.getName() + " isn't of NSArray type, but it is annotated with the size property.");
+	}
+
+	return createEOForType(type, annotation, factory);
+
+    }
+
     private static List<Field> getAllFields(Class<?> type) {
 	List<Field> fields = new ArrayList<Field>();
 
@@ -44,6 +87,14 @@ class AnnotationProcessor {
 	}
 
 	return fields;
+    }
+
+    private static int getAnnotationSize(Annotation annotation) {
+	try {
+	    return (Integer) annotation.getClass().getDeclaredMethod("size").invoke(annotation);
+	} catch (Exception exception) {
+	    throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
+	}
     }
 
     /**
@@ -67,27 +118,6 @@ class AnnotationProcessor {
 	this.fields = getAllFields(target.getClass());
     }
 
-    private Object createObjectForType(Class<?> type, Field field, AbstractEnterpriseObjectFactory factory) {
-	if (NSArray.class.isAssignableFrom(type)) {
-	    ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-	    type = (Class<?>) genericType.getActualTypeArguments()[0];
-
-	    NSMutableArray<EOEnterpriseObject> objects = new NSMutableArray<EOEnterpriseObject>();
-
-	    EOEnterpriseObject object = factory.create(type.asSubclass(EOEnterpriseObject.class));
-
-	    objects.add(object);
-
-	    return objects;
-	}
-
-	if (EOEnterpriseObject.class.isAssignableFrom(type)) {
-	    return factory.create(type.asSubclass(EOEnterpriseObject.class));
-	}
-
-	return null;
-    }
-
     /**
      * Examine the fields of this target object and create enterprise objects
      * for the fields which the given annotation is present.
@@ -103,13 +133,7 @@ class AnnotationProcessor {
 		continue;
 	    }
 
-	    Class<?> type = field.getType();
-
-	    Object object = createObjectForType(type, field, factory);
-
-	    if (object == null) {
-		throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
-	    }
+	    Object object = createObjectForField(field, annotation, factory);
 
 	    field.setAccessible(true);
 
@@ -118,8 +142,6 @@ class AnnotationProcessor {
 	    } catch (Exception exception) {
 		throw new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
 	    }
-
 	}
     }
-
 }

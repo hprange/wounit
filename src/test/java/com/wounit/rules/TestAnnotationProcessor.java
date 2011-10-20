@@ -15,6 +15,7 @@
  */
 package com.wounit.rules;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -34,26 +35,13 @@ import com.wounit.annotations.Dummy;
 import com.wounit.exceptions.WOUnitException;
 import com.wounit.model.FooEntity;
 import com.wounit.stubs.ChildStubTestCase;
-import com.wounit.stubs.DummyArrayTestCase;
+import com.wounit.stubs.DummyArrayStubTestCase;
+import com.wounit.stubs.RawArrayDeclarationForDummyStubTest;
 import com.wounit.stubs.StubTestCase;
+import com.wounit.stubs.WrongGenericTypeForDummyStubTestCase;
 import com.wounit.stubs.WrongTypeForDummyStubTestCase;
 
 /**
- * TODO: Create dummies for array
- * <p>
- * TODO: Dummies are not same object
- * <p>
- * TODO: Dummies without size for array creates only one object
- * <p>
- * TODO: Dummy with size in a non array property produces a warn
- * <p>
- * TODO: Array of Dummies has the correct type
- * <p>
- * TODO: Exception if NSArray annotated by Dummy doesn't declare the generic
- * type
- * <p>
- * TODO: Exception if NSArray generic type isn't EOEnterpriseObject
- * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -68,15 +56,37 @@ public class TestAnnotationProcessor {
     public final ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void createArrayOfDummiesIfAnnotationPresent() throws Exception {
-	DummyArrayTestCase mockTarget = new DummyArrayTestCase();
+    public void createArrayOfDummiesBasedOnTheGenericType() throws Exception {
+	DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
 
 	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
 	processor.process(Dummy.class, mockFactory);
 
-	assertThat(mockTarget.dummies(), notNullValue());
-	assertThat(mockTarget.dummies().size(), is(1));
+	assertThat(mockTarget.arrayOfOneDummy().get(0), instanceOf(FooEntity.class));
+    }
+
+    @Test
+    public void createArrayOfDummiesIfAnnotationAndSizePresent() throws Exception {
+	DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
+
+	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+
+	processor.process(Dummy.class, mockFactory);
+
+	assertThat(mockTarget.arrayOfTwoDummies().size(), is(2));
+    }
+
+    @Test
+    public void createArrayOfOneDummyIfAnnotationPresentButNoSize() throws Exception {
+	DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
+
+	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+
+	processor.process(Dummy.class, mockFactory);
+
+	assertThat(mockTarget.arrayOfOneDummy(), notNullValue());
+	assertThat(mockTarget.arrayOfOneDummy().size(), is(1));
     }
 
     @Test
@@ -113,13 +123,37 @@ public class TestAnnotationProcessor {
     }
 
     @Test
+    public void exceptionIfAnnotatedGenericTypeIsIncompatible() throws Exception {
+	WrongGenericTypeForDummyStubTestCase mockTarget = new WrongGenericTypeForDummyStubTestCase();
+
+	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+
+	thrown.expect(WOUnitException.class);
+	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+
+	processor.process(Dummy.class, mockFactory);
+    }
+
+    @Test
     public void exceptionIfAnnotatedTypeIsIncompatible() throws Exception {
 	WrongTypeForDummyStubTestCase mockTarget = new WrongTypeForDummyStubTestCase();
 
 	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
 	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+
+	processor.process(Dummy.class, mockFactory);
+    }
+
+    @Test
+    public void exceptionIfRawArrayAnnotated() throws Exception {
+	RawArrayDeclarationForDummyStubTest mockTarget = new RawArrayDeclarationForDummyStubTest();
+
+	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+
+	thrown.expect(WOUnitException.class);
+	thrown.expectMessage(is("Cannot create object for a raw type com.webobjects.foundation.NSArray. Please, provide a generic type."));
 
 	processor.process(Dummy.class, mockFactory);
     }
