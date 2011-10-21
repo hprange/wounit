@@ -307,6 +307,10 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	super.saveChanges();
 
 	for (EOEnterpriseObject insertedObject : insertedObjects) {
+	    if (globalIDForObject(insertedObject) == null) {
+		continue;
+	    }
+
 	    forgetObject(insertedObject);
 
 	    EOGlobalID globalId = createPermanentGlobalFakeId(insertedObject.entityName());

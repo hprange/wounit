@@ -251,6 +251,25 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
+    public void doNotTryToForgetObjectDeletedByCascade() throws Exception {
+	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
+
+	FooEntity mockFoo = FooEntity.createFooEntity(editingContext);
+
+	FooEntityWithRequiredField mockFoo2 = FooEntityWithRequiredField.createFooEntityWithRequiredField(editingContext, 1);
+
+	mockFoo2.setFooEntityRelationship(mockFoo);
+
+	editingContext.deleteObject(mockFoo2);
+
+	editingContext = spy(editingContext);
+
+	editingContext.saveChanges();
+
+	verify(editingContext, never()).forgetObject(mockFoo);
+    }
+
+    @Test
     public void incrementPermanentGlobalIdForEachMockInstance() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
