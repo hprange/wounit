@@ -37,7 +37,7 @@ import com.wounit.model.FooEntity;
 import com.wounit.stubs.ChildStubTestCase;
 import com.wounit.stubs.DummyArrayStubTestCase;
 import com.wounit.stubs.NotInitializedSpiedObjectStubTestCase;
-import com.wounit.stubs.RawArrayDeclarationForDummyStubTest;
+import com.wounit.stubs.RawArrayDeclarationForDummyStubTestCase;
 import com.wounit.stubs.StubTestCase;
 import com.wounit.stubs.WrongGenericTypeForDummyStubTestCase;
 import com.wounit.stubs.WrongGenericTypeForSpiedObjectStubTestCase;
@@ -151,7 +151,7 @@ public class TestAnnotationProcessor {
 
     @Test
     public void exceptionIfRawArrayAnnotated() throws Exception {
-	RawArrayDeclarationForDummyStubTest mockTarget = new RawArrayDeclarationForDummyStubTest();
+	RawArrayDeclarationForDummyStubTestCase mockTarget = new RawArrayDeclarationForDummyStubTestCase();
 
 	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 

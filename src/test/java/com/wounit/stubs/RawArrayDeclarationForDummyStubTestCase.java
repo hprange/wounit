@@ -21,7 +21,7 @@ import com.wounit.annotations.Dummy;
 /**
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  */
-public class RawArrayDeclarationForDummyStubTest {
+public class RawArrayDeclarationForDummyStubTestCase {
     @Dummy
     @SuppressWarnings("rawtypes")
     public NSArray rawType;
