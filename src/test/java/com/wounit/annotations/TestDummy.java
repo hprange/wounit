@@ -19,9 +19,15 @@ package com.wounit.annotations;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
@@ -31,18 +37,28 @@ import com.wounit.rules.MockEditingContext;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TestDummy {
     @Dummy(size = 2)
     private NSArray<FooEntity> dummies;
 
+    @Spy
     @Rule
-    public final MockEditingContext mockEditingContext = new MockEditingContext("Test");
+    public MockEditingContext mockEditingContext = new MockEditingContext("Test");
 
     @Dummy
     private FooEntity mockEntity1, mockEntity2;
 
     @Dummy
     private FooEntityWithRequiredField mockEntity3;
+
+    @Spy
+    @Dummy
+    private NSArray<FooEntity> spiedDummies;
+
+    @Spy
+    @Dummy
+    private FooEntity spiedDummy;
 
     @Test
     public void verifyArrayContainsTheSpecifiedNumberOfDummyObjects() throws Exception {
@@ -55,5 +71,25 @@ public class TestDummy {
 	assertThat(mockEntity1, notNullValue());
 	assertThat(mockEntity2, notNullValue());
 	assertThat(mockEntity3, notNullValue());
+    }
+
+    @Test
+    public void verifySpiedDummyWasInsertedIntoMockEditingContext() throws Exception {
+	verify(mockEditingContext).insertSavedObject(spiedDummy);
+    }
+
+    @Test
+    public void verifySpiedNSArrayContainsInsertedObjects() throws Exception {
+	verify(mockEditingContext).insertSavedObject(spiedDummies.get(0));
+    }
+
+    @Test
+    public void verifySpiedNSArrayContainsSpiedObjects() throws Exception {
+	try {
+	    verify(spiedDummies.get(0), never()).toLongString();
+	} catch (Throwable exception) {
+	    fail("The object has not been spied as expected.");
+	}
+
     }
 }

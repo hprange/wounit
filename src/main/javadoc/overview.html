@@ -71,5 +71,27 @@ public class TestFoo {
    }
 }
     </PRE>
+    <P>
+    WOUnit can also be used in combination with <A HREF="http://code.google.com/p/mockito/" TARGET="_blank">Mockito</A> for advanced testing.
+    <PRE>
+import static com.wounit.EOAssert.*;
+import com.wounit.rules.MockEditingContext;
+import com.wounit.annotations.UnderTest;
+import org.mockito.Spy;
+
+public class TestFoo {
+   &#64;Rule
+   public MockEditingContext editingContext = new MockEditingContext(&quot;FooModel&quot;);
+
+   &#64;Spy &#64;UnderTest
+   private Foo foo;
+
+   &#64;Test
+   public void cantSaveWithNullProperty() {
+      doReturn("text").when(foo).methodThatReturnString();
+      ...
+   }
+}
+    </PRE>
   </BODY>
 </HTML>

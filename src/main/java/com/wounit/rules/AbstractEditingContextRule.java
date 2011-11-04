@@ -47,11 +47,11 @@ import er.extensions.eof.ERXEC;
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
     /**
-     * This factory creates enterprise objects and inserts them into the
+     * This facade creates enterprise objects and inserts them into the
      * specified editing context.
      */
-    static class UnderTestFactory extends AbstractEnterpriseObjectFactory {
-	public UnderTestFactory(EOEditingContext editingContext) {
+    static class UnderTestFacade extends EditingContextFacade {
+	public UnderTestFacade(EOEditingContext editingContext) {
 	    super(editingContext);
 	}
 
@@ -60,6 +60,11 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	    EOEntity entity = EOUtilities.entityForClass(editingContext, type);
 
 	    return EOUtilities.createAndInsertInstance(editingContext, entity.name());
+	}
+
+	@Override
+	public void insert(EOEnterpriseObject object) {
+	    editingContext.insertObject(object);
 	}
     }
 
@@ -150,7 +155,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     protected void before() {
 	lock();
 
-	processor.process(UnderTest.class, new UnderTestFactory(this));
+	processor.process(UnderTest.class, new UnderTestFacade(this));
     }
 
     /**

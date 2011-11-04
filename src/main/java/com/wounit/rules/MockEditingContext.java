@@ -70,17 +70,22 @@ import er.extensions.foundation.ERXArrayUtilities;
  */
 public class MockEditingContext extends AbstractEditingContextRule {
     /**
-     * This factory creates dummy enterprise objects using the
+     * This facade creates or inserts dummy enterprise objects using the
      * {@link MockEditingContext#createSavedObject(Class)} method.
      */
-    static class DummyFactory extends AbstractEnterpriseObjectFactory {
-	public DummyFactory(EOEditingContext editingContext) {
+    static class DummyFacade extends EditingContextFacade {
+	public DummyFacade(MockEditingContext editingContext) {
 	    super(editingContext);
 	}
 
 	@Override
 	public EOEnterpriseObject create(Class<? extends EOEnterpriseObject> type) {
 	    return ((MockEditingContext) editingContext).createSavedObject(type);
+	}
+
+	@Override
+	public void insert(EOEnterpriseObject object) {
+	    ((MockEditingContext) editingContext).insertSavedObject(object);
 	}
     }
 
@@ -141,7 +146,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     protected void before() {
 	super.before();
 
-	processor.process(Dummy.class, new DummyFactory(this));
+	processor.process(Dummy.class, new DummyFacade(this));
     }
 
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {
