@@ -277,6 +277,53 @@ confirm(editingContext, doNotSaveChanges());
 confirm(editingContext, doNotSaveChangesBecause(
 		"The bar property of Foo cannot be null"));</pre>
 			</p>
+			<h2>Advanced Testing with WOUnit + Mockito</h2>
+			<p>
+				<a href="http://code.google.com/p/mockito" target="_blank">Mockito</a> is a powerful mocking and test spy framework. Test spy is a useful technique that allows to verify behavior and stub methods. Since WOUnit 1.2, fields annotated with <code>@UnderTest</code> and <code>@Dummy</code> can be spied using the Mockito's <code>@Spy</code> annotation.
+			<pre class="brush: java; toolbar: false; highlight: [1,3,8,10];">
+@RunWith(MockitoJUnitRunner.class)
+public class SpyTest {
+	@Spy @UnderTest
+	private Foo foo;
+	
+	@Test
+	public void testOneLogic() throws Exception {
+		doReturn("text").when(foo).stringMethod();
+		...
+		verify(foo).aMethod();
+	}
+}</pre>
+			<p>
+				The test case must be run with the <code>MockitoJUnitRunner</code> (line 1) to spy objects properly. The <code>@Spy</code> annotation (line 3) can be defined in the companion of WOUnit annotations. The resulting object is a valid EO that can have methods stubbed (line 8) and can be verified (line 10).
+			</p>
+			<p>
+				So far, so good. Mockito can stub methods and verify the behavior, but what kind of real problem can it solve?
+			</p>
+			<p>
+				Suppose a test for a piece of code that needs to fetch the sum of values in the database. Wonder helper classes allow the construction of a simple SQL query like <code>"SELECT SUM(value) FROM table"</code>. Running a query like that hits the database, which is undesirable during the execution of a unit test. Mocking the Wonder helper classes is not an option in this case. How can one test some logic that depends on this kind of behavior?
+			</p>
+			<p>
+				The following code demonstrates a solution for this problem.
+			</p>
+			<pre class="brush: java; toolbar: false; highlight: [9];">
+@RunWith(MockitoJUnitRunner.class)
+public class StubSumTest {
+	@Spy @UnderTest
+	private Foo foo;
+	
+	@Test
+	public void testLogicRequiresSum() throws Exception {
+		// Stub the invocation of fetchSumOfValues to always return 10
+		doReturn(10).when(foo).fetchSumOfValues();
+		
+		// Execute the real logic that requires the sum of value
+		foo.realMethod();
+		...
+	}
+}</pre>
+			<p>
+				The code that executes the query can be isolated in a package private method and, combined with the Mockito stub mechanism, can solve that problem (line 9). When the fetchSumOfValues method is called during the realMethod execution, it will return 10 without reaching the database.
+			</p>
 			<div class="footer">
 				get the source code on GitHub : <a href="http://github.com/hprange/wounit">hprange/wounit</a>
 			</div>
