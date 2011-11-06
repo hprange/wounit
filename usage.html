@@ -230,6 +230,24 @@ public class FooTest {
 			<p>
 				The <code>@Dummy</code> annotation can be used to create saved enterprise objects and insert them into the editing context rule. You can have as many fields annotated with <code>@Dummy</code> as required to test the object under test in isolation. This annotation only works with the <code>MockEditingContext</code> rule.
 			</p>
+			<h2>Creating an Array of EOs Using Annotations</h2>
+			<p>
+				Since WOUnit 1.2, the <code>@UnderTest</code> and <code>@Dummy</code> annotations can be used to create an array of EOs.
+			</p>
+			<pre class="brush: java; toolbar: false;">
+public class ArrayTest {
+	@UnderTest(size = 2)
+	private NSArray&lt;Foo&gt; arrayOfFoos;
+	
+	@Dummy(size = 5)
+	private NSArray&lt;Bar&gt; arrayOfDummyBars;
+}</pre>
+			<p>
+				The size parameter defines the number of elements to create and add into the <code>NSArray</code>. If the size is omitted, then the array will be created with only one element.
+			</p>
+			<p>
+				For advanced testing, the Mockito's <code>@Spy</code> annotation can be used in the companion of the <code>@UnderTest</code> and <code>@Dummy</code> annotations. If the <code>@Spy</code> annotation is present, then the elements in the <code>NSArray</code> will be spied. Learn more about the Mockito integration in the <a href="#advanced_testing">Advanced Testing with WOUnit + Mockito</a> section.
+			</p>
 			<h2>Assertion with EOAssert</h2>
 			<p>
 				The <code>EOAssert</code> class is the entry point for writing assertions to WebObjects related unit tests. This class provides static methods to check conditions against enterprise objects and editing contexts.
@@ -277,7 +295,7 @@ confirm(editingContext, doNotSaveChanges());
 confirm(editingContext, doNotSaveChangesBecause(
 		"The bar property of Foo cannot be null"));</pre>
 			</p>
-			<h2>Advanced Testing with WOUnit + Mockito</h2>
+			<h2><a name="advanced_testing">Advanced Testing with WOUnit + Mockito</a></h2>
 			<p>
 				<a href="http://code.google.com/p/mockito" target="_blank">Mockito</a> is a powerful mocking and test spy framework. Test spy is a useful technique that allows to verify behavior and stub methods. Since WOUnit 1.2, fields annotated with <code>@UnderTest</code> and <code>@Dummy</code> can be spied using the Mockito's <code>@Spy</code> annotation.
 			<pre class="brush: java; toolbar: false; highlight: [1,3,8,10];">
