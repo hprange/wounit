@@ -46,6 +46,12 @@ import er.extensions.eof.ERXEC;
  * @since 1.0
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
+
+	// Lazy initialization of singleton instance of ERXExtensions
+	private static class SINGLETONS {
+		static ERXExtensions exrExtensions = new ERXExtensions();
+	}
+
     /**
      * This facade creates enterprise objects and inserts them into the
      * specified editing context.
@@ -89,6 +95,9 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	System.setProperty("NSProjectBundleEnabled", "true");
 
 	System.setProperty("NSBundleFactories", "(" + WOUnitBundleFactory.class.getName() + ")");
+
+	// Simulate what ERExtensions does
+	EOModelGroup.setClassDelegate(SINGLETONS.exrExtensions);
 
 	for (String modelName : modelNames) {
 	    loadModel(modelName);
