@@ -1,7 +1,7 @@
 {
     EOModelVersion = "2.1"; 
     adaptorName = JDBC; 
-    connectionDictionary = {}; 
+    connectionDictionary = {URL = foo; username = bar; }; 
     entities = (
         {className = "com.wounit.model.CompoundKeyEntity"; name = CompoundKeyEntity; }, 
         {
@@ -22,7 +22,13 @@
     userInfo = {
         "_EntityModeler" = {
             activeDatabaseConfigName = Default; 
-            databaseConfigs = {Default = {adaptorName = JDBC; prototypeEntityName = EOJDBCPrototypes; }; }; 
+            databaseConfigs = {
+                Default = {
+                    adaptorName = JDBC; 
+                    connectionDictionary = {URL = foo; username = bar; }; 
+                    prototypeEntityName = EOJDBCPrototypes; 
+                }; 
+            }; 
         }; 
     }; 
 }
