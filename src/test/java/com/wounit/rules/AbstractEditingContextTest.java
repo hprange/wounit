@@ -40,12 +40,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.webobjects.eoaccess.EOAttribute;
+import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
 import com.wounit.stubs.StubTestCase;
+
+import er.extensions.eof.ERXEOAccessUtilities;
+import er.extensions.foundation.ERXProperties;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractEditingContextTest {
@@ -153,6 +158,25 @@ public abstract class AbstractEditingContextTest {
 	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), notNullValue());
+    }
+
+    @Test
+    public void enablePrototypesOverriding() throws Exception {
+	ERXProperties.setStringForKey("com.webobjects.eoaccess.ERXModel", "er.extensions.ERXModelGroup.modelClassName");
+	ERXProperties.setStringForKey("true", "er.extensions.ERXModel.useExtendedPrototypes");
+	ERXProperties.setStringForKey("false", "er.extensions.ERXModelGroup.flattenPrototypes");
+
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
+
+	EOEntity entity = ERXEOAccessUtilities.entityNamed(editingContext, "ExtendedPrototypeEntity");
+
+	EOAttribute attribute = entity.attributeNamed("extendedAttribute");
+
+	assertThat(attribute.scale(), is(6));
+
+	ERXProperties.removeKey("er.extensions.ERXModelGroup.modelClassName");
+	ERXProperties.removeKey("er.extensions.ERXModel.useExtendedPrototypes");
+	ERXProperties.removeKey("er.extensions.ERXModelGroup.flattenPrototypes");
     }
 
     @Test

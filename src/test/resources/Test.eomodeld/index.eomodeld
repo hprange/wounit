@@ -8,6 +8,11 @@
             className = "com.wounit.model.DifferentClassNameForEntity"; 
             name = EntityWithDifferentClassName; 
         }, 
+        {className = EOGenericRecord; name = EOTestPrototypes; }, 
+        {
+            className = "com.wounit.model.ExtendedPrototypeEntity"; 
+            name = ExtendedPrototypeEntity; 
+        }, 
         {className = "com.wounit.model.FooEntity"; name = FooEntity; }, 
         {
             className = "com.wounit.model.FooEntityWithRequiredField"; 

@@ -1,0 +1,17 @@
+{
+    attributes = (
+        {
+            columnName = extendedAttribute; 
+            name = extendedAttribute; 
+            prototypeName = currencyAmount; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }
+    ); 
+    attributesUsedForLocking = (extendedAttribute, id); 
+    className = "com.wounit.model.ExtendedPrototypeEntity"; 
+    classProperties = (extendedAttribute); 
+    externalName = ExtendedPrototypeEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = ExtendedPrototypeEntity; 
+    primaryKeyAttributes = (id); 
+}

@@ -1,0 +1,21 @@
+{
+    attributes = (
+        {
+            columnName = currencyAmount; 
+            externalType = DECIMAL; 
+            name = currencyAmount; 
+            precision = 38; 
+            scale = 6; 
+            valueClassName = NSDecimalNumber; 
+            valueType = B; 
+        }, 
+        {columnName = id; name = id; }
+    ); 
+    attributesUsedForLocking = (id); 
+    className = EOGenericRecord; 
+    classProperties = (currencyAmount); 
+    fetchSpecificationDictionary = {}; 
+    isAbstractEntity = Y; 
+    name = EOTestPrototypes; 
+    primaryKeyAttributes = (id); 
+}
