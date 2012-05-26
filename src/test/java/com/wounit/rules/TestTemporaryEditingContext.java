@@ -40,32 +40,6 @@ import er.extensions.foundation.ERXProperties;
 public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     private static final String JAVA_MEMORY_ADAPTOR_BUNDLE_NAME = "JavaMemoryAdaptor";
 
-    @Test
-    public void changeAdaptorForModelsNotLoadedByTemporaryEditingContext() throws Exception {
-	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
-
-	EOModel model = EOModelGroup.defaultGroup().addModelWithPathURL(url);
-
-	model.setAdaptorName("JDBC");
-
-	new TemporaryEditingContext();
-
-	assertThat(model.adaptorName(), is("Memory"));
-    }
-
-    @Test
-    public void changeAdaptorIfModelAlreadyLoadedWithDifferentAdaptor() throws Exception {
-	URL url = getClass().getResource("/" + TEST_MODEL_NAME + ".eomodeld");
-
-	EOModel model = EOModelGroup.defaultGroup().addModelWithPathURL(url);
-
-	model.setAdaptorName("JDBC");
-
-	new TemporaryEditingContext(TEST_MODEL_NAME);
-
-	assertThat(model.adaptorName(), is("Memory"));
-    }
-
     @Override
     protected TemporaryEditingContext createEditingContext(String... modelNames) {
 	return new TemporaryEditingContext(modelNames);
