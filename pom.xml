@@ -5,7 +5,7 @@
 	<groupId>com.wounit</groupId>
 	<artifactId>wounit</artifactId>
 	<packaging>jar</packaging>
-	<version>1.3-SNAPSHOT</version>
+	<version>1.2.1</version>
 	<name>WOUnit Framework</name>
 	<description>The WOUnit framework contains a set of utilities for testing WebObjects applications using JUnit 4.7 or later capabilities.</description>
 	<url>http://github.com/hprange/wounit</url>
