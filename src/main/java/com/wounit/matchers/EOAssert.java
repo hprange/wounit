@@ -230,7 +230,7 @@ public class EOAssert {
      * 
      * @param <T>
      *            the static type accepted by the matcher
-     * @param editingContext
+     * @param actual
      *            the editing context to be checked
      * @param matcher
      *            an expression, built of {@link Matcher}s, specifying allowed
@@ -238,8 +238,8 @@ public class EOAssert {
      * @see org.hamcrest.CoreMatchers
      * @see org.junit.matchers.JUnitMatchers
      */
-    public static <T extends EOEditingContext> void confirm(T editingContext, Matcher<T> matcher) {
-	confirmImplementation(editingContext, matcher);
+    public static <T extends EOEditingContext> void confirm(T actual, Matcher<T> matcher) {
+	confirmImplementation(actual, matcher);
     }
 
     private static <T> void confirmImplementation(T actual, Matcher<T> matcher) {
