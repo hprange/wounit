@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -227,6 +228,21 @@ public abstract class AbstractEditingContextTest {
 	thrown.expectMessage(is("Cannot load model named 'UnknownModel'"));
 
 	initEditingContext("UnknownModel");
+    }
+
+    @Test
+    public void ignoreExceptionOnEditingContextDisposal() throws Exception {
+	AbstractEditingContextRule editingContext = Mockito.spy(initEditingContext(TEST_MODEL_NAME));
+
+	Mockito.doThrow(new NullPointerException("sample exception")).when(editingContext).dispose();
+
+	editingContext.before();
+
+	try {
+	    editingContext.after();
+	} catch (Exception exception) {
+	    fail("should not throw an exception");
+	}
     }
 
     protected final AbstractEditingContextRule initEditingContext(String... modelNames) {

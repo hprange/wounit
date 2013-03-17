@@ -47,7 +47,6 @@ import er.extensions.eof.ERXEC;
  * @since 1.0
  */
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
-
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
 	static ERXExtensions exrExtensions = new ERXExtensions();
@@ -122,7 +121,14 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      */
     protected void after() {
 	unlock();
-	dispose();
+
+	try {
+	    dispose();
+	} catch (Exception exception) {
+	    System.out.println("[WARN] An exception has been thrown while disposing the " + getClass().getSimpleName() + " after the test execution.");
+
+	    exception.printStackTrace();
+	}
 
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
