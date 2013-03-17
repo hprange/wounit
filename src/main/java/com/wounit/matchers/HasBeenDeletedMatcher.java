@@ -39,7 +39,7 @@ class HasBeenDeletedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatche
     private String status;
 
     public void describeTo(Description description) {
-	description.appendText(String.format("deleted object\n     but got: %s object", status));
+	description.appendText(String.format("deleted object%n     but got: %s object", status));
     }
 
     private boolean isDeletedEO(T eo) {

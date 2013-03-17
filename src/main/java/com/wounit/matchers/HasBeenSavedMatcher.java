@@ -36,7 +36,7 @@ class HasBeenSavedMatcher<T extends EOEnterpriseObject> extends TypeSafeMatcher<
     private String status;
 
     public void describeTo(Description description) {
-	description.appendText(String.format("saved object\n     but got: an object with %s changes", status));
+	description.appendText(String.format("saved object%n     but got: an object with %s changes", status));
     }
 
     @Override
