@@ -192,7 +192,7 @@ class AnnotationProcessor {
      * @param annotation
      *            the annotation to search for.
      * @param facade
-     *            a facade to crate and insert enterprise objects.
+     *            a facade to create and insert enterprise objects.
      * 
      * @see org.mockito.Spy
      */
