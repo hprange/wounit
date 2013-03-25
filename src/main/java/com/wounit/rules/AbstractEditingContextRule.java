@@ -31,6 +31,7 @@ import com.webobjects.eoaccess.EOUtilities;
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
+import com.wounit.WOUnitTroubleshooter;
 import com.wounit.annotations.UnderTest;
 import com.wounit.foundation.WOUnitBundleFactory;
 
@@ -199,6 +200,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	}
 
 	if (url == null) {
+	    WOUnitTroubleshooter.diagnoseModelNotFound(modelName);
+
 	    throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
 	}
 
