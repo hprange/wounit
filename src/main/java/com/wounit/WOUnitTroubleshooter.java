@@ -169,11 +169,13 @@ public class WOUnitTroubleshooter {
 		return accumulator + n;
 	    }
 
+	    int cost = 0;
+
 	    if (x.charAt(n - 1) != y.charAt(m - 1)) {
-		accumulator++;
+		cost = 1;
 	    }
 
-	    return Math.min(levenshteinDistance(x.subSequence(0, n - 1), y, limit, accumulator), Math.min(levenshteinDistance(x, y.subSequence(0, m - 1), limit, accumulator), levenshteinDistance(x.subSequence(0, n - 1), y.subSequence(0, m - 1), limit, accumulator)));
+	    return Math.min(levenshteinDistance(x.subSequence(0, n - 1), y, limit, accumulator + 1), Math.min(levenshteinDistance(x, y.subSequence(0, m - 1), limit, accumulator + 1), levenshteinDistance(x.subSequence(0, n - 1), y.subSequence(0, m - 1), limit, accumulator + cost)));
 	}
     }
 
