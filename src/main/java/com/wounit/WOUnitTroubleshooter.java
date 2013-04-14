@@ -179,7 +179,7 @@ public class WOUnitTroubleshooter {
 	}
     }
 
-    static AtomicBoolean ALREADY_DIAGNOSED = new AtomicBoolean(false);
+    static final AtomicBoolean ALREADY_DIAGNOSED = new AtomicBoolean(false);
 
     public static void diagnoseModelNotFound(String modelName) {
 	if (!ALREADY_DIAGNOSED.compareAndSet(false, true)) {
