@@ -39,6 +39,9 @@ import com.webobjects.foundation.NSBundle;
 import com.webobjects.foundation.NSMutableArray;
 
 /**
+ * This class provides utility methods to help diagnose problems when running
+ * WOUnit tests. This class is intended for internal use.
+ * 
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  * @since 1.3
  */
@@ -181,6 +184,12 @@ public class WOUnitTroubleshooter {
 
     static final AtomicBoolean ALREADY_DIAGNOSED = new AtomicBoolean(false);
 
+    /**
+     * Diagnose eomodel not found errors.
+     * 
+     * @param modelName
+     *            the name of the model not found
+     */
     public static void diagnoseModelNotFound(String modelName) {
 	if (!ALREADY_DIAGNOSED.compareAndSet(false, true)) {
 	    return;

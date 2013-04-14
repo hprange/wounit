@@ -15,7 +15,7 @@
  */
 
 /**
- * This package contains only the base <code>WOUnit</code> class.
+ * This package contains some WOUnit utility classes.
  * 
  * @since 1.1
  */
