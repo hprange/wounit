@@ -91,6 +91,37 @@ OR
 		}
 	}
 
+Building From Source
+--------------------
+
+### Building with Maven
+
+WOUnit requires WebObjects and Wonder libraries that are not available in the Maven Central repository. Check steps 2 and 3 in the [Quick Start guide](http://wiki.wocommunity.org/display/WOL/Quick+Start) for more information about how to setup the WOCommunity repository and how to install WebObjects in the local Maven repository.
+
+WOUnit can be built running the Maven command:
+
+	mvn clean install
+
+**Note**: WOUnit can only be successfully built if the WOCommunity repository is correctly configured.
+
+### Building with Ant
+
+WOUnit can be built running the Ant command:
+
+	ant package
+
+The required libraries will be automatically download to the `lib` folder in the WOUnit project root.
+
+**Note**: WebObjects must be installed. If it isn't installed in the default location, a parameter can be used to define the path to the WebObjects libraries.
+
+	ant package -Dwebobjects.lib=${path_to_webobjects_lib_folder}
+
+### Importing into Eclipse
+
+Maven users should install the [m2e](http://eclipse.org/m2e/) plug-in for Eclipse and use the _Import Maven Project_ option.
+
+Ant users can add the libraries downloaded into the `lib` folder to the project's build path. The WebObjects libraries must be added manually.
+
 Acknowledge
 -----------
 
