@@ -1,0 +1,18 @@
+{
+    attributes = (
+        {
+            allowsNull = Y; 
+            columnName = baseAttribute; 
+            name = baseAttribute; 
+            prototypeName = longText; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }
+    ); 
+    attributesUsedForLocking = (id); 
+    className = "com.wounit.model.BaseEntity"; 
+    classProperties = (baseAttribute); 
+    externalName = BaseEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = BaseEntity; 
+    primaryKeyAttributes = (id); 
+}

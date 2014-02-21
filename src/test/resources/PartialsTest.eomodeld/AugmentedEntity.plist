@@ -1,0 +1,19 @@
+{
+    attributes = (
+        {
+            allowsNull = Y; 
+            columnName = augmentedAttribute; 
+            name = augmentedAttribute; 
+            prototypeName = intNumber; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }
+    ); 
+    attributesUsedForLocking = (id); 
+    className = "com.wounit.model.AugmentedEntity"; 
+    classProperties = (augmentedAttribute); 
+    externalName = BaseEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = AugmentedEntity; 
+    primaryKeyAttributes = (id); 
+    userInfo = {"_EntityModeler" = {partialEntity = BaseEntity; }; }; 
+}
