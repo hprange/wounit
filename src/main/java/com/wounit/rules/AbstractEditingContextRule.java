@@ -37,6 +37,7 @@ import com.wounit.foundation.WOUnitBundleFactory;
 import er.extensions.ERXExtensions;
 import er.extensions.eof.ERXEC;
 import er.extensions.eof.ERXEntityClassDescription;
+import er.extensions.foundation.ERXArrayUtilities;
 import er.extensions.foundation.ERXProperties;
 
 /**
@@ -100,8 +101,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
 	// Simulate what ERExtensions does
 	EOModelGroup.setClassDelegate(SINGLETONS.exrExtensions);
-
 	ERXEntityClassDescription.registerDescription();
+	ERXArrayUtilities.initialize();
 
 	for (String modelName : modelNames) {
 	    loadModel(modelName);
