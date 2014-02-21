@@ -19,8 +19,8 @@
 
 	<path id="build.classpath">
 		<pathelement location="${maven.repo.local}/ERFoundation-1.0.jar" />
-		<pathelement location="${maven.repo.local}/ERExtensions-5.4.2.jar" />
-		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.4.2.jar" />
+		<pathelement location="${maven.repo.local}/ERExtensions-5.4.3.jar" />
+		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.4.3.jar" />
 		<pathelement location="${webobjects.lib}/JavaFoundation.jar" />
 		<pathelement location="${webobjects.lib}/JavaWebObjects.jar" />
 		<pathelement location="${webobjects.lib}/JavaXML.jar" />
@@ -33,14 +33,15 @@
 		<pathelement location="${maven.repo.local}/slf4j-api-1.5.8.jar" />
 		<pathelement location="${maven.repo.local}/junit-dep-4.8.2.jar" />
 		<pathelement location="${maven.repo.local}/hamcrest-core-1.2.1.jar" />
-		<pathelement location="${maven.repo.local}/JavaMemoryAdaptor-5.4.2.jar" />
+		<pathelement location="${maven.repo.local}/JavaMemoryAdaptor-5.4.3.jar" />
+		<pathelement location="${maven.repo.local}/ERAttributeExtension-5.4.3.jar" />
 		<pathelement location="${maven.repo.local}/ognl-2.6.7.jar" />
 		<pathelement location="${maven.repo.local}/mockito-core-1.9.0-rc1.jar" />
 	</path>
 	<path id="build.test.classpath">
 		<pathelement location="${maven.repo.local}/ERFoundation-1.0.jar" />
-		<pathelement location="${maven.repo.local}/ERExtensions-5.4.2.jar" />
-		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.4.2.jar" />
+		<pathelement location="${maven.repo.local}/ERExtensions-5.4.3.jar" />
+		<pathelement location="${maven.repo.local}/JavaWOExtensions-5.4.3.jar" />
 		<pathelement location="${webobjects.lib}/JavaFoundation.jar" />
 		<pathelement location="${webobjects.lib}/JavaWebObjects.jar" />
 		<pathelement location="${webobjects.lib}/JavaXML.jar" />
@@ -52,12 +53,13 @@
 		<pathelement location="${maven.repo.local}/log4j-1.2.14.jar" />
 		<pathelement location="${maven.repo.local}/slf4j-api-1.5.8.jar" />
 		<pathelement location="${maven.repo.local}/junit-dep-4.8.2.jar" />
-		<pathelement location="${maven.repo.local}/JavaMemoryAdaptor-5.4.2.jar" />
+		<pathelement location="${maven.repo.local}/JavaMemoryAdaptor-5.4.3.jar" />
+		<pathelement location="${maven.repo.local}/ERAttributeExtension-5.4.3.jar" />
 		<pathelement location="${maven.repo.local}/ognl-2.6.7.jar" />
 		<pathelement location="${maven.repo.local}/mockito-core-1.9.0-rc1.jar" />
 		<pathelement location="${maven.repo.local}/hamcrest-core-1.2.1.jar" />
 		<pathelement location="${maven.repo.local}/objenesis-1.0.jar" />
-		<pathelement location="${maven.repo.local}/ERPrototypes-5.4.2.jar" />
+		<pathelement location="${maven.repo.local}/ERPrototypes-5.4.3.jar" />
 	</path>
 
 	<!-- ====================================================================== -->
@@ -207,18 +209,19 @@
 	<target name="get-deps" depends="test-offline" description="Download all dependencies" unless="maven.mode.offline">
 		<mkdir dir="${maven.repo.local}" />
 		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERFoundation/1.0/ERFoundation-1.0.jar" dest="${maven.repo.local}/ERFoundation-1.0.jar" usetimestamp="true" ignoreerrors="true" />
-		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERExtensions/5.4.2/ERExtensions-5.4.2.jar" dest="${maven.repo.local}/ERExtensions-5.4.2.jar" usetimestamp="true" ignoreerrors="true" />
-		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/JavaWOExtensions/5.4.2/JavaWOExtensions-5.4.2.jar" dest="${maven.repo.local}/JavaWOExtensions-5.4.2.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERExtensions/5.4.3/ERExtensions-5.4.3.jar" dest="${maven.repo.local}/ERExtensions-5.4.3.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/JavaWOExtensions/5.4.3/JavaWOExtensions-5.4.3.jar" dest="${maven.repo.local}/JavaWOExtensions-5.4.3.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/com/ibm/icu/icu4j/3.8/icu4j-3.8.jar" dest="${maven.repo.local}/icu4j-3.8.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/log4j/log4j/1.2.14/log4j-1.2.14.jar" dest="${maven.repo.local}/log4j-1.2.14.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar" dest="${maven.repo.local}/slf4j-api-1.5.8.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/junit/junit-dep/4.8.2/junit-dep-4.8.2.jar" dest="${maven.repo.local}/junit-dep-4.8.2.jar" usetimestamp="true" ignoreerrors="true" />
-		<get src="http://maven.wocommunity.org/content/groups/public/wonder/eoadaptors/JavaMemoryAdaptor/5.4.2/JavaMemoryAdaptor-5.4.2.jar" dest="${maven.repo.local}/JavaMemoryAdaptor-5.4.2.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/eoadaptors/JavaMemoryAdaptor/5.4.3/JavaMemoryAdaptor-5.4.3.jar" dest="${maven.repo.local}/JavaMemoryAdaptor-5.4.3.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/eof/ERAttributeExtension/5.4.3/ERAttributeExtension-5.4.3.jar" dest="${maven.repo.local}/ERAttributeExtension-5.4.3.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/ognl/ognl/2.6.7/ognl-2.6.7.jar" dest="${maven.repo.local}/ognl-2.6.7.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/org/mockito/mockito-core/1.9.0-rc1/mockito-core-1.9.0-rc1.jar" dest="${maven.repo.local}/mockito-core-1.9.0-rc1.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.2.1/hamcrest-core-1.2.1.jar" dest="${maven.repo.local}/hamcrest-core-1.2.1.jar" usetimestamp="true" ignoreerrors="true" />
 		<get src="http://repo1.maven.org/maven2/org/objenesis/objenesis/1.0/objenesis-1.0.jar" dest="${maven.repo.local}/objenesis-1.0.jar" usetimestamp="true" ignoreerrors="true" />
-		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERPrototypes/5.4.2/ERPrototypes-5.4.2.jar" dest="${maven.repo.local}/ERPrototypes-5.4.2.jar" usetimestamp="true" ignoreerrors="true" />
+		<get src="http://maven.wocommunity.org/content/groups/public/wonder/core/ERPrototypes/5.4.3/ERPrototypes-5.4.3.jar" dest="${maven.repo.local}/ERPrototypes-5.4.3.jar" usetimestamp="true" ignoreerrors="true" />
 	</target>
 
 	<!-- ====================================================================== -->

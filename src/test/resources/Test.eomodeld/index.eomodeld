@@ -18,6 +18,7 @@
             className = "com.wounit.model.FooEntityWithRequiredField"; 
             name = FooEntityWithRequiredField; 
         }, 
+        {className = "com.wounit.model.JodaEntity"; name = JodaEntity; }, 
         {
             className = "com.wounit.model.SubFooEntity"; 
             name = SubFooEntity; 
