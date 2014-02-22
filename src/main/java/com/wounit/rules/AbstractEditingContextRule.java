@@ -37,6 +37,10 @@ import com.wounit.foundation.WOUnitBundleFactory;
 
 import er.extensions.ERXExtensions;
 import er.extensions.eof.ERXEC;
+import er.extensions.eof.ERXEntityClassDescription;
+import er.extensions.foundation.ERXArrayUtilities;
+import er.extensions.foundation.ERXProperties;
+import er.extensions.partials.ERXPartialInitializer;
 
 /**
  * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
@@ -93,16 +97,20 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     AbstractEditingContextRule(EOObjectStore objectStore, String... modelNames) {
 	super(objectStore);
 
-	System.setProperty("NSProjectBundleEnabled", "true");
-
-	System.setProperty("NSBundleFactories", "(" + WOUnitBundleFactory.class.getName() + ")");
+	ERXProperties.setStringForKey("true", "NSProjectBundleEnabled");
+	ERXProperties.setStringForKey("true", "er.extensions.partials.enabled");
+	ERXProperties.setStringForKey("(" + WOUnitBundleFactory.class.getName() + ")", "NSBundleFactories");
 
 	// Simulate what ERExtensions does
 	EOModelGroup.setClassDelegate(SINGLETONS.exrExtensions);
+	ERXEntityClassDescription.registerDescription();
+	ERXArrayUtilities.initialize();
 
 	for (String modelName : modelNames) {
 	    loadModel(modelName);
 	}
+
+	ERXPartialInitializer.initializer().initializePartialEntities(EOModelGroup.defaultGroup());
     }
 
     /**

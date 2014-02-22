@@ -1,0 +1,36 @@
+{
+    attributes = (
+        {
+            allowsNull = Y; 
+            columnName = dateTime; 
+            name = dateTime; 
+            prototypeName = jodaDateTime; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }, 
+        {
+            allowsNull = Y; 
+            columnName = localDate; 
+            name = localDate; 
+            prototypeName = jodaLocalDate; 
+        }, 
+        {
+            allowsNull = Y; 
+            columnName = localDateTime; 
+            name = localDateTime; 
+            prototypeName = jodaLocalDateTime; 
+        }, 
+        {
+            allowsNull = Y; 
+            columnName = localTime; 
+            name = localTime; 
+            prototypeName = jodaLocalTime; 
+        }
+    ); 
+    attributesUsedForLocking = (id); 
+    className = "com.wounit.model.JodaEntity"; 
+    classProperties = (dateTime, localDate, localDateTime, localTime); 
+    externalName = JodaEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = JodaEntity; 
+    primaryKeyAttributes = (id); 
+}
