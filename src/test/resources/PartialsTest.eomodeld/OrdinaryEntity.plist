@@ -1,0 +1,27 @@
+{
+    attributes = (
+        {allowsNull = N; name = id; prototypeName = id; }, 
+        {
+            allowsNull = Y; 
+            columnName = partialID; 
+            name = partialID; 
+            prototypeName = id; 
+        }
+    ); 
+    attributesUsedForLocking = (id, partialID); 
+    className = "com.wounit.model.OrdinaryEntity"; 
+    classProperties = (relationshipToPartial); 
+    externalName = OrdinaryEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = OrdinaryEntity; 
+    primaryKeyAttributes = (id); 
+    relationships = (
+        {
+            destination = AugmentedEntity; 
+            isToMany = N; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = id; sourceAttribute = partialID; }); 
+            name = relationshipToPartial; 
+        }
+    ); 
+}

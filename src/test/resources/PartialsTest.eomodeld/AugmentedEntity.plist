@@ -10,10 +10,19 @@
     ); 
     attributesUsedForLocking = (id); 
     className = "com.wounit.model.AugmentedEntity"; 
-    classProperties = (augmentedAttribute); 
+    classProperties = (augmentedAttribute, relationshipToOrdinaries); 
     externalName = BaseEntity; 
     fetchSpecificationDictionary = {}; 
     name = AugmentedEntity; 
     primaryKeyAttributes = (id); 
+    relationships = (
+        {
+            destination = OrdinaryEntity; 
+            isToMany = Y; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = partialID; sourceAttribute = id; }); 
+            name = relationshipToOrdinaries; 
+        }
+    ); 
     userInfo = {"_EntityModeler" = {partialEntity = BaseEntity; }; }; 
 }

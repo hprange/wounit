@@ -4,7 +4,8 @@
     connectionDictionary = {}; 
     entities = (
         {className = "com.wounit.model.AugmentedEntity"; name = AugmentedEntity; }, 
-        {className = "com.wounit.model.BaseEntity"; name = BaseEntity; }
+        {className = "com.wounit.model.BaseEntity"; name = BaseEntity; }, 
+        {className = "com.wounit.model.OrdinaryEntity"; name = OrdinaryEntity; }
     ); 
     userInfo = {
         "_EntityModeler" = {

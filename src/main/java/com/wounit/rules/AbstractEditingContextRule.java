@@ -39,6 +39,7 @@ import er.extensions.eof.ERXEC;
 import er.extensions.eof.ERXEntityClassDescription;
 import er.extensions.foundation.ERXArrayUtilities;
 import er.extensions.foundation.ERXProperties;
+import er.extensions.partials.ERXPartialInitializer;
 
 /**
  * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
@@ -107,6 +108,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 	for (String modelName : modelNames) {
 	    loadModel(modelName);
 	}
+
+	ERXPartialInitializer.initializer().initializePartialEntities(EOModelGroup.defaultGroup());
     }
 
     /**
