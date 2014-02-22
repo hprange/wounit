@@ -15,8 +15,6 @@
  */
 package com.wounit.model;
 
-import org.apache.log4j.Logger;
 
 public class OrdinaryEntity extends _OrdinaryEntity {
-  private static Logger log = Logger.getLogger(OrdinaryEntity.class);
 }
