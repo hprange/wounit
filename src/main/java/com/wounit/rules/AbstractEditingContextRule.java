@@ -31,7 +31,6 @@ import com.webobjects.eoaccess.EOUtilities;
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
-import com.wounit.WOUnitTroubleshooter;
 import com.wounit.annotations.UnderTest;
 import com.wounit.foundation.WOUnitBundleFactory;
 

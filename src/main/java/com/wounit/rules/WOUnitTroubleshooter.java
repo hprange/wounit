@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.wounit;
+package com.wounit.rules;
 
-import static com.wounit.WOUnitTroubleshooter.Utils.findAvailableModels;
-import static com.wounit.WOUnitTroubleshooter.Utils.findSimilarModelName;
+import static com.wounit.rules.WOUnitTroubleshooter.Utils.findAvailableModels;
+import static com.wounit.rules.WOUnitTroubleshooter.Utils.findSimilarModelName;
 
 import java.io.File;
 import java.net.URL;
@@ -45,7 +45,7 @@ import com.webobjects.foundation.NSMutableArray;
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  * @since 1.3
  */
-public class WOUnitTroubleshooter {
+class WOUnitTroubleshooter {
     protected static class Utils {
 	protected static String extractModelName(String path) {
 	    Pattern pattern = Pattern.compile("(.*?)\\.eomodeld");
@@ -190,7 +190,7 @@ public class WOUnitTroubleshooter {
      * @param modelName
      *            the name of the model not found
      */
-    public static void diagnoseModelNotFound(String modelName) {
+    static void diagnoseModelNotFound(String modelName) {
 	if (!ALREADY_DIAGNOSED.compareAndSet(false, true)) {
 	    return;
 	}

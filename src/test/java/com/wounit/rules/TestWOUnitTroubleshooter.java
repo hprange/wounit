@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.wounit;
+package com.wounit.rules;
 
-import static com.wounit.WOUnitTroubleshooter.Utils.extractModelName;
+import static com.wounit.rules.WOUnitTroubleshooter.Utils.extractModelName;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -33,6 +33,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.wounit.rules.WOUnitTroubleshooter;
 
 /**
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
