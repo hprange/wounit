@@ -33,6 +33,7 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.annotations.UnderTest;
 import com.wounit.foundation.WOUnitBundleFactory;
+import com.wounit.utils.WOUnitEditingContextFactory;
 
 import er.extensions.ERXExtensions;
 import er.extensions.eof.ERXEC;
@@ -145,6 +146,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
 	    modelGroup.removeModel(model);
 	}
+
+	ERXEC.setFactory(null);
     }
 
     /*
@@ -177,6 +180,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * test execution.
      */
     protected void before() {
+	ERXEC.setFactory(new WOUnitEditingContextFactory(this));
+
 	lock();
 
 	processor.process(UnderTest.class, new UnderTestFacade(this));

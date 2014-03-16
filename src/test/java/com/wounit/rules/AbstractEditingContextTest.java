@@ -17,7 +17,9 @@
 package com.wounit.rules;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -45,11 +47,14 @@ import com.webobjects.eoaccess.EOAttribute;
 import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
+import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
 import com.wounit.stubs.StubTestCase;
+import com.wounit.utils.WOUnitEditingContextFactory;
 
+import er.extensions.eof.ERXEC;
 import er.extensions.eof.ERXEOAccessUtilities;
 import er.extensions.foundation.ERXProperties;
 
@@ -303,6 +308,27 @@ public abstract class AbstractEditingContextTest {
 	editingContext.after();
 
 	assertThat(EOModelGroup.defaultGroup().modelNamed(TEST_MODEL_NAME), nullValue());
+    }
+
+    @Test
+    public void replaceDefaultERXECFactoryByWOUnitEditingContextFactoryBeforeRunningTests() throws Exception {
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	assertThat(ERXEC.newEditingContext(), is((EOEditingContext) editingContext));
+
+	editingContext.after();
+    }
+
+    @Test
+    public void revertToDefaultERXECFactoryAfterRunningTests() throws Exception {
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+	editingContext.after();
+
+	assertThat(ERXEC._factory(), not(instanceOf(WOUnitEditingContextFactory.class)));
     }
 
     @After
