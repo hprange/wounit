@@ -20,6 +20,8 @@ import org.hamcrest.Description;
 
 import com.webobjects.eocontrol.EOEnterpriseObject;
 
+import er.extensions.eof.ERXEnterpriseObject;
+
 /**
  * Tests if the <code>EOEnterpriseObject</code> can be deleted.
  * 
@@ -73,6 +75,11 @@ class CanBeDeletedMatcher<T extends EOEnterpriseObject> extends AbstractEnhanced
 
     @Override
     protected void matchesWithPossibleException(T eo) throws Exception {
+	if (eo instanceof ERXEnterpriseObject) {
+	    ((ERXEnterpriseObject) eo).mightDelete();
+	}
+
+	eo.propagateDeleteWithEditingContext(eo.editingContext());
 	eo.validateForDelete();
     }
 }

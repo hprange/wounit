@@ -18,17 +18,24 @@ package com.wounit.matchers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.hamcrest.StringDescription;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSValidation;
+
+import er.extensions.eof.ERXEnterpriseObject;
 
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
@@ -118,6 +125,33 @@ public class TestCanBeDeletedMatcher {
 	boolean result = matcher.matchesSafely(mockObject);
 
 	assertThat(result, is(false));
+    }
+
+    @Test
+    public void performMightDeleteBeforePropagatingDeleteIfERXEnterpriseObject() throws Exception {
+	mockObject = mock(ERXEnterpriseObject.class);
+
+	matcher.matchesSafely(mockObject);
+
+	InOrder inOrder = inOrder(mockObject);
+
+	inOrder.verify((ERXEnterpriseObject) mockObject).mightDelete();
+	inOrder.verify(mockObject).propagateDeleteWithEditingContext(Mockito.any(EOEditingContext.class));
+	inOrder.verify(mockObject).validateForDelete();
+    }
+
+    @Test
+    public void propagateDeleteBeforeValidatingForDelete() throws Exception {
+	EOEditingContext mockEditingContext = mock(EOEditingContext.class);
+
+	when(mockObject.editingContext()).thenReturn(mockEditingContext);
+
+	matcher.matchesSafely(mockObject);
+
+	InOrder inOrder = inOrder(mockObject);
+
+	inOrder.verify(mockObject).propagateDeleteWithEditingContext(mockEditingContext);
+	inOrder.verify(mockObject).validateForDelete();
     }
 
     @Before
