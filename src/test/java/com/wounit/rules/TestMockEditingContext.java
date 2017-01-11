@@ -16,6 +16,7 @@
 
 package com.wounit.rules;
 
+import static er.extensions.eof.ERXEOControlUtilities.primaryKeyObjectForObject;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -48,6 +49,7 @@ import com.webobjects.foundation.NSArray;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
+import com.wounit.model.LongPKEntity;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
 import com.wounit.stubs.StubTestCase;
@@ -555,6 +557,24 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	FooEntity mockFoo = editingContext.createSavedObject(FooEntity.class);
 
 	assertThat((Integer) ((EOKeyGlobalID) mockFoo.__globalID()).keyValues()[0], is(2));
+
+	editingContext.after();
+    }
+
+    @Test
+    public void savedObjectUsesGlobalFakeIdInCaseOfALongPK() throws Exception {
+	MockEditingContext editingContext = (MockEditingContext) initEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	LongPKEntity.createLongPKEntity(editingContext);
+
+	editingContext.saveChanges();
+
+	LongPKEntity mockLongPKEntity = editingContext.createSavedObject(LongPKEntity.class);
+
+	assertThat(primaryKeyObjectForObject(mockLongPKEntity), instanceOf(Long.class));
+	assertThat(primaryKeyObjectForObject(mockLongPKEntity), is((Object) 2L));
 
 	editingContext.after();
     }
