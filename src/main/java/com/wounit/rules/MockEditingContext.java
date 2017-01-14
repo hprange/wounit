@@ -36,6 +36,7 @@ import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 import com.wounit.annotations.Dummy;
 
+import er.extensions.eof.ERXModelGroup;
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
 import er.extensions.foundation.ERXArrayUtilities;
@@ -99,7 +100,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     /**
      * A counter for fake global IDs.
      */
-    private int globalFakeId = 0;
+    private long globalFakeId = 0;
 
     /**
      * An array of objects whose changes must be ignored during the test cycle.
@@ -151,8 +152,12 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {
 	globalFakeId++;
+	final EOEntity entity =ERXModelGroup.defaultGroup().entityNamed(entityName);
+	if (entity.primaryKeyAttributes().size() == 1 && entity.primaryKeyAttributes().get(0).valueTypeClassName().equals(Long.class.getName())){
+		return new _EOIntegralKeyGlobalID(entityName, globalFakeId);
+	}
 
-	return new _EOIntegralKeyGlobalID(entityName, globalFakeId);
+	return new _EOIntegralKeyGlobalID(entityName, (int)globalFakeId);
     }
 
     /**
@@ -284,7 +289,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
      * <code>EOEditingContext<code> to not call the super behavior for objects
      * registered with {@link #insertSavedObject(EOEnterpriseObject)} or {@link #createSavedObject(Class)}.
      * 
-     * @param anObject
+     * @param object
      *            the object whose state is to be recorded
      * 
      * @see er.extensions.eof.ERXEC#objectWillChange(java.lang.Object)

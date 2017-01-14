@@ -48,6 +48,7 @@ import com.webobjects.foundation.NSArray;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
+import com.wounit.model.LongPKEntity;
 import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
 import com.wounit.stubs.StubTestCase;
@@ -558,6 +559,25 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 
 	editingContext.after();
     }
+
+
+	@Test
+	public void savedObjectUsesGlobalFakeIdInCaseOfALongPK() throws Exception {
+	MockEditingContext editingContext = (MockEditingContext) initEditingContext(TEST_MODEL_NAME);
+
+	editingContext.before();
+
+	LongPKEntity.createLongPKEntity(editingContext);
+
+	editingContext.saveChanges();
+
+	LongPKEntity mockLongPKEntity = editingContext.createSavedObject(LongPKEntity.class);
+
+	assertThat(mockLongPKEntity.valueForKey(mockLongPKEntity.primaryKeyAttributeNames().get(0)), is(2L));
+	assertThat((Long) ((EOKeyGlobalID) mockLongPKEntity.__globalID()).keyValues()[0], is(2L));
+
+	editingContext.after();
+	}
 
     @Before
     public void setup() {
