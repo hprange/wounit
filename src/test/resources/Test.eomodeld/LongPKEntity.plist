@@ -1,0 +1,14 @@
+{
+    attributes = (
+        {allowsNull = Y; columnName = bar; name = bar; prototypeName = shortString; }, 
+        {allowsNull = N; columnName = id; name = id; prototypeName = longNumber; }, 
+        {allowsNull = Y; columnName = type; name = type; prototypeName = intNumber; }
+    ); 
+    attributesUsedForLocking = (bar, id, type); 
+    className = "com.wounit.model.LongPKEntity"; 
+    classProperties = (bar, type); 
+    externalName = LongPKEntity; 
+    fetchSpecificationDictionary = {}; 
+    name = LongPKEntity; 
+    primaryKeyAttributes = (id); 
+}

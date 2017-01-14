@@ -18,6 +18,7 @@ package com.wounit.rules;
 
 import java.lang.reflect.Field;
 
+import com.webobjects.eoaccess.EOAttribute;
 import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eoaccess.EOUtilities;
@@ -36,6 +37,7 @@ import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 import com.wounit.annotations.Dummy;
 
+import er.extensions.eof.ERXModelGroup;
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
 import er.extensions.foundation.ERXArrayUtilities;
@@ -96,10 +98,18 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
     private static final long serialVersionUID = 1L;
 
+    private static boolean hasLongPrimaryKey(String entityName) {
+	EOEntity entity = ERXModelGroup.defaultGroup().entityNamed(entityName);
+
+	NSArray<EOAttribute> primaryKeys = entity.primaryKeyAttributes();
+
+	return primaryKeys.size() == 1 && primaryKeys.get(0).valueTypeClassName().equals(Long.class.getName());
+    }
+
     /**
      * A counter for fake global IDs.
      */
-    private int globalFakeId = 0;
+    private long globalFakeId = 0L;
 
     /**
      * An array of objects whose changes must be ignored during the test cycle.
@@ -152,7 +162,11 @@ public class MockEditingContext extends AbstractEditingContextRule {
     private EOGlobalID createPermanentGlobalFakeId(String entityName) {
 	globalFakeId++;
 
-	return new _EOIntegralKeyGlobalID(entityName, globalFakeId);
+	if (hasLongPrimaryKey(entityName)) {
+	    return new _EOIntegralKeyGlobalID(entityName, globalFakeId);
+	}
+
+	return new _EOIntegralKeyGlobalID(entityName, (int) globalFakeId);
     }
 
     /**
