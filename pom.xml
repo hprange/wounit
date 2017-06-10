@@ -239,6 +239,8 @@
 						<exclude>README.md</exclude>
 						<exclude>.gitignore</exclude>
 						<exclude>.maven/**</exclude>
+						<exclude>.maven_settings.xml</exclude>
+						<exclude>.travis.yml</exclude>
 						<exclude>src/test/resources/**</exclude>
 					</excludes>
 					<properties>
