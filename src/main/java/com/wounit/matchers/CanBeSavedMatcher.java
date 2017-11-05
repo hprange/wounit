@@ -16,13 +16,15 @@
 
 package com.wounit.matchers;
 
+import static er.extensions.eof.ERXEOControlUtilities.isNewObject;
+
 import org.hamcrest.Description;
 
 import com.webobjects.eocontrol.EOEnterpriseObject;
 
 /**
  * Tests if the <code>EOEnterpriseObject</code> can be saved.
- * 
+ *
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  * @param <T>
@@ -73,6 +75,10 @@ class CanBeSavedMatcher<T extends EOEnterpriseObject> extends AbstractEnhancedTy
 
     @Override
     protected void matchesWithPossibleException(T eo) {
-	eo.validateForSave();
+	if (isNewObject(eo)) {
+	    eo.validateForInsert();
+	} else {
+	    eo.validateForUpdate();
+	}
     }
 }
