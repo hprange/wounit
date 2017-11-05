@@ -27,7 +27,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
+import com.webobjects.eocontrol.EOGlobalID;
 import com.webobjects.foundation.NSValidation;
 
 /**
@@ -35,6 +37,12 @@ import com.webobjects.foundation.NSValidation;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TestCanBeSavedMatcher {
+    @Mock
+    private EOEditingContext editingContext;
+
+    @Mock
+    private EOGlobalID globalId;
+
     private CanBeSavedMatcher<EOEnterpriseObject> matcher;
 
     private StringDescription mockDescription;
@@ -44,7 +52,7 @@ public class TestCanBeSavedMatcher {
 
     @Test
     public void descriptionForCanBeSavedFailure() throws Exception {
-	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForUpdate();
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
@@ -63,7 +71,7 @@ public class TestCanBeSavedMatcher {
     public void descriptionForCanBeSavedWithMessageFailure() throws Exception {
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>("An expected error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("An unexpectedError")).when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("An unexpectedError")).when(mockObject).validateForUpdate();
 
 	matcher.matchesSafely(mockObject);
 	matcher.describeTo(mockDescription);
@@ -82,7 +90,16 @@ public class TestCanBeSavedMatcher {
 
     @Test
     public void matchesCanBeSaved() throws Exception {
-	Mockito.doNothing().when(mockObject).validateForSave();
+	Mockito.doNothing().when(mockObject).validateForUpdate();
+
+	boolean result = matcher.matchesSafely(mockObject);
+
+	assertThat(result, is(true));
+    }
+
+    @Test
+    public void matchesCanBeSavedIfExistingObjectAndExceptionOnInsertion() throws Exception {
+	Mockito.doThrow(new NSValidation.ValidationException("insertion error")).when(mockObject).validateForInsert();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -91,7 +108,17 @@ public class TestCanBeSavedMatcher {
 
     @Test
     public void matchesCannotBeSaved() throws Exception {
-	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForUpdate();
+
+	boolean result = matcher.matchesSafely(mockObject);
+
+	assertThat(result, is(false));
+    }
+
+    @Test
+    public void matchesCannotBeSavedIfNewObjectAndExceptionOnInsertion() throws Exception {
+	Mockito.when(globalId.isTemporary()).thenReturn(true);
+	Mockito.doThrow(new NSValidation.ValidationException("insertion error")).when(mockObject).validateForInsert();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -102,7 +129,7 @@ public class TestCanBeSavedMatcher {
     public void matchesCannotBeSavedWithMatchingMessage() throws Exception {
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>("error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForUpdate();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -113,7 +140,7 @@ public class TestCanBeSavedMatcher {
     public void matchesCannotBeSavedWithNoMatchingMessage() throws Exception {
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>("another error");
 
-	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForSave();
+	Mockito.doThrow(new NSValidation.ValidationException("error")).when(mockObject).validateForUpdate();
 
 	boolean result = matcher.matchesSafely(mockObject);
 
@@ -122,6 +149,10 @@ public class TestCanBeSavedMatcher {
 
     @Before
     public void setup() {
+	Mockito.when(globalId.isTemporary()).thenReturn(false);
+	Mockito.when(editingContext.globalIDForObject(mockObject)).thenReturn(globalId);
+	Mockito.when(mockObject.editingContext()).thenReturn(editingContext);
+
 	matcher = new CanBeSavedMatcher<EOEnterpriseObject>();
 
 	mockDescription = new StringDescription();
