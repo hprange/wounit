@@ -16,6 +16,8 @@
 
 package com.wounit.rules;
 
+import static com.wounit.rules.WOUnitUtils.arrayMinusArray;
+
 import java.lang.reflect.Field;
 
 import com.webobjects.eoaccess.EOAttribute;
@@ -40,7 +42,6 @@ import com.wounit.annotations.Dummy;
 import er.extensions.eof.ERXModelGroup;
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
-import er.extensions.foundation.ERXArrayUtilities;
 
 /**
  * <code>MockEditingContext</code> is a subclass of
@@ -264,7 +265,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     @Override
     public NSArray<EOEnterpriseObject> objectsWithFetchSpecification(EOFetchSpecification fetchSpecification, EOEditingContext editingContext) {
 	@SuppressWarnings("unchecked")
-	NSArray<EOEnterpriseObject> availableObjects = ERXArrayUtilities.arrayMinusArray(registeredObjects(), deletedObjects());
+	NSArray<EOEnterpriseObject> availableObjects = arrayMinusArray(registeredObjects(), deletedObjects());
 
 	String entityName = fetchSpecification.entityName();
 
@@ -321,7 +322,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
     @Override
     public void saveChanges() {
 	@SuppressWarnings("unchecked")
-	NSArray<EOEnterpriseObject> insertedObjects = ERXArrayUtilities.arrayMinusArray(insertedObjects(), deletedObjects());
+	NSArray<EOEnterpriseObject> insertedObjects = arrayMinusArray(insertedObjects(), deletedObjects());
 
 	super.saveChanges();
 
