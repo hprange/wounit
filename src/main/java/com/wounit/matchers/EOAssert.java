@@ -35,12 +35,13 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * <pre>
  * import static com.wounit.EOAssert.*;
  * </pre>
- * 
- * The <code>EOAssert</code> class provides static methods to check whether an
+ *
+ * The {@code EOAssert} class provides static methods to check whether an
  * enterprise object can be saved or deleted and if it has been saved or
  * deleted.
- * <h4>Confirm that an enterprise object can/cannot be saved</h4>
- * 
+ * <p>
+ * <b>Confirm that an enterprise object can/cannot be saved</b>
+ *
  * <pre>
  * // Checks whether the eo can be saved
  * confirm(eo, canBeSaved());
@@ -55,9 +56,9 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * // Safer check whether eo cannot be saved
  * confirm(eo, cannotBeSavedBecause(&quot;The foo property cannot be null&quot;));
  * </pre>
- * 
- * <h4>Confirm that an enterprise object can/cannot be deleted</h4>
- * 
+ * <p>
+ * <b>Confirm that an enterprise object can/cannot be deleted</b>
+ *
  * <pre>
  * // Checks whether the eo can be deleted
  * confirm(eo, canBeDeleted());
@@ -72,9 +73,9 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * // Safer check whether eo cannot be deleted
  * confirm(eo, cannotBeDeletedBecause(&quot;It is a required object&quot;));
  * </pre>
- * 
- * <h4>Confirm that an enterprise object has/hasn't been saved</h4>
- * 
+ * <p>
+ * <b>Confirm that an enterprise object has/hasn't been saved</b>
+ *
  * <pre>
  * // Checks whether the eo has been saved and has no pending changes
  * confirm(eo, hasBeenSaved());
@@ -84,9 +85,9 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * // Checks whether the eo has not been saved
  * confirm(eo, hasNotBeenSaved());
  * </pre>
- * 
- * <h4>Confirm that an enterprise object has/hasn't been deleted</h4>
- * 
+ * <p>
+ * <b>Confirm that an enterprise object has/hasn't been deleted</b>
+ *
  * <pre>
  * // Checks whether the eo has been deleted
  * confirm(eo, hasBeenDeleted());
@@ -96,11 +97,12 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * // Checks whether the eo has not been deleted
  * confirm(eo, hasNotBeenDeleted());
  * </pre>
- * 
- * The <code>EOAssert</code> class also offers methods to check if an
- * <code>EOEditingContext</code> can save changes correctly.
- * <h4>Confirm that an editing context save changes successfully or not</h4>
- * 
+ *
+ * The {@code EOAssert} class also offers methods to check if an
+ * {@code EOEditingContext} can save changes correctly.
+ * <p>
+ * <b>Confirm that an editing context save changes successfully or not</b>
+ *
  * <pre>
  * // Checks whether the editing context save changes successfully
  * confirm(editingContext, saveChanges());

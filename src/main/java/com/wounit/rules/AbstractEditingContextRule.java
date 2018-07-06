@@ -194,7 +194,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      *            name of the model to be loaded
      * @throws IllegalArgumentException
      *             if no model can be found with the specified name
-     * @see EOModelGroup#defaultGroup();
+     * @see EOModelGroup#defaultGroup
      */
     protected void loadModel(String modelName) {
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();

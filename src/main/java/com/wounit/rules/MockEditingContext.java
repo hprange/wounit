@@ -137,8 +137,8 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
     /**
      * Clear the ignored objects array after the test execution.
-     * 
-     * @see com.wounit.rules.AbstractEditingContextRule#after(java.lang.Object)
+     *
+     * @see com.wounit.rules.AbstractEditingContextRule#after()
      */
     @Override
     protected void after() {
@@ -150,8 +150,8 @@ public class MockEditingContext extends AbstractEditingContextRule {
     /**
      * Create dummy objects for fields annotated with @Dummy before the test
      * execution.
-     * 
-     * @see com.wounit.rules.AbstractEditingContextRule#before(java.lang.Object)
+     *
+     * @see com.wounit.rules.AbstractEditingContextRule#before()
      */
     @Override
     protected void before() {
@@ -296,10 +296,10 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
     /**
      * Overrides the implementation inherited from
-     * <code>EOEditingContext<code> to not call the super behavior for objects
+     * <code>EOEditingContext</code> to not call the super behavior for objects
      * registered with {@link #insertSavedObject(EOEnterpriseObject)} or {@link #createSavedObject(Class)}.
-     * 
-     * @param anObject
+     *
+     * @param object
      *            the object whose state is to be recorded
      * 
      * @see er.extensions.eof.ERXEC#objectWillChange(java.lang.Object)
