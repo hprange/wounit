@@ -60,7 +60,7 @@
   </scm>
 
 	<properties>
-		<wonder.version>7.0.0-SNAPSHOT</wonder.version>
+		<wonder.version>7.0</wonder.version>
 		<webobjects.version>5.4.3</webobjects.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
