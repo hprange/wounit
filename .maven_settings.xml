@@ -9,7 +9,7 @@
       <repositories>
         <repository>
           <id>wocommunity</id>
-          <url>http://maven.wocommunity.org/content/groups/public/</url>
+          <url>https://maven.wocommunity.org/content/groups/public/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -21,7 +21,7 @@
       <pluginRepositories>
         <pluginRepository>
           <id>wocommunity-plugins</id>
-          <url>http://maven.wocommunity.org/content/groups/public/</url>
+          <url>https://maven.wocommunity.org/content/groups/public/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
