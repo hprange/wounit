@@ -25,4 +25,4 @@ jobs:
         java-version: 1.8
     
     - name: Build and Test with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file pom.xml -s .maven_settings.xml 
