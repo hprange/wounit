@@ -46,6 +46,7 @@ import com.webobjects.eocontrol.EOKeyGlobalID;
 import com.webobjects.eocontrol.EOObjectStoreCoordinator;
 import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.foundation.NSArray;
+import com.webobjects.foundation.NSDictionary;
 import com.wounit.model.DifferentClassNameForEntity;
 import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
@@ -54,6 +55,7 @@ import com.wounit.model.StubEntity;
 import com.wounit.model.SubFooEntity;
 import com.wounit.stubs.StubTestCase;
 
+import er.extensions.eof.ERXFetchSpecification;
 import er.extensions.eof.ERXQ;
 import er.extensions.eof.ERXS;
 
@@ -64,6 +66,76 @@ import er.extensions.eof.ERXS;
 public class TestMockEditingContext extends AbstractEditingContextTest {
     @Mock
     private EOFetchSpecification mockFetchSpecification;
+
+    @Test
+    public void allowToUseRawRowsWhenUseFetchSpecification() throws Exception {
+	MockEditingContext editingContext = (MockEditingContext) initEditingContext(TEST_MODEL_NAME);
+
+	FooEntity fooEntity = editingContext.createSavedObject(FooEntity.class);
+	fooEntity.setBar("Bar");
+	fooEntity.setType(1);
+
+	ERXFetchSpecification<FooEntity> fs = new ERXFetchSpecification<FooEntity>(FooEntity.ENTITY_NAME, null, null);
+	fs.setFetchesRawRows(true);
+	fs.setRawRowKeyPaths(FooEntity.BAR_KEY, FooEntity.TYPE_KEY);
+
+	NSArray<NSDictionary<String, Object>> fetchedRawRows = fs.fetchRawRows(editingContext);
+
+	NSDictionary<String, Object> fooRawRow = fetchedRawRows.get(0);
+
+	assertThat((String) fooRawRow.objectForKey(FooEntity.BAR_KEY), is("Bar"));
+	assertThat((Integer) fooRawRow.objectForKey(FooEntity.TYPE_KEY), is(1));
+    }
+
+    @Test
+    public void allowToUseRawRowsWithLimitWhenUseFetchSpecification() throws Exception {
+	MockEditingContext editingContext = (MockEditingContext) initEditingContext(TEST_MODEL_NAME);
+
+	FooEntity fooEntity = editingContext.createSavedObject(FooEntity.class);
+	fooEntity.setBar("Bar");
+
+	FooEntity otherFooEntity = editingContext.createSavedObject(FooEntity.class);
+	otherFooEntity.setBar("Bar2");
+
+	ERXFetchSpecification<FooEntity> fs = new ERXFetchSpecification<FooEntity>(FooEntity.ENTITY_NAME, null, null);
+	fs.setFetchesRawRows(true);
+	fs.setRawRowKeyPaths(FooEntity.BAR_KEY, FooEntity.TYPE_KEY);
+	fs.setFetchLimit(1);
+
+	NSArray<NSDictionary<String, Object>> fetchedRawRows = fs.fetchRawRows(editingContext);
+
+	assertThat(fetchedRawRows.size(), is(1));
+
+	NSDictionary<String, Object> fooRawRow = fetchedRawRows.get(0);
+
+	assertThat((String) fooRawRow.objectForKey(FooEntity.BAR_KEY), is("Bar"));
+	assertThat((Integer) fooRawRow.objectForKey(FooEntity.TYPE_KEY), nullValue());
+    }
+
+    @Test
+    public void allowToUseRawRowsWithRelationshipWhenUseFetchSpecification() throws Exception {
+	MockEditingContext editingContext = (MockEditingContext) initEditingContext(TEST_MODEL_NAME);
+
+	FooEntity fooEntity = editingContext.createSavedObject(FooEntity.class);
+	fooEntity.setBar("Bar");
+
+	FooEntityWithRequiredField fooEntityWithRequiredField = editingContext.createSavedObject(FooEntityWithRequiredField.class);
+	fooEntityWithRequiredField.setRequired(4);
+	fooEntityWithRequiredField.setFooEntityRelationship(fooEntity);
+
+	String BAR_KEY = FooEntityWithRequiredField.FOO_ENTITY_KEY + "." + FooEntity.BAR_KEY;
+
+	ERXFetchSpecification<FooEntityWithRequiredField> fs = new ERXFetchSpecification<FooEntityWithRequiredField>(FooEntityWithRequiredField.ENTITY_NAME, null, null);
+	fs.setFetchesRawRows(true);
+	fs.setRawRowKeyPaths(FooEntityWithRequiredField.REQUIRED_KEY, BAR_KEY);
+
+	NSArray<NSDictionary<String, Object>> fetchedRawRows = fs.fetchRawRows(editingContext);
+
+	NSDictionary<String, Object> fooRawRow = fetchedRawRows.get(0);
+
+	assertThat((String) fooRawRow.objectForKey(BAR_KEY), is("Bar"));
+	assertThat((Integer) fooRawRow.objectForKey(FooEntityWithRequiredField.REQUIRED_KEY), is(4));
+    }
 
     @Test
     public void callAwakeFromInsertionOnMockInstance() throws Exception {
