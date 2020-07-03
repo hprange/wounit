@@ -17,6 +17,9 @@
 package com.wounit.rules;
 
 import static com.wounit.rules.WOUnitUtils.arrayMinusArray;
+import static er.extensions.foundation.ERXDictionaryUtilities.dictionaryFromObjectWithKeys;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 import java.lang.reflect.Field;
 
@@ -35,6 +38,7 @@ import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.eocontrol.EOTemporaryGlobalID;
 import com.webobjects.eocontrol._EOIntegralKeyGlobalID;
 import com.webobjects.foundation.NSArray;
+import com.webobjects.foundation.NSDictionary;
 import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 import com.wounit.annotations.Dummy;
@@ -263,7 +267,7 @@ public class MockEditingContext extends AbstractEditingContextRule {
      *      com.webobjects.eocontrol.EOEditingContext)
      */
     @Override
-    public NSArray<EOEnterpriseObject> objectsWithFetchSpecification(EOFetchSpecification fetchSpecification, EOEditingContext editingContext) {
+    public NSArray<?> objectsWithFetchSpecification(EOFetchSpecification fetchSpecification, EOEditingContext editingContext) {
 	@SuppressWarnings("unchecked")
 	NSArray<EOEnterpriseObject> availableObjects = arrayMinusArray(registeredObjects(), deletedObjects());
 
@@ -285,10 +289,22 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
 	availableObjects = ERXS.sorted(availableObjects, fetchSpecification.sortOrderings());
 
+	boolean fetchesRawRows = fetchSpecification.fetchesRawRows();
+
 	int limit = fetchSpecification.fetchLimit();
 
 	if (limit > 0 && limit < availableObjects.size()) {
-	    return availableObjects.subarrayWithRange(new NSRange(0, limit));
+	    NSArray<EOEnterpriseObject> subarrayWithRange = availableObjects.subarrayWithRange(new NSRange(0, limit));
+
+	    if (fetchesRawRows) {
+		return rawRowsFor(fetchSpecification, subarrayWithRange);
+	    }
+
+	    return subarrayWithRange;
+	}
+
+	if (fetchesRawRows) {
+	    return rawRowsFor(fetchSpecification, availableObjects);
 	}
 
 	return availableObjects;
@@ -309,6 +325,12 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	if (!ignoredObjects.contains(object)) {
 	    super.objectWillChange(object);
 	}
+    }
+
+    private NSArray<NSDictionary<String, Object>> rawRowsFor(EOFetchSpecification fetchSpecification, NSArray<EOEnterpriseObject> availableObjects) {
+	return availableObjects.stream()
+			       .map(eo -> dictionaryFromObjectWithKeys(eo, fetchSpecification.rawRowKeyPaths()))
+			       .collect(collectingAndThen(toCollection(NSMutableArray::new), NSArray::immutableClone));
     }
 
     /**
