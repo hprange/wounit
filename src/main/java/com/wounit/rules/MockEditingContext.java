@@ -38,7 +38,6 @@ import com.webobjects.eocontrol.EOQualifier;
 import com.webobjects.eocontrol.EOTemporaryGlobalID;
 import com.webobjects.eocontrol._EOIntegralKeyGlobalID;
 import com.webobjects.foundation.NSArray;
-import com.webobjects.foundation.NSDictionary;
 import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSRange;
 import com.wounit.annotations.Dummy;
@@ -289,22 +288,16 @@ public class MockEditingContext extends AbstractEditingContextRule {
 
 	availableObjects = ERXS.sorted(availableObjects, fetchSpecification.sortOrderings());
 
-	boolean fetchesRawRows = fetchSpecification.fetchesRawRows();
-
 	int limit = fetchSpecification.fetchLimit();
 
 	if (limit > 0 && limit < availableObjects.size()) {
-	    NSArray<EOEnterpriseObject> subarrayWithRange = availableObjects.subarrayWithRange(new NSRange(0, limit));
-
-	    if (fetchesRawRows) {
-		return rawRowsFor(fetchSpecification, subarrayWithRange);
-	    }
-
-	    return subarrayWithRange;
+	    availableObjects = availableObjects.subarrayWithRange(new NSRange(0, limit));
 	}
 
-	if (fetchesRawRows) {
-	    return rawRowsFor(fetchSpecification, availableObjects);
+	if (fetchSpecification.fetchesRawRows()) {
+	    return availableObjects.stream()
+				   .map(eo -> dictionaryFromObjectWithKeys(eo, fetchSpecification.rawRowKeyPaths()))
+				   .collect(collectingAndThen(toCollection(NSMutableArray::new), NSArray::immutableClone));
 	}
 
 	return availableObjects;
@@ -325,12 +318,6 @@ public class MockEditingContext extends AbstractEditingContextRule {
 	if (!ignoredObjects.contains(object)) {
 	    super.objectWillChange(object);
 	}
-    }
-
-    private NSArray<NSDictionary<String, Object>> rawRowsFor(EOFetchSpecification fetchSpecification, NSArray<EOEnterpriseObject> availableObjects) {
-	return availableObjects.stream()
-			       .map(eo -> dictionaryFromObjectWithKeys(eo, fetchSpecification.rawRowKeyPaths()))
-			       .collect(collectingAndThen(toCollection(NSMutableArray::new), NSArray::immutableClone));
     }
 
     /**
