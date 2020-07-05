@@ -4,3 +4,4 @@ com.wounit.exceptions
 com.wounit.foundation
 com.wounit.matchers
 com.wounit.rules
+com.wounit.utils
