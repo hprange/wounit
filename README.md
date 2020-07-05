@@ -9,14 +9,15 @@ applications using JUnit 4.7 or later capabilities. This library can be
 useful if you write unit/integration tests for Enterprise Objects or
 employ the TDD technique on your projects.
 
-**Version**: 1.2.4
+**Version**: 1.3.1
 
 Requirements
 ------------
 
 * [JUnit](http://www.junit.org/) 4.7 or later
-* [Project Wonder](http://wiki.objectstyle.org/confluence/display/WONDER/Home) 5
+* [Project Wonder](http://wiki.objectstyle.org/confluence/display/WONDER/Home) 6 or later
 * WebObjects 5
+* Java 8
 
 Features
 --------
@@ -39,7 +40,7 @@ Maven users have to add the dependency declaration:
 	<dependency>
 		<groupId>com.wounit</groupId>
 		<artifactId>wounit</artifactId>
-		<version>1.2.4</version>
+		<version>1.3.1</version>
 	</dependency>
 
 Non Maven users have to:
