@@ -19,6 +19,8 @@ import static com.wounit.rules.WOUnitTroubleshooter.Utils.findAvailableModels;
 import static com.wounit.rules.WOUnitTroubleshooter.Utils.findSimilarModelName;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -92,7 +94,7 @@ class WOUnitTroubleshooter {
 		File resourcesFolder = new File(WOUnitTroubleshooter.class.getResource("/").toURI());
 
 		paths.addAll(findModelsRecursively(resourcesFolder));
-	    } catch (Exception exception) {
+	    } catch (IOException | URISyntaxException exception) {
 		// Ignore the exception and keep trying to diagnose
 	    }
 
