@@ -70,15 +70,16 @@ class WOUnitTroubleshooter {
 
 		for (URL url : urls) {
 		    if (url.getPath().endsWith(".jar")) {
-			JarFile jar = new JarFile(url.getPath());
+			try (JarFile jar = new JarFile(url.getPath())) {
 
-			Enumeration<JarEntry> entries = jar.entries();
+			    Enumeration<JarEntry> entries = jar.entries();
 
-			while (entries.hasMoreElements()) {
-			    String name = entries.nextElement().getName();
+			    while (entries.hasMoreElements()) {
+				String name = entries.nextElement().getName();
 
-			    if (name.contains("eomodeld/index.eomodeld")) {
-				paths.add(name);
+				if (name.contains("eomodeld/index.eomodeld")) {
+				    paths.add(name);
+				}
 			    }
 			}
 		    } else {
