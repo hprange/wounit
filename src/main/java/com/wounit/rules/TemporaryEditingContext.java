@@ -18,6 +18,7 @@ package com.wounit.rules;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.webobjects.eoaccess.EOAdaptorContext;
 import com.webobjects.eoaccess.EODatabaseContext;
@@ -111,7 +112,8 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
-	for (String modelName : adaptorsToRestore.keySet()) {
+	for (Entry<String, String> adaptorToRestore : adaptorsToRestore.entrySet()) {
+	    String modelName = adaptorToRestore.getKey();
 	    EOModel model = modelGroup.modelNamed(modelName);
 
 	    if (model == null) {
@@ -120,7 +122,9 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 		continue;
 	    }
 
-	    model.setAdaptorName(adaptorsToRestore.get(modelName));
+	    String adaptorName = adaptorToRestore.getValue();
+	    
+	    model.setAdaptorName(adaptorName);
 	}
 
 	super.after();
@@ -138,7 +142,9 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 	EOAdaptorContext adaptorContext = databaseContext.adaptorContext();
 
 	if (!(adaptorContext instanceof ERMemoryAdaptorContext)) {
-	    throw new IllegalStateException(String.format("Expected %s, but got %s. Please, use the %s constructor to load all the required models for testing.", ERMemoryAdaptorContext.class.getName(), adaptorContext.getClass().getName(), this.getClass().getSimpleName()));
+	    throw new IllegalStateException(String.format("Expected %s, but got %s. Please, use the %s constructor to load all the required models for testing.", ERMemoryAdaptorContext.class.getName(), adaptorContext.getClass()
+																											.getName(), this.getClass()
+																													.getSimpleName()));
 	}
 
 	return (ERMemoryAdaptorContext) adaptorContext;
@@ -155,6 +161,7 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 	    throw new WOUnitException("The JavaMemoryAdaptor bundle is not loaded. Are you sure the JavaMemoryAdaptor framework is in the test classpath?");
 	}
 
-	bundle._infoDictionary().takeValueForKey(ERMemoryAdaptor.class.getName(), "EOAdaptorClassName");
+	bundle._infoDictionary()
+	      .takeValueForKey(ERMemoryAdaptor.class.getName(), "EOAdaptorClassName");
     }
 }
