@@ -97,8 +97,11 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     AbstractEditingContextRule(EOObjectStore objectStore, String... modelNames) {
         super(objectStore);
 
+        if (!ERXProperties.hasKey("er.extensions.partials.enabled")) {
+            ERXProperties.setStringForKey("true", "er.extensions.partials.enabled");
+        }
+
         ERXProperties.setStringForKey("true", "NSProjectBundleEnabled");
-        ERXProperties.setStringForKey("true", "er.extensions.partials.enabled");
         ERXProperties.setStringForKey("(" + WOUnitBundleFactory.class.getName() + ")", "NSBundleFactories");
 
         // Simulate what ERExtensions does
@@ -110,7 +113,11 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
             loadModel(modelName);
         }
 
-        ERXPartialInitializer.initializer().initializePartialEntities(EOModelGroup.defaultGroup());
+        boolean isPartialsEnabled = ERXProperties.booleanForKey("er.extensions.partials.enabled");
+
+        if (isPartialsEnabled) {
+            ERXPartialInitializer.initializer().initializePartialEntities(EOModelGroup.defaultGroup());
+        }
     }
 
     /**
