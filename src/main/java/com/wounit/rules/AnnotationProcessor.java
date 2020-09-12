@@ -15,8 +15,6 @@
  */
 package com.wounit.rules;
 
-import static org.mockito.Mockito.spy;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -25,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.mockito.Mockito;
 import org.mockito.Spy;
 
 import com.webobjects.eocontrol.EOEnterpriseObject;
@@ -47,6 +46,18 @@ class AnnotationProcessor {
         }
 
         return facade.create(type.asSubclass(EOEnterpriseObject.class));
+    }
+
+    private static EOEnterpriseObject createSpiedEOForType(Class<?> type) {
+        EOEnterpriseObject object;
+
+        try {
+            object = type.asSubclass(EOEnterpriseObject.class).newInstance();
+        } catch (InstantiationException | IllegalAccessException exception) {
+            throw unexpectedException(exception);
+        }
+
+        return Mockito.spy(object);
     }
 
     private static List<Field> getAllFields(Class<?> type) {
@@ -121,14 +132,10 @@ class AnnotationProcessor {
 
                 if (isMockitoPresent && field.isAnnotationPresent(Spy.class)) {
                     if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
-                        throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
+                        throw new WOUnitException("Cannot create object of type " + (type).getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
                     }
 
-                    try {
-                        object = spy(type.asSubclass(EOEnterpriseObject.class).newInstance());
-                    } catch (Exception exception) {
-                        throw unexpectedException(exception);
-                    }
+                    object = createSpiedEOForType(type);
 
                     facade.insert(object);
                 } else {
@@ -146,13 +153,13 @@ class AnnotationProcessor {
         }
 
         if (isMockitoPresent && field.isAnnotationPresent(Spy.class)) {
-            if (!EOEnterpriseObject.class.isAssignableFrom(field.getType())) {
-                throw new WOUnitException("Cannot spy object of type " + field.getType().getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @Spy + @" + annotation.getSimpleName() + ".");
+            if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
+                throw new WOUnitException("Cannot spy object of type " + type.getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @Spy + @" + annotation.getSimpleName() + ".");
             }
 
             field.setAccessible(true);
 
-            EOEnterpriseObject object = null;
+            EOEnterpriseObject object;
 
             try {
                 object = (EOEnterpriseObject) field.get(target);
@@ -161,7 +168,10 @@ class AnnotationProcessor {
             }
 
             if (object == null) {
-                throw new WOUnitException("The " + field.getName() + " field has not been initialized by Mockito. Make sure the test has been run with MockitoJUnitRunner class.");
+                // Depending on the Mockito version, the MockitoJUnitRunner evaluation may not run before evaluating the
+                // WOUnit rule. As a result, the field may be null at this point. We must create and spy the object by
+                // ourselves in this case.
+                object = createSpiedEOForType(type);
             }
 
             facade.insert(object);

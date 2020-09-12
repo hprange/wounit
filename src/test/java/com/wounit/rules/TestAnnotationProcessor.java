@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -29,6 +30,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.MockUtil;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.wounit.annotations.Dummy;
@@ -57,6 +59,9 @@ public class TestAnnotationProcessor {
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public final MockEditingContext editingContext = new MockEditingContext("Test");
 
     @Test
     public void createArrayOfDummiesBasedOnTheGenericType() throws Exception {
@@ -115,6 +120,21 @@ public class TestAnnotationProcessor {
     }
 
     @Test
+    public void createSpiedObjectIfFieldHasNotBeenInitializedByMockito() throws Exception {
+        NotInitializedSpiedObjectStubTestCase mockTarget = new NotInitializedSpiedObjectStubTestCase();
+
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+
+        processor.process(Dummy.class, mockFacade);
+
+        assertThat(mockTarget.value(), notNullValue());
+
+        boolean isSpy = new MockUtil().isSpy(mockTarget.value());
+
+        assertTrue(isSpy);
+    }
+
+    @Test
     public void doNotCreateObjectIfAnnotationIsAbsent() throws Exception {
         StubTestCase mockTarget = new StubTestCase();
 
@@ -169,18 +189,6 @@ public class TestAnnotationProcessor {
 
         thrown.expect(WOUnitException.class);
         thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
-
-        processor.process(Dummy.class, mockFacade);
-    }
-
-    @Test
-    public void exceptionIfSpiedObjectNotInitialied() throws Exception {
-        NotInitializedSpiedObjectStubTestCase mockTarget = new NotInitializedSpiedObjectStubTestCase();
-
-        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
-
-        thrown.expect(WOUnitException.class);
-        thrown.expectMessage(is("The value field has not been initialized by Mockito. Make sure the test has been run with MockitoJUnitRunner class."));
 
         processor.process(Dummy.class, mockFacade);
     }
