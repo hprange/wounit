@@ -60,146 +60,146 @@ public class TestAnnotationProcessor {
 
     @Test
     public void createArrayOfDummiesBasedOnTheGenericType() throws Exception {
-	DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
+        DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
 
-	assertThat(mockTarget.arrayOfOneDummy().get(0), instanceOf(FooEntity.class));
+        assertThat(mockTarget.arrayOfOneDummy().get(0), instanceOf(FooEntity.class));
     }
 
     @Test
     public void createArrayOfDummiesIfAnnotationAndSizePresent() throws Exception {
-	DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
+        DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
 
-	assertThat(mockTarget.arrayOfTwoDummies().size(), is(2));
+        assertThat(mockTarget.arrayOfTwoDummies().size(), is(2));
     }
 
     @Test
     public void createArrayOfOneDummyIfAnnotationPresentButNoSize() throws Exception {
-	DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
+        DummyArrayStubTestCase mockTarget = new DummyArrayStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
 
-	assertThat(mockTarget.arrayOfOneDummy(), notNullValue());
-	assertThat(mockTarget.arrayOfOneDummy().size(), is(1));
+        assertThat(mockTarget.arrayOfOneDummy(), notNullValue());
+        assertThat(mockTarget.arrayOfOneDummy().size(), is(1));
     }
 
     @Test
     public void createObjectForInheritedFieldIfAnnotationPresent() throws Exception {
-	ChildStubTestCase mockTarget = new ChildStubTestCase();
+        ChildStubTestCase mockTarget = new ChildStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
 
-	assertThat(mockTarget.foo(), is(mockFoo));
+        assertThat(mockTarget.foo(), is(mockFoo));
     }
 
     @Test
     public void createObjectIfAnnotationPresent() throws Exception {
-	StubTestCase mockTarget = new StubTestCase();
+        StubTestCase mockTarget = new StubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
 
-	assertThat(mockTarget.foo(), is(mockFoo));
+        assertThat(mockTarget.foo(), is(mockFoo));
     }
 
     @Test
     public void doNotCreateObjectIfAnnotationIsAbsent() throws Exception {
-	StubTestCase mockTarget = new StubTestCase();
+        StubTestCase mockTarget = new StubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
 
-	assertThat(mockTarget.objectUnderTest(), nullValue());
+        assertThat(mockTarget.objectUnderTest(), nullValue());
     }
 
     @Test
     public void exceptionIfAnnotatedGenericTypeIsIncompatible() throws Exception {
-	WrongGenericTypeForDummyStubTestCase mockTarget = new WrongGenericTypeForDummyStubTestCase();
+        WrongGenericTypeForDummyStubTestCase mockTarget = new WrongGenericTypeForDummyStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+        thrown.expect(WOUnitException.class);
+        thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
     }
 
     @Test
     public void exceptionIfAnnotatedTypeIsIncompatible() throws Exception {
-	WrongTypeForDummyStubTestCase mockTarget = new WrongTypeForDummyStubTestCase();
+        WrongTypeForDummyStubTestCase mockTarget = new WrongTypeForDummyStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+        thrown.expect(WOUnitException.class);
+        thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
     }
 
     @Test
     public void exceptionIfRawArrayAnnotated() throws Exception {
-	RawArrayDeclarationForDummyStubTestCase mockTarget = new RawArrayDeclarationForDummyStubTestCase();
+        RawArrayDeclarationForDummyStubTestCase mockTarget = new RawArrayDeclarationForDummyStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create object for a raw type com.webobjects.foundation.NSArray. Please, provide a generic type."));
+        thrown.expect(WOUnitException.class);
+        thrown.expectMessage(is("Cannot create object for a raw type com.webobjects.foundation.NSArray. Please, provide a generic type."));
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
     }
 
     @Test
     public void exceptionIfSpiedGenericTypeIsIncompatible() throws Exception {
-	WrongGenericTypeForSpiedObjectStubTestCase mockTarget = new WrongGenericTypeForSpiedObjectStubTestCase();
+        WrongGenericTypeForSpiedObjectStubTestCase mockTarget = new WrongGenericTypeForSpiedObjectStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+        thrown.expect(WOUnitException.class);
+        thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
     }
 
     @Test
     public void exceptionIfSpiedObjectNotInitialied() throws Exception {
-	NotInitializedSpiedObjectStubTestCase mockTarget = new NotInitializedSpiedObjectStubTestCase();
+        NotInitializedSpiedObjectStubTestCase mockTarget = new NotInitializedSpiedObjectStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("The value field has not been initialized by Mockito. Make sure the test has been run with MockitoJUnitRunner class."));
+        thrown.expect(WOUnitException.class);
+        thrown.expectMessage(is("The value field has not been initialized by Mockito. Make sure the test has been run with MockitoJUnitRunner class."));
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
     }
 
     @Test
     public void exceptionIfSpyingIncompatibleType() throws Exception {
-	WrongTypeForSpiedObjectStubTestCase mockTarget = new WrongTypeForSpiedObjectStubTestCase();
+        WrongTypeForSpiedObjectStubTestCase mockTarget = new WrongTypeForSpiedObjectStubTestCase();
 
-	AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
+        AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage(is("Cannot spy object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Spy + @Dummy."));
+        thrown.expect(WOUnitException.class);
+        thrown.expectMessage(is("Cannot spy object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Spy + @Dummy."));
 
-	processor.process(Dummy.class, mockFacade);
+        processor.process(Dummy.class, mockFacade);
     }
 
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
-	when(mockFacade.create(Mockito.any(Class.class))).thenReturn(mockFoo);
+        when(mockFacade.create(Mockito.any(Class.class))).thenReturn(mockFoo);
     }
 }
