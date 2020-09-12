@@ -26,5 +26,9 @@ import com.wounit.model.FooEntity;
 public class NotInitializedSpiedObjectStubTestCase {
     @Spy
     @Dummy
-    public FooEntity value = null;
+    private FooEntity value;
+
+    public FooEntity value() {
+        return value;
+    }
 }
