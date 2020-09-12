@@ -54,7 +54,7 @@ import er.extensions.partials.ERXPartialInitializer;
 public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
-	static ERXExtensions exrExtensions = new ERXExtensions();
+        static ERXExtensions exrExtensions = new ERXExtensions();
     }
 
     /**
@@ -62,21 +62,21 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * specified editing context.
      */
     static class UnderTestFacade extends EditingContextFacade {
-	public UnderTestFacade(EOEditingContext editingContext) {
-	    super(editingContext);
-	}
+        public UnderTestFacade(EOEditingContext editingContext) {
+            super(editingContext);
+        }
 
-	@Override
-	public EOEnterpriseObject create(Class<? extends EOEnterpriseObject> type) {
-	    EOEntity entity = EOUtilities.entityForClass(editingContext, type);
+        @Override
+        public EOEnterpriseObject create(Class<? extends EOEnterpriseObject> type) {
+            EOEntity entity = EOUtilities.entityForClass(editingContext, type);
 
-	    return EOUtilities.createAndInsertInstance(editingContext, entity.name());
-	}
+            return EOUtilities.createAndInsertInstance(editingContext, entity.name());
+        }
 
-	@Override
-	public void insert(EOEnterpriseObject object) {
-	    editingContext.insertObject(object);
-	}
+        @Override
+        public void insert(EOEnterpriseObject object) {
+            editingContext.insertObject(object);
+        }
     }
 
     private static final long serialVersionUID = 1L;
@@ -95,33 +95,40 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * Constructor only for test purposes.
      */
     AbstractEditingContextRule(EOObjectStore objectStore, String... modelNames) {
-	super(objectStore);
+        super(objectStore);
 
-	ERXProperties.setStringForKey("true", "NSProjectBundleEnabled");
-	ERXProperties.setStringForKey("true", "er.extensions.partials.enabled");
-	ERXProperties.setStringForKey("(" + WOUnitBundleFactory.class.getName() + ")", "NSBundleFactories");
+        if (!ERXProperties.hasKey("er.extensions.partials.enabled")) {
+            ERXProperties.setStringForKey("true", "er.extensions.partials.enabled");
+        }
 
-	// Simulate what ERExtensions does
-	EOModelGroup.setClassDelegate(SINGLETONS.exrExtensions);
-	ERXEntityClassDescription.registerDescription();
-	ERXArrayUtilities.initialize();
+        ERXProperties.setStringForKey("true", "NSProjectBundleEnabled");
+        ERXProperties.setStringForKey("(" + WOUnitBundleFactory.class.getName() + ")", "NSBundleFactories");
 
-	for (String modelName : modelNames) {
-	    loadModel(modelName);
-	}
+        // Simulate what ERExtensions does
+        EOModelGroup.setClassDelegate(SINGLETONS.exrExtensions);
+        ERXEntityClassDescription.registerDescription();
+        ERXArrayUtilities.initialize();
 
-	ERXPartialInitializer.initializer().initializePartialEntities(EOModelGroup.defaultGroup());
+        for (String modelName : modelNames) {
+            loadModel(modelName);
+        }
+
+        boolean isPartialsEnabled = ERXProperties.booleanForKey("er.extensions.partials.enabled");
+
+        if (isPartialsEnabled) {
+            ERXPartialInitializer.initializer().initializePartialEntities(EOModelGroup.defaultGroup());
+        }
     }
 
     /**
      * Create a new instance of this editing context loading the models
      * specified by parameter.
-     * 
+     *
      * @param modelNames
      *            the name of the models to be loaded before the test execution.
      */
     public AbstractEditingContextRule(String... modelNames) {
-	this(defaultParentObjectStore(), modelNames);
+        this(defaultParentObjectStore(), modelNames);
     }
 
     /**
@@ -129,48 +136,49 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * loaded by this class at the beginning of the test execution.
      */
     protected void after() {
-	unlock();
+        unlock();
 
-	try {
-	    dispose();
-	} catch (Exception exception) {
-	    System.out.println("[WARN] An exception has been thrown while disposing the " + getClass().getSimpleName() + " after the test execution.");
+        try {
+            dispose();
+        } catch (Exception exception) {
+            System.out.println("[WARN] An exception has been thrown while disposing the " + getClass().getSimpleName() + " after the test execution.");
 
-	    exception.printStackTrace();
-	}
+            exception.printStackTrace();
+        }
 
-	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
+        EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
-	for (String modelName : modelToUnload) {
-	    EOModel model = modelGroup.modelNamed(modelName);
+        for (String modelName : modelToUnload) {
+            EOModel model = modelGroup.modelNamed(modelName);
 
-	    modelGroup.removeModel(model);
-	}
+            modelGroup.removeModel(model);
+        }
 
-	ERXEC.setFactory(null);
+        ERXEC.setFactory(null);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.junit.rules.MethodRule#apply(org.junit.runners.model.Statement,
      * org.junit.runners.model.FrameworkMethod, java.lang.Object)
      */
+    @Override
     public final Statement apply(final Statement base, FrameworkMethod method, final Object target) {
-	processor = new AnnotationProcessor(target);
+        processor = new AnnotationProcessor(target);
 
-	return new Statement() {
-	    @Override
-	    public void evaluate() throws Throwable {
-		before();
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                before();
 
-		try {
-		    base.evaluate();
-		} finally {
-		    after();
-		}
-	    }
-	};
+                try {
+                    base.evaluate();
+                } finally {
+                    after();
+                }
+            }
+        };
     }
 
     /**
@@ -180,16 +188,16 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * test execution.
      */
     protected void before() {
-	ERXEC.setFactory(new WOUnitEditingContextFactory(this));
+        ERXEC.setFactory(new WOUnitEditingContextFactory(this));
 
-	lock();
+        lock();
 
-	processor.process(UnderTest.class, new UnderTestFacade(this));
+        processor.process(UnderTest.class, new UnderTestFacade(this));
     }
 
     /**
      * Load the model with the specified name into the default model group.
-     * 
+     *
      * @param modelName
      *            name of the model to be loaded
      * @throws IllegalArgumentException
@@ -197,29 +205,29 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      * @see EOModelGroup#defaultGroup
      */
     protected void loadModel(String modelName) {
-	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
+        EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
-	EOModel model = modelGroup.modelNamed(modelName);
+        EOModel model = modelGroup.modelNamed(modelName);
 
-	if (model != null) {
-	    return;
-	}
+        if (model != null) {
+            return;
+        }
 
-	URL url = getClass().getResource("/Resources/" + modelName + ".eomodeld");
+        URL url = getClass().getResource("/Resources/" + modelName + ".eomodeld");
 
-	if (url == null) {
-	    url = getClass().getResource("/" + modelName + ".eomodeld");
-	}
+        if (url == null) {
+            url = getClass().getResource("/" + modelName + ".eomodeld");
+        }
 
-	if (url == null) {
-	    WOUnitTroubleshooter.diagnoseModelNotFound(modelName);
+        if (url == null) {
+            WOUnitTroubleshooter.diagnoseModelNotFound(modelName);
 
-	    throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
-	}
+            throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
+        }
 
-	modelGroup.addModelWithPathURL(url);
+        modelGroup.addModelWithPathURL(url);
 
-	modelToUnload.add(modelName);
+        modelToUnload.add(modelName);
     }
 
 }
