@@ -139,7 +139,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
         unlock();
 
         try {
-            dispose();
+            disposeImpl();
         } catch (Exception exception) {
             System.out.println("[WARN] An exception has been thrown while disposing the " + getClass().getSimpleName() + " after the test execution.");
 
@@ -155,6 +155,31 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
         }
 
         ERXEC.setFactory(null);
+    }
+
+    @Override
+    public void dispose() {
+        // We're not invoking the super implementation on purpose.
+        // This method is called to prepare the editing context for destruction, making it unusable as a result.
+        // Thus, one can expect unpredictable outcomes if the code under test calls this method,
+        // including the inability to clean up properly after the test execution.
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+        for (StackTraceElement element : stackTrace) {
+            if (!element.getClassName().matches("(com.wounit|org.mockito|java.lang).*")) {
+                System.out.println("[WARN] ignoring call to EOEditingContext.dispose method by the code under test at " + element.toString());
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * An alternative method used by this editing context to invoke the real {@code EOEditingContext#dispose}
+     * implementation after running tests.
+     */
+    protected void disposeImpl() {
+        super.dispose();
     }
 
     /*

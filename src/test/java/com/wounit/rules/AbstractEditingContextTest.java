@@ -145,12 +145,27 @@ public abstract class AbstractEditingContextTest {
 
 	editingContext.before();
 
-	Mockito.verify(editingContext, Mockito.times(0)).dispose();
+	Mockito.verify(editingContext, Mockito.times(0)).disposeImpl();
 
 	editingContext.after();
 
-	Mockito.verify(editingContext, Mockito.times(1)).dispose();
+	Mockito.verify(editingContext, Mockito.times(1)).disposeImpl();
     }
+
+	@Test
+	public void ignoreCallToEditingContextDisposeByTheCodeUnderTest() throws Throwable {
+		AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
+
+		editingContext.before();
+
+		try {
+			editingContext.dispose();
+
+			editingContext.after();
+		} catch (Exception exception) {
+			fail("Call to EOEditingContext.dispose should be ignored.");
+		}
+	}
 
     @Test
     public void doNotRemoveModelsNotLoadedByTheEditingContextRule() throws Throwable {
