@@ -53,10 +53,10 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:git@github.com:hprange/wounit.git</connection>
-		<url>scm:git:git@github.com:hprange/wounit.git</url>
-		<developerConnection>scm:git:git@github.com:hprange/wounit.git</developerConnection>
-	  <tag>HEAD</tag>
+		<connection>scm:git:https://github.com/hprange/wounit.git</connection>
+		<url>scm:git:https://github.com/hprange/wounit.git</url>
+		<developerConnection>scm:git:https://github.com/hprange/wounit.git</developerConnection>
+		<tag>HEAD</tag>
   </scm>
 
 	<properties>
@@ -64,6 +64,7 @@
 		<webobjects.version>5.4.3</webobjects.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.scm.id>github</project.scm.id>
 	</properties>
 
 	<profiles>
