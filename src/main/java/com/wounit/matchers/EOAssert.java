@@ -116,8 +116,10 @@ import static org.hamcrest.CoreMatchers.not;
  * // Safer check whether the editing context does not save changes successfully
  * confirm(editingContext, doNotSaveChangesBecause(&quot;The bar property of Foo cannot be null&quot;));
  * </pre>
+ *
+ * <b>Check if a value matches an expression using key-value coding</b>
  * <p>
- * The {@code EOAssert} class provides static methods to check where a value matches an expression
+ * The {@code EOAssert} class provides static methods to check if a value matches an expression
  * using the key-value coding mechanism.
  * <pre>
  * // Checks whether a value matches an expression using the key-value coding mechanism
