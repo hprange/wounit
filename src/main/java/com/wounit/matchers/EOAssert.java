@@ -13,17 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.wounit.matchers;
 
-import static org.hamcrest.CoreMatchers.not;
-
+import com.webobjects.eocontrol.EOEditingContext;
+import com.webobjects.eocontrol.EOEnterpriseObject;
+import er.extensions.eof.ERXKey;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 
-import com.webobjects.eocontrol.EOEditingContext;
-import com.webobjects.eocontrol.EOEnterpriseObject;
+import static org.hamcrest.CoreMatchers.not;
 
 /**
  * This class is the entry point for writing assertions to WebObjects related
@@ -117,7 +116,21 @@ import com.webobjects.eocontrol.EOEnterpriseObject;
  * // Safer check whether the editing context does not save changes successfully
  * confirm(editingContext, doNotSaveChangesBecause(&quot;The bar property of Foo cannot be null&quot;));
  * </pre>
- * 
+ *
+ * <b>Check if a value matches an expression using key-value coding</b>
+ * <p>
+ * The {@code EOAssert} class provides static methods to check if a value matches an expression
+ * using the key-value coding mechanism.
+ * <pre>
+ * // Checks whether a value matches an expression using the key-value coding mechanism
+ * assertThat(fooEntity, hasValueForKey(FooEntity.BAR_KEY, is("a value")));
+ * </pre>
+ *
+ * <pre>
+ *  // Checks whether an NSArray contains an item whose value matches an expression using the key-value coding mechanism
+ *  assertThat(arrayOfFoos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("a value"))));
+ *  </pre>
+ *
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  * @see org.junit.Assert
@@ -334,6 +347,30 @@ public class EOAssert {
      */
     public static Matcher<EOEditingContext> saveChanges() {
 	return new SaveChangesMatcher<EOEditingContext>();
+    }
+
+    /**
+     * Used to check whether a value matches an expression using the key-value coding mechanism.
+     *
+     * @param key          identifies the property to retrieve
+     * @param valueMatcher a matcher for the value obtained using the key of the examined object
+     * @return a <code>Matcher</code> matching if the value matches an expression using the key-value
+     * coding mechanism.
+     */
+    public static <T> Matcher<T> hasValueForKey(String key, Matcher<?> valueMatcher) {
+        return HasValueForKeyMatcher.hasValueForKey(key, valueMatcher);
+    }
+
+    /**
+     * Used to check whether a value matches an expression using the key-value coding mechanism.
+     *
+     * @param key          identifies the property to retrieve
+     * @param valueMatcher a matcher for the value obtained using the key of the examined object
+     * @return a <code>Matcher</code> matching if the value matches an expression using the key-value
+     * coding mechanism.
+     */
+    public static <T, V> Matcher<T> hasValueForKey(ERXKey<V> key, Matcher<V> valueMatcher) {
+        return HasValueForKeyMatcher.hasValueForKey(key.key(), valueMatcher);
     }
 
     /**
